@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id            String   @id @default(cuid())
   name          String?
@@ -26,7 +27,6 @@ model User {
   wallet        Wallet?
 }
 
-/* --------------------------- AUTH MODELS --------------------------- */
 
 model Account {
   id                String  @id @default(cuid())
@@ -47,6 +47,7 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -56,6 +57,7 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -64,7 +66,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-/* --------------------------- CONTACT FORM --------------------------- */
 
 model Contact {
   id        String   @id @default(cuid())
@@ -74,7 +75,6 @@ model Contact {
   createdAt DateTime @default(now())
 }
 
-/* --------------------------- FEEDBACK FORM --------------------------- */
 
 model Feedback {
   id        String   @id @default(cuid())
@@ -87,7 +87,6 @@ model Feedback {
   user User? @relation(fields: [userId], references: [id])
 }
 
-/* --------------------------- REFERRAL SYSTEM --------------------------- */
 
 model Referral {
   id         String   @id @default(cuid())
@@ -100,7 +99,6 @@ model Referral {
   receiver User? @relation("RecvReferral", fields: [receiverId], references: [id])
 }
 
-/* --------------------------- WALLET SYSTEM --------------------------- */
 
 model Wallet {
   id        String   @id @default(cuid())
@@ -112,6 +110,7 @@ model Wallet {
   transactions Transaction[]
 }
 
+
 model Transaction {
   id        String   @id @default(cuid())
   walletId  String
@@ -122,7 +121,6 @@ model Transaction {
   wallet Wallet @relation(fields: [walletId], references: [id])
 }
 
-/* --------------------------- WITHDRAW REQUEST --------------------------- */
 
 model WithdrawRequest {
   id        String   @id @default(cuid())
