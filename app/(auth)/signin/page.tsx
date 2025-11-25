@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 export default function AuthPage() {
   const { data: session } = useSession();
-  const [localUser, setLocalUser] = useState<{ name: string; email?: string } | null>(null);
+  const [localUser, setLocalUser] =
+    useState<{ name: string; email?: string } | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("dealhuntUser");
@@ -21,14 +22,28 @@ export default function AuthPage() {
     signIn(provider, { callbackUrl: "/" });
   };
 
-  const cardVariants = {
+  /** FIX 1 — Proper Framer Motion Variants **/
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 18 },
-    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.04 } },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { staggerChildren: 0.04 },
+    },
   };
 
-  const slideVariant = {
-    hidden: (dir: number) => ({ x: dir * 40, opacity: 0 }),
-    show: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 260, damping: 22 } },
+  /** FIX 2 — slide variants MUST be a valid Variant structure **/
+  const slideVariant: Variants = {
+    hidden: { opacity: 0, x: -40 },
+    show: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 260,
+        damping: 22,
+      },
+    },
   };
 
   return (
@@ -43,7 +58,6 @@ export default function AuthPage() {
           {/* Left Panel */}
           <motion.div
             variants={slideVariant}
-            custom={-1}
             className="flex flex-col items-center justify-center gap-6 p-10 bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 text-white order-1 md:order-none"
           >
             <div className="flex flex-col items-center gap-3">
@@ -59,35 +73,44 @@ export default function AuthPage() {
                 </div>
               )}
               <div className="text-center">
-                <h3 className="text-lg md:text-xl font-semibold">{userName || "Welcome!"}</h3>
+                <h3 className="text-lg md:text-xl font-semibold">
+                  {userName || "Welcome!"}
+                </h3>
                 <p className="text-xs md:text-sm opacity-80 mt-1">
                   {session ? "Signed in via Google" : "Sign in to continue"}
                 </p>
               </div>
             </div>
+
             <p className="max-w-xs text-center text-xs md:text-sm opacity-85 mt-2 md:mt-0">
-              DealHunt brings curated luxury deals right to you — sign in to save favorites, get offers and manage your account.
+              DealHunt brings curated luxury deals right to you — sign in to
+              save favorites, get offers and manage your account.
             </p>
           </motion.div>
 
           {/* Right Panel */}
-          <motion.div variants={slideVariant} custom={1} className="p-8 order-2">
+          <motion.div variants={slideVariant} className="p-8 order-2">
             <div className="max-w-md mx-auto">
               {!session ? (
                 <>
-                  {/* Google Button Only */}
+                  {/* Google Button */}
                   <div className="space-y-3">
                     <button
                       onClick={() => handleSocialSignIn("google")}
                       className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white hover:shadow transition"
                     >
-                      <img src="/google-icon.svg" alt="Google" className="w-5 h-5" />
+                      <img
+                        src="/google-icon.svg"
+                        alt="Google"
+                        className="w-5 h-5"
+                      />
                       Continue with Google
                     </button>
                   </div>
 
                   <div className="text-xs text-gray-400 text-center mt-4">
-                    By continuing you agree to our <a className="underline">Terms</a> and{" "}
+                    By continuing you agree to our{" "}
+                    <a className="underline">Terms</a> and{" "}
                     <a className="underline">Privacy Policy</a>.
                   </div>
                 </>
@@ -108,4 +131,4 @@ export default function AuthPage() {
       </div>
     </main>
   );
-    }
+        }
