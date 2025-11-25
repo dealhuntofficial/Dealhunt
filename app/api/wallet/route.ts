@@ -1,33 +1,67 @@
-// app/api/wallet/route.ts
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/options";
-import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+// GET WALLET INFO
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
 
-  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!userId)
+      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
 
-  let wallet = await prisma.wallet.findUnique({
-    where: { userId: user.id },
-    include: { transactions: { orderBy: { createdAt: "desc" }, take: 50 } },
-  });
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId },
+      include: { transactions: true },
+    });
 
-  if (!wallet) {
-    wallet = await prisma.wallet.create({ data: { userId: user.id, available: 0, pending: 0, withdrawn: 0 }, include: { transactions: true } });
+    return NextResponse.json({ success: true, wallet });
+  } catch (err) {
+    console.error("Wallet GET Error:", err);
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
+}
 
-  const summary = {
-    available: wallet.available,
-    pending: wallet.pending,
-    withdrawn: wallet.withdrawn,
-    totalEarned: wallet.available + wallet.pending + wallet.withdrawn,
-  };
+// ADD TRANSACTION (Credit/Debit)
+export async function POST(req: Request) {
+  try {
+    const { userId, type, amount } = await req.json();
 
-  const transactions = wallet.transactions.map((t) => ({ id: t.id, date: t.createdAt, description: t.description, type: t.type, amount: t.amount }));
+    if (!userId || !type || !amount)
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
-  return NextResponse.json({ summary, transactions });
+    // Ensure wallet exists
+    let wallet = await prisma.wallet.findUnique({ where: { userId } });
+
+    if (!wallet) {
+      wallet = await prisma.wallet.create({
+        data: { userId, balance: 0 },
+      });
+    }
+
+    // Update balance
+    const newBalance =
+      type === "credit"
+        ? wallet.balance + amount
+        : wallet.balance - amount;
+
+    const updatedWallet = await prisma.wallet.update({
+      where: { userId },
+      data: {
+        balance: newBalance,
+        transactions: {
+          create: {
+            type,
+            amount,
+          },
+        },
+      },
+      include: { transactions: true },
+    });
+
+    return NextResponse.json({ success: true, wallet: updatedWallet });
+  } catch (err) {
+    console.error("Wallet POST Error:", err);
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+  }
 }
