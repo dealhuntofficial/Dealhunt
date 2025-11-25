@@ -18,7 +18,15 @@ model User {
   updatedAt     DateTime @updatedAt
   accounts      Account[]
   sessions      Session[]
+
+  // Relations
+  feedbacks     Feedback[]
+  referralsSent Referral[] @relation("SentReferral")
+  referralsRecv Referral[] @relation("RecvReferral")
+  wallet        Wallet?
 }
+
+/* --------------------------- AUTH MODELS --------------------------- */
 
 model Account {
   id                String  @id @default(cuid())
@@ -33,7 +41,8 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -43,7 +52,8 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -54,3 +64,72 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+/* --------------------------- CONTACT FORM --------------------------- */
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+/* --------------------------- FEEDBACK FORM --------------------------- */
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?
+  message   String
+  rating    Int?
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+/* --------------------------- REFERRAL SYSTEM --------------------------- */
+
+model Referral {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String?
+  code       String   @unique
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentReferral", fields: [senderId], references: [id])
+  receiver User? @relation("RecvReferral", fields: [receiverId], references: [id])
+}
+
+/* --------------------------- WALLET SYSTEM --------------------------- */
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  walletId  String
+  type      String   // "credit" or "debit"
+  amount    Float
+  createdAt DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+}
+
+/* --------------------------- WITHDRAW REQUEST --------------------------- */
+
+model WithdrawRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
