@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+
+import { useSession, signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
 import {
   FaCopy,
   FaWhatsapp,
@@ -9,7 +11,21 @@ import {
 } from "react-icons/fa6";
 
 export default function ReferPage() {
+  const { data: session, status } = useSession();
   const [copied, setCopied] = useState(false);
+
+  // 🚫 If not logged in → redirect to signin
+  useEffect(() => {
+    if (status === "unauthenticated") signIn();
+  }, [status]);
+
+  if (status === "loading")
+    return (
+      <div className="text-center py-20 text-gray-500 text-lg">
+        Checking authentication...
+      </div>
+    );
+
   const referralCode = "DEALHUNT50";
   const referralLink = `https://dealhunt.in/ref/${referralCode}`;
 
@@ -27,11 +43,12 @@ export default function ReferPage() {
         <span className="text-yellow-600 font-semibold">
           earn up to ₹50
         </span>{" "}
-        for each successful referral when your friend makes a purchase!
+        for each successful referral!
       </p>
 
       <div className="mt-8 bg-white p-6 rounded-lg shadow text-center">
         <p className="text-lg text-gray-700">Your Referral Link:</p>
+
         <div className="flex items-center justify-center gap-2 mt-3">
           <input
             type="text"
@@ -46,11 +63,13 @@ export default function ReferPage() {
             <FaCopy />
           </button>
         </div>
+
         {copied && <p className="text-green-500 mt-2">Copied!</p>}
       </div>
 
       <div className="mt-8 text-center">
         <h2 className="text-xl font-semibold mb-4">Share via</h2>
+
         <div className="flex justify-center gap-4 text-2xl">
           <a
             href={`https://wa.me/?text=${encodeURIComponent(
@@ -61,6 +80,7 @@ export default function ReferPage() {
           >
             <FaWhatsapp />
           </a>
+
           <a
             href={`https://t.me/share/url?url=${encodeURIComponent(
               referralLink
@@ -70,6 +90,7 @@ export default function ReferPage() {
           >
             <FaTelegram />
           </a>
+
           <a
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
               referralLink
@@ -79,6 +100,7 @@ export default function ReferPage() {
           >
             <FaXTwitter />
           </a>
+
           <a
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
               referralLink
@@ -101,4 +123,4 @@ export default function ReferPage() {
       </div>
     </main>
   );
-              }
+}
