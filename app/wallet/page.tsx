@@ -1,7 +1,23 @@
 "use client";
+
+import { useSession, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function WalletPage() {
+  const { data: session, status } = useSession();
+
+  // 🚫 If not logged in → redirect to signin
+  useEffect(() => {
+    if (status === "unauthenticated") signIn();
+  }, [status]);
+
+  if (status === "loading")
+    return (
+      <div className="text-center py-20 text-gray-500 text-lg">
+        Checking authentication...
+      </div>
+    );
+
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({
     available: 0,
@@ -43,7 +59,9 @@ export default function WalletPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: withdrawAmount }),
       });
+
       const data = await res.json();
+
       if (res.ok) {
         alert("Withdrawal successful!");
         setSummary((prev) => ({
@@ -70,7 +88,7 @@ export default function WalletPage() {
   return (
     <main className="max-w-5xl mx-auto py-10 px-4 space-y-8">
       <h1 className="text-3xl font-bold text-yellow-600">My Wallet</h1>
-      <p className="text-gray-600">Track your DealHunt cashback & referral rewards.</p>
+      <p className="text-gray-600">Track your DealHunt cashback & rewards.</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
@@ -110,6 +128,7 @@ export default function WalletPage() {
         <h2 className="text-lg font-semibold mb-4 text-gray-800">
           Transaction History
         </h2>
+
         {transactions.length === 0 ? (
           <p className="text-gray-500 text-center">No transactions yet.</p>
         ) : (
@@ -132,7 +151,9 @@ export default function WalletPage() {
                     <td className="border p-2">{t.description}</td>
                     <td
                       className={`border p-2 font-semibold ${
-                        t.type === "Credit" ? "text-green-600" : "text-red-600"
+                        t.type === "Credit"
+                          ? "text-green-600"
+                          : "text-red-600"
                       }`}
                     >
                       {t.type}
@@ -156,4 +177,4 @@ export default function WalletPage() {
       </div>
     </main>
   );
-}
+        }
