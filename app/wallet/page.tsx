@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export default function WalletPage() {
   const { data: session, status } = useSession();
 
-  // 🚫 If not logged in → redirect to signin
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") signIn();
   }, [status]);
@@ -17,6 +17,8 @@ export default function WalletPage() {
         Checking authentication...
       </div>
     );
+
+  const userId = session?.user?.id;
 
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({
@@ -29,14 +31,25 @@ export default function WalletPage() {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
 
+  // LOAD WALLET DATA
   useEffect(() => {
+    if (!userId) return;
+
     const fetchWallet = async () => {
       try {
-        const res = await fetch("/api/wallet");
-        if (!res.ok) throw new Error("Failed to fetch wallet");
+        const res = await fetch(`/api/wallet?userId=${userId}`);
         const data = await res.json();
-        setSummary(data.summary);
-        setTransactions(data.transactions);
+
+        if (!res.ok) throw new Error(data.error);
+
+        setSummary({
+          available: data.wallet.balance,
+          pending: 0,
+          withdrawn: 0,
+          totalEarned: data.wallet.balance,
+        });
+
+        setTransactions(data.wallet.transactions || []);
       } catch (err) {
         console.error(err);
         alert("Error loading wallet data!");
@@ -44,34 +57,47 @@ export default function WalletPage() {
         setLoading(false);
       }
     };
-    fetchWallet();
-  }, []);
 
+    fetchWallet();
+  }, [userId]);
+
+  // WITHDRAW FUNCTION
   const handleWithdraw = async () => {
     if (!withdrawAmount || Number(withdrawAmount) <= 0) {
       alert("Enter valid amount");
       return;
     }
+
     setWithdrawing(true);
+
     try {
       const res = await fetch("/api/wallet/withdraw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: withdrawAmount }),
+        body: JSON.stringify({
+          userId,
+          amount: Number(withdrawAmount),
+        }),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        alert("Withdrawal successful!");
-        setSummary((prev) => ({
-          ...prev,
-          available: data.wallet.available,
-          withdrawn: data.wallet.withdrawn,
-        }));
-        setWithdrawAmount("");
-      } else alert(data.error || "Withdrawal failed!");
-    } catch {
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
+
+      alert("Withdrawal successful!");
+
+      setSummary((prev) => ({
+        ...prev,
+        available: data.wallet.balance,
+        withdrawn: prev.withdrawn + Number(withdrawAmount),
+      }));
+
+      setWithdrawAmount("");
+    } catch (err) {
+      console.error(err);
       alert("Something went wrong!");
     } finally {
       setWithdrawing(false);
@@ -90,6 +116,7 @@ export default function WalletPage() {
       <h1 className="text-3xl font-bold text-yellow-600">My Wallet</h1>
       <p className="text-gray-600">Track your DealHunt cashback & rewards.</p>
 
+      {/* Summary Boxes */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: "Available", value: summary.available, color: "text-green-600" },
@@ -104,6 +131,7 @@ export default function WalletPage() {
         ))}
       </div>
 
+      {/* Withdraw Section */}
       <div className="text-center space-y-3">
         <input
           type="number"
@@ -124,6 +152,7 @@ export default function WalletPage() {
         </button>
       </div>
 
+      {/* Transaction History */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4 text-gray-800">
           Transaction History
@@ -148,10 +177,10 @@ export default function WalletPage() {
                     <td className="border p-2">
                       {new Date(t.date).toLocaleDateString()}
                     </td>
-                    <td className="border p-2">{t.description}</td>
+                    <td className="border p-2">{t.description || "—"}</td>
                     <td
                       className={`border p-2 font-semibold ${
-                        t.type === "Credit"
+                        t.type?.toLowerCase() === "credit"
                           ? "text-green-600"
                           : "text-red-600"
                       }`}
@@ -167,6 +196,7 @@ export default function WalletPage() {
         )}
       </div>
 
+      {/* Back Button */}
       <div className="text-center">
         <a
           href="/"
@@ -177,4 +207,4 @@ export default function WalletPage() {
       </div>
     </main>
   );
-        }
+      }
