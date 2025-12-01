@@ -9,7 +9,7 @@ interface Category {
   image: string;
 }
 
-// All categories including extra ones
+// All categories (Boys / Girls removed)
 const allCategories: Category[] = [
   { name: "Watches", slug: "watches", image: "/images/categories/watches.jpg" },
   { name: "Perfumes", slug: "perfumes", image: "/images/categories/perfumes.jpg" },
@@ -19,8 +19,6 @@ const allCategories: Category[] = [
   { name: "Footwear", slug: "footwear", image: "/images/categories/footwear.jpg" },
   { name: "Men", slug: "men", image: "/images/categories/men.jpg" },
   { name: "Women", slug: "women", image: "/images/categories/women.jpg" },
-  { name: "Boys", slug: "boys", image: "/images/categories/boys.jpg" },
-  { name: "Girls", slug: "girls", image: "/images/categories/girls.jpg" },
   { name: "Kids", slug: "kids", image: "/images/categories/kids.jpg" },
   { name: "Furniture", slug: "furniture", image: "/images/categories/furniture.jpg" },
   { name: "Music", slug: "music", image: "/images/categories/music.jpg" },
@@ -42,7 +40,6 @@ interface Props {
 export default function CategoryGrid({ mode }: Props) {
   const isLuxury = mode === "luxury";
 
-  // Filter categories for luxury
   const luxuryCategories = [
     "Watches",
     "Perfumes",
@@ -57,7 +54,6 @@ export default function CategoryGrid({ mode }: Props) {
   const displayCategories = isLuxury
     ? allCategories.filter((cat) => luxuryCategories.includes(cat.name))
     : [
-        // For general, move Smartphones + Laptop to start
         ...allCategories.filter((cat) =>
           ["Smartphones", "Laptop"].includes(cat.name)
         ),
@@ -81,7 +77,6 @@ export default function CategoryGrid({ mode }: Props) {
           Shop by Category
         </h2>
 
-        {/* Horizontal scrollable strip */}
         <div className="flex space-x-3 overflow-x-auto scrollbar-hide py-4">
           {displayCategories.map((cat) => (
             <Link
@@ -104,7 +99,6 @@ export default function CategoryGrid({ mode }: Props) {
                   className="object-cover group-hover:scale-110 transition-transform duration-300 relative"
                 />
               </div>
-              {/* Responsive text size for mobile / desktop */}
               <span
                 className={`mt-1 font-medium group-hover:font-semibold transition-colors text-center break-words ${
                   isLuxury
@@ -118,7 +112,6 @@ export default function CategoryGrid({ mode }: Props) {
           ))}
         </div>
 
-        {/* See All Categories */}
         <div className="text-center mt-8">
           <Link
             href="/categories"
