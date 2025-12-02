@@ -3,39 +3,38 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 text-white mt-6 animate-banner overflow-hidden">
+    <section className="relative text-white mt-6 animate-banner overflow-hidden">
 
-      {/* Background Image */}
-      <div className="absolute inset-0 w-full h-full">
+      {/* FIXED HEIGHTS */}
+      <div className="absolute inset-0 h-[300px] sm:h-[450px] md:h-[500px] w-full">
         <Image
           src="/images/banners/general-hero.jpg"
           alt="General Deals"
           fill
           priority
           className="
-            object-contain    /* Mobile – full image, no crop */
-            sm:object-cover   /* Desktop – hero style cropping */
+            object-cover          /* Mobile & Desktop perfect fill */
             opacity-40
           "
         />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center py-24 px-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg animate-slideDown">
+      <div className="relative z-10 max-w-4xl mx-auto text-center h-[300px] sm:h-[450px] md:h-[500px] flex flex-col items-center justify-center px-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-lg animate-slideDown">
           Smart Deals for Everyday You 💙
         </h1>
 
-        <p className="text-lg font-bold mb-4 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
+        <p className="text-base sm:text-lg font-bold mb-3 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
           Affordable • Trendy • Trusted
         </p>
 
-        <p className="text-lg md:text-xl mb-6 opacity-90 animate-fadeIn">
+        <p className="text-sm sm:text-lg md:text-xl mb-5 opacity-90 animate-fadeIn">
           Discover best-value products — gadgets, fashion, and lifestyle offers updated daily.
         </p>
 
         <a
           href="/products"
-          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 py-2 sm:px-8 sm:py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
         >
           Explore Deals
         </a>
