@@ -3,58 +3,44 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative text-white mt-6 animate-banner overflow-hidden">
+    <section className="relative w-full overflow-hidden">
 
-      {/* RESPONSIVE HEIGHTS */}
-      <div className="absolute inset-0 h-[220px] sm:h-[300px] md:h-[450px] lg:h-[520px] w-full">
+      {/* FIXED HEIGHT — Mobile to Desktop */}
+      <div className="relative w-full h-[240px] sm:h-[300px] md:h-[420px] lg:h-[520px]">
+
         <Image
           src="/images/banners/general-hero.jpg"
           alt="General Deals"
           fill
           priority
-          className="object-cover object-center"   // image center aligned, no fade
+          className="object-cover object-center" 
+          // object-center ensures center focus ALWAYS visible
         />
       </div>
 
-      {/* CONTENT — perfectly centered in that height */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center 
-                      h-[220px] sm:h-[300px] md:h-[450px] lg:h-[520px]
-                      flex flex-col items-center justify-center px-4">
+      {/* CONTENT ON TOP OF IMAGE */}
+      <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 z-10">
 
-        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold mb-2 drop-shadow-lg animate-slideDown">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg">
           Smart Deals for Everyday You 💙
         </h1>
 
-        <p className="text-sm sm:text-lg font-bold mb-2 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
+        <p className="mt-1 text-sm sm:text-base md:text-lg font-semibold text-white opacity-90">
           Affordable • Trendy • Trusted
         </p>
 
-        <p className="text-xs sm:text-base md:text-xl mb-4 opacity-95 animate-fadeIn">
+        <p className="mt-1 text-xs sm:text-sm md:text-lg text-white opacity-90 max-w-xl">
           Discover best-value products — gadgets, fashion, lifestyle offers updated daily.
         </p>
 
         <a
           href="/products"
-          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-5 py-2 sm:px-7 sm:py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
+          className="mt-4 bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 py-2 sm:px-8 sm:py-3 rounded-full shadow-lg transition transform hover:scale-105"
         >
           Explore Deals
         </a>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-banner { animation: fadeIn 0.8s ease-in-out; }
-        .animate-slideDown { animation: slideDown 0.8s ease-out forwards; }
-        .animate-fadeIn { animation: fadeIn 1s ease-out forwards; }
-        .delay-300 { animation-delay: 0.3s; }
-      `}</style>
     </section>
   );
 }
