@@ -3,21 +3,24 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative mt-6 overflow-hidden">
+    <section className="relative bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 text-white mt-6 animate-banner overflow-hidden">
 
-      {/* Background Image without fade */}
-      <Image
-        src="/images/banners/general-hero.jpg"
-        alt="General Deals"
-        fill
-        priority
-        className="object-cover object-center" 
-      />
+      {/* Background Image */}
+      <div className="absolute inset-0 w-full h-full">
+        <Image
+          src="/images/banners/general-hero.jpg"
+          alt="General Deals"
+          fill
+          priority
+          className="
+            object-contain    /* Mobile – full image, no crop */
+            sm:object-cover   /* Desktop – hero style cropping */
+            opacity-40
+          "
+        />
+      </div>
 
-      {/* Optional subtle overlay (remove if not needed) */}
-      <div className="absolute inset-0 bg-black/30"></div>
-
-      <div className="relative z-10 max-w-4xl mx-auto text-center py-24 px-4 text-white">
+      <div className="relative z-10 max-w-4xl mx-auto text-center py-24 px-4">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg animate-slideDown">
           Smart Deals for Everyday You 💙
         </h1>
@@ -47,11 +50,11 @@ export default function HeroBannerGeneral() {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        .animate-banner { animation: fadeIn 0.8s ease-in-out; }
         .animate-slideDown { animation: slideDown 0.8s ease-out forwards; }
         .animate-fadeIn { animation: fadeIn 1s ease-out forwards; }
         .delay-300 { animation-delay: 0.3s; }
       `}</style>
-
     </section>
   );
 }
