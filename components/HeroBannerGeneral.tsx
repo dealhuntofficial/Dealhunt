@@ -5,36 +5,37 @@ export default function HeroBannerGeneral() {
   return (
     <section className="relative text-white mt-6 animate-banner overflow-hidden">
 
-      {/* FIXED HEIGHTS */}
-      <div className="absolute inset-0 h-[300px] sm:h-[450px] md:h-[500px] w-full">
+      {/* RESPONSIVE HEIGHTS */}
+      <div className="absolute inset-0 h-[220px] sm:h-[300px] md:h-[450px] lg:h-[520px] w-full">
         <Image
           src="/images/banners/general-hero.jpg"
           alt="General Deals"
           fill
           priority
-          className="
-            object-cover          /* Mobile & Desktop perfect fill */
-            opacity-40
-          "
+          className="object-cover object-center"   // image center aligned, no fade
         />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center h-[300px] sm:h-[450px] md:h-[500px] flex flex-col items-center justify-center px-4">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-lg animate-slideDown">
+      {/* CONTENT — perfectly centered in that height */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center 
+                      h-[220px] sm:h-[300px] md:h-[450px] lg:h-[520px]
+                      flex flex-col items-center justify-center px-4">
+
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold mb-2 drop-shadow-lg animate-slideDown">
           Smart Deals for Everyday You 💙
         </h1>
 
-        <p className="text-base sm:text-lg font-bold mb-3 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
+        <p className="text-sm sm:text-lg font-bold mb-2 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
           Affordable • Trendy • Trusted
         </p>
 
-        <p className="text-sm sm:text-lg md:text-xl mb-5 opacity-90 animate-fadeIn">
-          Discover best-value products — gadgets, fashion, and lifestyle offers updated daily.
+        <p className="text-xs sm:text-base md:text-xl mb-4 opacity-95 animate-fadeIn">
+          Discover best-value products — gadgets, fashion, lifestyle offers updated daily.
         </p>
 
         <a
           href="/products"
-          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 py-2 sm:px-8 sm:py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-5 py-2 sm:px-7 sm:py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
         >
           Explore Deals
         </a>
