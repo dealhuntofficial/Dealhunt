@@ -3,36 +3,36 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative text-white mt-6 animate-banner overflow-hidden
-      h-[320px] sm:h-[380px] md:h-[450px] lg:h-[520px]">
+    <section className="relative mt-6 overflow-hidden">
 
-      {/* Background Image */}
+      {/* Background Image without fade */}
       <Image
         src="/images/banners/general-hero.jpg"
         alt="General Deals"
         fill
         priority
-        className="object-cover sm:object-cover md:object-cover object-top opacity-40"
+        className="object-cover object-center" 
       />
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center py-16 md:py-24 px-4">
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-lg animate-slideDown">
+      {/* Optional subtle overlay (remove if not needed) */}
+      <div className="absolute inset-0 bg-black/30"></div>
+
+      <div className="relative z-10 max-w-4xl mx-auto text-center py-24 px-4 text-white">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg animate-slideDown">
           Smart Deals for Everyday You 💙
         </h1>
 
-        <p className="text-md md:text-lg font-bold mb-4 
-          bg-gradient-to-r from-blue-300 via-white to-blue-300 
-          bg-clip-text text-transparent animate-pulse">
+        <p className="text-lg font-bold mb-4 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent animate-pulse">
           Affordable • Trendy • Trusted
         </p>
 
-        <p className="text-sm md:text-xl mb-6 opacity-90 animate-fadeIn">
+        <p className="text-lg md:text-xl mb-6 opacity-90 animate-fadeIn">
           Discover best-value products — gadgets, fashion, and lifestyle offers updated daily.
         </p>
 
         <a
           href="/products"
-          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 md:px-8 py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition transform hover:scale-105 animate-fadeIn delay-300"
         >
           Explore Deals
         </a>
@@ -47,11 +47,11 @@ export default function HeroBannerGeneral() {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-banner { animation: fadeIn 0.8s ease-in-out; }
         .animate-slideDown { animation: slideDown 0.8s ease-out forwards; }
         .animate-fadeIn { animation: fadeIn 1s ease-out forwards; }
         .delay-300 { animation-delay: 0.3s; }
       `}</style>
+
     </section>
   );
 }
