@@ -3,43 +3,51 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative w-full mt-6 overflow-hidden">
-
-      <div className="relative w-full h-[260px] md:h-[480px]">
-
-        {/* MOBILE = COVER, DESKTOP = CONTAIN */}
+    <section className="relative w-full h-[420px] md:h-[520px] overflow-hidden flex items-center justify-center">
+      
+      {/* Desktop Image */}
+      <div className="hidden md:block absolute inset-0">
         <Image
-          src="/images/banners/general-hero.jpg"
-          alt="General Deals"
+          src="/images/banners/hero-desktop.jpg"
+          alt="DealHunt Desktop Banner"
           fill
           priority
-          className="object-cover md:object-contain"
+          className="object-cover"
         />
-
-        {/* Overlay Content */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 bg-black/10">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-xl mb-3">
-            Smart Deals for Everyday You 💙
-          </h1>
-
-          <p className="text-lg font-bold mb-3 bg-gradient-to-r from-blue-200 via-white to-blue-200 bg-clip-text text-transparent drop-shadow-lg">
-            Affordable • Trendy • Trusted
-          </p>
-
-          <p className="text-md md:text-xl mb-5 text-white drop-shadow-lg">
-            Discover best-value products — gadgets, fashion, and lifestyle offers updated daily.
-          </p>
-
-          <a
-            href="/products"
-            className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition transform hover:scale-105"
-          >
-            Explore Deals
-          </a>
-        </div>
-
       </div>
 
+      {/* Mobile Image */}
+      <div className="md:hidden absolute inset-0">
+        <Image
+          src="/images/banners/hero-mobile.jpg"
+          alt="DealHunt Mobile Banner"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
+
+      {/* Overlay Content */}
+      <div className="relative z-10 text-center px-5 max-w-2xl">
+        <h1 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight
+                       bg-gradient-to-r from-purple-600 via-blue-600 to-blue-400 
+                       bg-clip-text text-transparent drop-shadow-md">
+          Smart Deals<br />for Everyday You 💙
+        </h1>
+
+        <p className="text-white text-lg font-semibold mb-4 drop-shadow">
+          Affordable • Trendy • Trusted
+        </p>
+
+        <a
+          href="/products"
+          className="bg-blue-600 hover:bg-blue-500 text-white font-semibold 
+                     px-7 py-3 rounded-full shadow-lg transition transform 
+                     hover:scale-105 inline-block"
+        >
+          Explore Deals
+        </a>
+      </div>
     </section>
   );
 }
