@@ -3,21 +3,20 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative w-full mt-6">
+    <section className="relative w-full mt-6 overflow-hidden">
 
-      {/* FIXED ASPECT RATIO WRAPPER (keeps image shape perfect on mobile) */}
-      <div className="relative w-full aspect-[16/9]">
+      <div className="relative w-full h-[260px] md:h-[480px]">
 
-        {/* PERFECT NON-CROPPED IMAGE */}
+        {/* MOBILE = COVER, DESKTOP = CONTAIN */}
         <Image
           src="/images/banners/general-hero.jpg"
           alt="General Deals"
           fill
           priority
-          className="object-contain"
+          className="object-cover md:object-contain"
         />
 
-        {/* TEXT OVERLAY ON IMAGE */}
+        {/* Overlay Content */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 bg-black/10">
           <h1 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-xl mb-3">
             Smart Deals for Everyday You 💙
@@ -38,6 +37,7 @@ export default function HeroBannerGeneral() {
             Explore Deals
           </a>
         </div>
+
       </div>
 
     </section>
