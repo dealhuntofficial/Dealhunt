@@ -3,37 +3,32 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section
-      className="relative w-full overflow-hidden mt-6"
-      style={{ height: "auto" }}
-    >
-      {/* Background Image */}
-      <div className="absolute inset-0 w-full h-full">
+    <section className="w-full mt-6">
+      
+      {/* PERFECT NON-CROPPED IMAGE */}
+      <div className="w-full relative">
         <Image
           src="/images/banners/general-hero.jpg"
           alt="General Deals"
-          fill
+          width={2000}
+          height={1000}
+          className="w-full h-auto object-contain"
           priority
-          className="object-contain md:object-cover"
         />
       </div>
 
-      {/* Overlay to make text readable */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/20 z-0"></div>
-
-      {/* Text Section */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center py-16 md:py-24 px-4">
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
+      {/* TEXT CONTENT (separate block, no overlay, no overlapping) */}
+      <div className="text-center mt-4 px-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold mb-3">
           Smart Deals for Everyday You 💙
         </h1>
 
-        <p className="text-lg font-bold mb-4 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent">
+        <p className="text-lg font-bold mb-3 bg-gradient-to-r from-blue-300 via-blue-500 to-blue-300 bg-clip-text text-transparent">
           Affordable • Trendy • Trusted
         </p>
 
-        <p className="text-lg md:text-xl mb-6 opacity-90">
-          Discover best-value products — gadgets, fashion, and lifestyle offers
-          updated daily.
+        <p className="text-lg md:text-xl mb-5 opacity-90">
+          Discover best-value products — gadgets, fashion, and lifestyle offers updated daily.
         </p>
 
         <a
