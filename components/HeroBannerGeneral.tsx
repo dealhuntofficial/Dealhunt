@@ -8,7 +8,7 @@ export default function HeroBannerGeneral() {
       {/* Desktop Image */}
       <div className="hidden md:block absolute inset-0">
         <Image
-          src="/images/banners/hero-desktop.jpg"
+          src="public/images/banners/hero-desktop.jpg"
           alt="DealHunt Desktop Banner"
           fill
           priority
@@ -19,7 +19,7 @@ export default function HeroBannerGeneral() {
       {/* Mobile Image */}
       <div className="md:hidden absolute inset-0">
         <Image
-          src="/images/banners/hero-mobile.jpg"
+          src="public/images/banners/hero-mobile.jpg"
           alt="DealHunt Mobile Banner"
           fill
           priority
