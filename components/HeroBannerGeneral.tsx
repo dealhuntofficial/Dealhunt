@@ -3,12 +3,12 @@ import Image from "next/image";
 
 export default function HeroBannerGeneral() {
   return (
-    <section className="relative w-full h-[420px] md:h-[520px] overflow-hidden flex items-center justify-center">
-      
+    <section className="relative w-full h-[420px] md:h-[520px] overflow-hidden flex items-end justify-center">
+
       {/* Desktop Image */}
       <div className="hidden md:block absolute inset-0">
         <Image
-          src="public/images/banners/hero-desktop.jpg"
+          src="/images/banners/hero-desktop.jpg"
           alt="DealHunt Desktop Banner"
           fill
           priority
@@ -19,7 +19,7 @@ export default function HeroBannerGeneral() {
       {/* Mobile Image */}
       <div className="md:hidden absolute inset-0">
         <Image
-          src="public/images/banners/hero-mobile.jpg"
+          src="/images/banners/hero-mobile.jpg"
           alt="DealHunt Mobile Banner"
           fill
           priority
@@ -27,18 +27,8 @@ export default function HeroBannerGeneral() {
         />
       </div>
 
-      {/* Overlay Content */}
-      <div className="relative z-10 text-center px-5 max-w-2xl">
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight
-                       bg-gradient-to-r from-purple-600 via-blue-600 to-blue-400 
-                       bg-clip-text text-transparent drop-shadow-md">
-          Smart Deals<br />for Everyday You 💙
-        </h1>
-
-        <p className="text-white text-lg font-semibold mb-4 drop-shadow">
-          Affordable • Trendy • Trusted
-        </p>
-
+      {/* CTA Button */}
+      <div className="relative z-10 mb-10">
         <a
           href="/products"
           className="bg-blue-600 hover:bg-blue-500 text-white font-semibold 
@@ -48,6 +38,7 @@ export default function HeroBannerGeneral() {
           Explore Deals
         </a>
       </div>
+
     </section>
   );
 }
