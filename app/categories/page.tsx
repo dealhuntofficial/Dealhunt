@@ -1,19 +1,35 @@
 "use client";
 
-import Link from "next/link";
+import CategoryCard from "@/components/CategoryCard";
 
 const categories = [
-  "Watches",
-  "Shoes",
-  "Bags",
-  "Electronics",
-  "Jewelry",
-  "Fashion",
+  { name: "Watches", slug: "watches" },
+  { name: "Perfumes", slug: "perfumes" },
+  { name: "Jewelry", slug: "jewelry" },
+  { name: "Bags", slug: "bags" },
+  { name: "Sunglasses", slug: "sunglasses" },
+  { name: "Footwear", slug: "footwear" },
+  { name: "Men", slug: "men" },
+  { name: "Women", slug: "women" },
+  { name: "Kids", slug: "kids" },
+  { name: "Furniture", slug: "furniture" },
+  { name: "Music", slug: "music" },
+  { name: "Education", slug: "education" },
+  { name: "Home Decor", slug: "home-decor" },
+  { name: "Kitchen", slug: "kitchen" },
+  { name: "Electronics", slug: "electronics" },
+  { name: "Beauty", slug: "beauty" },
+  { name: "Toys", slug: "toys" },
+  { name: "Smartphones", slug: "smartphones" },
+  { name: "Laptop", slug: "laptop" },
+  { name: "Undergarments", slug: "undergarments" },
+  { name: "Others", slug: "others" },
 ];
 
 export default function CategoriesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => window.history.back()}
@@ -21,24 +37,22 @@ export default function CategoriesPage() {
         >
           ⬅ Back
         </button>
+
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           Shop by Categories
         </h1>
       </div>
 
-      {/* Category Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {categories.map((cat, idx) => (
-          <Link
-            key={idx}
-            href={`/products?search=${cat}`}
-            className="bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center justify-center text-lg font-semibold hover:bg-yellow-50 transition"
-          >
-            {cat}
-          </Link>
+        {categories.map(cat => (
+          <CategoryCard
+            key={cat.slug}
+            title={cat.name}
+            slug={cat.slug}
+            image={null} // fallback SVG icon for all
+          />
         ))}
       </div>
     </div>
   );
-                   }
-    
+}
