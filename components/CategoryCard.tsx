@@ -1,43 +1,28 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 
 interface Props {
   title: string;
   slug: string;
-  image?: string | null;
+  image?: string; // URL for main category image
 }
 
 export default function CategoryCard({ title, slug, image }: Props) {
-  const fallback = svgForCategory(title, 600);
-  const src = image || fallback;
-
   return (
-    <Link
-      href={`/products?category=${encodeURIComponent(slug)}`}
-      className="group block bg-white rounded-xl shadow hover:shadow-lg p-4 text-center transition"
-    >
-      <div className="w-28 h-28 mx-auto relative">
-        {src.startsWith("data:") ? (
-          <img
-            src={src}
-            alt={title}
-            className="w-full h-full object-cover rounded-lg"
-          />
-        ) : (
+    <Link href={`/categories/${slug}`}>
+      <div className="p-4 border rounded-xl flex flex-col items-center hover:shadow-md transition">
+        {image && (
           <Image
-            src={src}
+            src={image}
             alt={title}
-            fill
-            className="object-cover rounded-lg"
+            width={80}
+            height={80}
+            className="rounded-xl object-cover"
           />
         )}
-      </div>
 
-      <div className="mt-3 text-sm font-semibold text-gray-800 group-hover:text-blue-600">
-        {title}
+        <h3 className="mt-2 text-center font-medium">{title}</h3>
       </div>
     </Link>
   );
-            }
+}
