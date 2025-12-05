@@ -49,7 +49,7 @@ export default function CategoriesPage() {
             key={cat.slug}
             title={cat.name}
             slug={cat.slug}
-            image={null} // fallback SVG icon for all
+            image={cat.image} // fallback SVG icon for all
           />
         ))}
       </div>
