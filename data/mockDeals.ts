@@ -36,5 +36,4 @@ export const mockDeals = [
     dealUrl: "https://example.com/deal/s1",
     merchant: "Meesho",
   },
-  // add more mock deals — you can replace dataset with real API results later
 ];
