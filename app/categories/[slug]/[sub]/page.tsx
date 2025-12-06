@@ -1,4 +1,3 @@
-// app/categories/[slug]/[sub]/page.tsx
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
@@ -44,4 +43,4 @@ export default async function SubcategoryDealsPage({ params, searchParams }: Pro
       </section>
     </div>
   );
-          }
+}
