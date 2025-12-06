@@ -1,4 +1,3 @@
-// app/categories/[slug]/page.tsx
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
@@ -16,7 +15,7 @@ export default async function CategoryDealsPage({ params, searchParams }: Props)
   if (searchParams?.maxPrice) qs.set("maxPrice", String(searchParams.maxPrice));
   if (searchParams?.merchant) qs.set("merchant", String(searchParams.merchant));
   if (searchParams?.sort) qs.set("sort", String(searchParams.sort));
-  // fetch mixed category deals
+
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/deals?category=${encodeURIComponent(slug)}&${qs.toString()}`, { cache: "no-store" });
   const json = res.ok ? await res.json() : { deals: [] };
   const deals = json.deals || [];
