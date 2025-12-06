@@ -1,30 +1,7 @@
 "use client";
 
 import CategoryCard from "@/components/CategoryCard";
-
-const categories = [
-  { name: "Watches", slug: "watches" },
-  { name: "Perfumes", slug: "perfumes" },
-  { name: "Jewelry", slug: "jewelry" },
-  { name: "Bags", slug: "bags" },
-  { name: "Sunglasses", slug: "sunglasses" },
-  { name: "Footwear", slug: "footwear" },
-  { name: "Men", slug: "men" },
-  { name: "Women", slug: "women" },
-  { name: "Kids", slug: "kids" },
-  { name: "Furniture", slug: "furniture" },
-  { name: "Music", slug: "music" },
-  { name: "Education", slug: "education" },
-  { name: "Home Decor", slug: "home-decor" },
-  { name: "Kitchen", slug: "kitchen" },
-  { name: "Electronics", slug: "electronics" },
-  { name: "Beauty", slug: "beauty" },
-  { name: "Toys", slug: "toys" },
-  { name: "Smartphones", slug: "smartphones" },
-  { name: "Laptop", slug: "laptop" },
-  { name: "Undergarments", slug: "undergarments" },
-  { name: "Others", slug: "others" },
-];
+import { categories } from "@/data/categories"; // ✅ Correct Import
 
 export default function CategoriesPage() {
   return (
@@ -49,7 +26,7 @@ export default function CategoriesPage() {
             key={cat.slug}
             title={cat.name}
             slug={cat.slug}
-            image={cat.image} // fallback SVG icon for all
+            image={cat.image} // ✅ Now image exists
           />
         ))}
       </div>
