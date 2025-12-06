@@ -1,4 +1,3 @@
-// app/api/deals/route.ts
 import { NextResponse } from "next/server";
 import { mockDeals } from "@/data/mockDeals";
 
@@ -30,4 +29,4 @@ export async function GET(req: Request) {
   } catch (err) {
     return NextResponse.json({ deals: [], error: (err as any).message || "Server" }, { status: 500 });
   }
-  }
+}
