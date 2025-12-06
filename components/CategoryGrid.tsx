@@ -9,7 +9,6 @@ interface Category {
   image: string;
 }
 
-// All categories (Boys / Girls removed)
 const allCategories: Category[] = [
   { name: "Watches", slug: "watches", image: "/images/categories/watches.jpg" },
   { name: "Perfumes", slug: "perfumes", image: "/images/categories/perfumes.jpg" },
@@ -23,8 +22,8 @@ const allCategories: Category[] = [
   { name: "Furniture", slug: "furniture", image: "/images/categories/furniture.jpg" },
   { name: "Music", slug: "music", image: "/images/categories/music.jpg" },
   { name: "Education", slug: "education", image: "/images/categories/education.jpg" },
-  { name: "home decor", slug: "home-decor", image: "/images/categories/home-decor.jpg" },
-  { name: "kitchen", slug: "kitchen", image: "/images/categories/kitchen.jpg" },
+  { name: "Home Decor", slug: "home-decor", image: "/images/categories/home-decor.jpg" },
+  { name: "Kitchen", slug: "kitchen", image: "/images/categories/kitchen.jpg" },
   { name: "Electronics", slug: "electronics", image: "/images/categories/electronics.jpg" },
   { name: "Beauty", slug: "beauty", image: "/images/categories/beauty.jpg" },
   { name: "Toys", slug: "toys", image: "/images/categories/toys.jpg" },
@@ -82,7 +81,7 @@ export default function CategoryGrid({ mode }: Props) {
           {displayCategories.map((cat) => (
             <Link
               key={cat.slug}
-              href={`/products?category=${encodeURIComponent(cat.slug)}`}
+              href={`/categories/${cat.slug}`}
               className="flex-shrink-0 w-1/6 sm:w-1/6 md:w-32 flex flex-col items-center text-center group cursor-pointer"
             >
               <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 shadow-lg transition-all duration-300">
@@ -128,4 +127,4 @@ export default function CategoryGrid({ mode }: Props) {
       </div>
     </section>
   );
-   }
+  }
