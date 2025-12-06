@@ -1,59 +1,60 @@
 // data/subcategories.ts
-
-export const subCategories: Record<string, { name: string; slug: string; icon: string }[]> = {
-
-  /* -----------------------------------------------
-     1️⃣ WATCHES SUBCATEGORIES (General + Brand Mix)
-  ------------------------------------------------*/
+export const subCategories: Record<string, { name: string; slug: string }[]> = {
   watches: [
-    { name: "Smartwatches", slug: "smartwatches", icon: "⌚" },
-    { name: "Analog Watches", slug: "analog-watches", icon: "🕰️" },
-    { name: "Digital Watches", slug: "digital-watches", icon: "⏱️" },
-    { name: "Luxury Watches", slug: "luxury-watches", icon: "💎" },
-    { name: "Sports Watches", slug: "sports-watches", icon: "🏃‍♂️" },
-
-    // ⭐ Brand subcategories
-    { name: "Rolex", slug: "rolex", icon: "👑" },
-    { name: "Fossil", slug: "fossil", icon: "🪨" },
-    { name: "Casio", slug: "casio", icon: "🎛️" },
-    { name: "Titan", slug: "titan", icon: "🛡️" },
-    { name: "Boat Smartwatch", slug: "boat-smartwatch", icon: "🚤" },
+    { name: "Smart Watches", slug: "smart-watches" },
+    { name: "Analog Watches", slug: "analog-watches" },
+    { name: "Digital Watches", slug: "digital-watches" },
+    { name: "Luxury Watches", slug: "luxury-watches" },
+    { name: "Sports Watches", slug: "sports-watches" },
+    { name: "Steel Strap", slug: "steel-strap" },
+    { name: "Leather Strap", slug: "leather-strap" },
+    { name: "Kids Watches", slug: "kids-watches" },
+    { name: "Classic Watches", slug: "classic-watches" },
+    { name: "Waterproof", slug: "waterproof" },
   ],
-
-  /* -----------------------------------------------
-     2️⃣ SMARTPHONES SUBCATEGORIES
-  ------------------------------------------------*/
-  smartphones: [
-    { name: "Android Phones", slug: "android", icon: "🤖" },
-    { name: "iPhones", slug: "iphone", icon: "📱" },
-    { name: "5G Smartphones", slug: "5g-phones", icon: "📡" },
-    { name: "Gaming Phones", slug: "gaming-phones", icon: "🎮" },
-    { name: "Camera Phones", slug: "camera-phones", icon: "📸" },
-
-    // ⭐ Brand subcategories
-    { name: "Samsung", slug: "samsung", icon: "🌌" },
-    { name: "Apple", slug: "apple", icon: "🍎" },
-    { name: "Xiaomi", slug: "xiaomi", icon: "🔥" },
-    { name: "OnePlus", slug: "oneplus", icon: "➕" },
-    { name: "Realme", slug: "realme", icon: "✨" },
+  perfumes: [
+    { name: "Men Perfume", slug: "men-perfume" },
+    { name: "Women Perfume", slug: "women-perfume" },
+    { name: "Unisex Perfume", slug: "unisex-perfume" },
+    { name: "Body Mists", slug: "body-mists" },
+    { name: "Luxury Perfumes", slug: "luxury-perfumes" },
+    { name: "Long Lasting", slug: "long-lasting" },
+    { name: "Pocket Sprays", slug: "pocket-sprays" },
+    { name: "Gift Sets", slug: "gift-sets" },
+    { name: "Attars", slug: "attars" },
+    { name: "Sample Packs", slug: "sample-packs" },
   ],
-
-  /* -----------------------------------------------
-     3️⃣ BAGS SUBCATEGORIES
-  ------------------------------------------------*/
+  jewelry: [
+    { name: "Rings", slug: "rings" },
+    { name: "Necklaces", slug: "necklaces" },
+    { name: "Bracelets", slug: "bracelets" },
+    { name: "Earrings", slug: "earrings" },
+    { name: "Anklets", slug: "anklets" },
+    { name: "Bangles", slug: "bangles" },
+    { name: "Kids Jewelry", slug: "kids-jewelry" },
+    { name: "Gold Jewelry", slug: "gold-jewelry" },
+    { name: "Silver Jewelry", slug: "silver-jewelry" },
+    { name: "Stone Jewelry", slug: "stone-jewelry" },
+  ],
+  // minimal examples for other categories (expand as needed)
   bags: [
-    { name: "Handbags", slug: "handbags", icon: "👜" },
-    { name: "Backpacks", slug: "backpacks", icon: "🎒" },
-    { name: "Travel Bags", slug: "travel-bags", icon: "🧳" },
-    { name: "Laptop Bags", slug: "laptop-bags", icon: "💼" },
-    { name: "Tote Bags", slug: "tote-bags", icon: "🛍️" },
-
-    // ⭐ Brand subcategories
-    { name: "Nike Bags", slug: "nike-bags", icon: "✔️" },
-    { name: "Adidas Bags", slug: "adidas-bags", icon: "🏅" },
-    { name: "Wildcraft", slug: "wildcraft", icon: "🌲" },
-    { name: "Skybags", slug: "skybags", icon: "☁️" },
-    { name: "American Tourister", slug: "american-tourister", icon: "🇺🇸" },
+    { name: "Backpacks", slug: "backpacks" },
+    { name: "Handbags", slug: "handbags" },
+    { name: "Tote Bags", slug: "tote-bags" },
+    { name: "Laptop Bags", slug: "laptop-bags" },
+    { name: "Travel Bags", slug: "travel-bags" },
+    { name: "Sling Bags", slug: "sling-bags" },
+    { name: "Wallets", slug: "wallets" },
+    { name: "Kids Bags", slug: "kids-bags" },
+    { name: "Premium Bags", slug: "premium-bags" },
+    { name: "Duffel Bags", slug: "duffel-bags" },
   ],
-
+  // fallback small list for other categories
+  default: [
+    { name: "General", slug: "general" },
+    { name: "New Arrivals", slug: "new-arrivals" },
+    { name: "Best Sellers", slug: "best-sellers" },
+    { name: "Budget Picks", slug: "budget-picks" },
+    { name: "Top Rated", slug: "top-rated" },
+  ],
 };
