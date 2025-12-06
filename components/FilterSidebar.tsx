@@ -1,4 +1,3 @@
-// components/FilterSidebar.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,13 +9,12 @@ export default function FilterSidebar({ initial = {} }: any) {
   const [merchant, setMerchant] = useState(initial.merchant || "");
   const [sort, setSort] = useState(initial.sort || "");
 
-  function applyFilters(categorySlug: string) {
+  function applyFilters() {
     const params = new URLSearchParams();
     if (minPrice) params.set("minPrice", minPrice);
     if (maxPrice) params.set("maxPrice", maxPrice);
     if (merchant) params.set("merchant", merchant);
     if (sort) params.set("sort", sort);
-    // keep current pathname; this component used inside pages where pathname contains category
     router.push(`${window.location.pathname}?${params.toString()}`);
   }
 
@@ -49,7 +47,7 @@ export default function FilterSidebar({ initial = {} }: any) {
         </select>
       </div>
 
-      <button onClick={() => applyFilters("")} className="w-full bg-blue-600 text-white py-2 rounded">Apply</button>
+      <button onClick={applyFilters} className="w-full bg-blue-600 text-white py-2 rounded">Apply</button>
     </aside>
   );
-      }
+}
