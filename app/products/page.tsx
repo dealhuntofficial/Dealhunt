@@ -20,7 +20,6 @@ interface Product {
   rating: number;
 }
 
-// ✅ Dynamic rendering for Next.js
 export const dynamic = "force-dynamic";
 
 export default function ProductsPage() {
@@ -28,9 +27,9 @@ export default function ProductsPage() {
   let categoryParam = "";
 
   try {
-    const searchParams = useSearchParams();
-    categoryParam = searchParams?.get("category") || "";
-    searchQuery = searchParams?.get("search") || categoryParam || "";
+    const params = useSearchParams();
+    categoryParam = params?.get("category") || "";
+    searchQuery = params?.get("search") || categoryParam || "";
   } catch (err) {
     searchQuery = "";
     categoryParam = "";
@@ -45,35 +44,31 @@ export default function ProductsPage() {
   const [priceSort, setPriceSort] = useState<"high" | "low" | "none">("none");
   const [partners, setPartners] = useState<string[]>([]);
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
-  const [showFilters, setShowFilters] = useState(false); // ✅ mobile toggle state
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     setLoading(true);
 
-    // Build API URL with category or search query
     const params = new URLSearchParams();
     if (categoryParam) params.set("category", categoryParam);
-    if (searchQuery && !categoryParam) params.set("q", searchQuery);
+    else if (searchQuery) params.set("q", searchQuery);
 
     const apiUrl = `/api/deals?${params.toString()}`;
 
-    // fetch from our API (server-side route) — safe with try/catch
     const fetchDeals = async () => {
       try {
         const res = await fetch(apiUrl);
+
         if (!res.ok) {
-          // fall back to mock data if available or set empty
           setProducts([]);
           setPartners([]);
-          setPriceRange([0, 0]);
-          setLoading(false);
           return;
         }
+
         const json = await res.json();
         const items = json.deals || [];
 
-        // map into Product shape if your API uses different keys
         const mapped: Product[] = items.map((it: any, idx: number) => ({
           id: it.id || idx,
           name: it.title || it.name || "Unknown Product",
@@ -81,27 +76,32 @@ export default function ProductsPage() {
           img: it.image || "/images/placeholder.png",
           comparison: it.comparison || [],
           brand: it.brand || it.merchant || "Unknown",
-          rating: it.rating || 4.0,
+          rating: it.rating || 4,
         }));
 
         setProducts(mapped);
 
+        // 🔥 API se auto partners extract
         const allPartners = [
-          ...new Set(mapped.flatMap((p) => p.comparison.map((c) => c.site))),
+          ...new Set(
+            mapped.flatMap((p) =>
+              p.comparison.map((c) => c.site?.trim()).filter(Boolean)
+            )
+          ),
         ];
+
         setPartners(allPartners);
 
-        const allPrices = mapped.map((p) =>
+        // Auto price range detection
+        const prices = mapped.map((p) =>
           Number(String(p.price).replace(/[^0-9]/g, ""))
         );
-        const min = allPrices.length ? Math.min(...allPrices) : 0;
-        const max = allPrices.length ? Math.max(...allPrices) : 0;
-        setPriceRange([min, max]);
+
+        if (prices.length > 0) {
+          setPriceRange([Math.min(...prices), Math.max(...prices)]);
+        }
       } catch (err) {
-        console.error("Fetch deals error:", err);
-        setProducts([]);
-        setPartners([]);
-        setPriceRange([0, 0]);
+        console.error("Error fetching:", err);
       } finally {
         setLoading(false);
       }
@@ -110,14 +110,15 @@ export default function ProductsPage() {
     fetchDeals();
   }, [searchQuery, categoryParam]);
 
-  // Apply filters
+  // 🔄 Filtering Logic
   let filteredProducts = products.filter((p) => {
-    const numericPrice = Number(String(p.price).replace(/[^0-9]/g, ""));
+    const numPrice = Number(String(p.price).replace(/[^0-9]/g, ""));
+
     return (
       (selectedBrand === "all" || p.brand === selectedBrand) &&
       p.rating >= minRating &&
-      numericPrice >= priceRange[0] &&
-      numericPrice <= priceRange[1] &&
+      numPrice >= priceRange[0] &&
+      numPrice <= priceRange[1] &&
       (selectedPartners.length === 0 ||
         selectedPartners.some((partner) =>
           p.comparison.some((c) => c.site === partner)
@@ -125,18 +126,21 @@ export default function ProductsPage() {
     );
   });
 
-  if (priceSort === "high")
+  if (priceSort === "high") {
     filteredProducts.sort(
       (a, b) =>
-        Number(String(b.price).replace(/[^0-9]/g, "")) -
-        Number(String(a.price).replace(/[^0-9]/g, ""))
+        Number(b.price.replace(/[^0-9]/g, "")) -
+        Number(a.price.replace(/[^0-9]/g, ""))
     );
-  else if (priceSort === "low")
+  }
+
+  if (priceSort === "low") {
     filteredProducts.sort(
       (a, b) =>
-        Number(String(a.price).replace(/[^0-9]/g, "")) -
-        Number(String(b.price).replace(/[^0-9]/g, ""))
+        Number(a.price.replace(/[^0-9]/g, "")) -
+        Number(b.price.replace(/[^0-9]/g, ""))
     );
+  }
 
   const togglePartner = (partner: string) => {
     setSelectedPartners((prev) =>
@@ -145,6 +149,8 @@ export default function ProductsPage() {
         : [...prev, partner]
     );
   };
+
+  // ---------------- UI START --------------------
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -156,7 +162,6 @@ export default function ProductsPage() {
           ← Back to Home
         </Link>
 
-        {/* Mobile Filter Button */}
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="md:hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow-md"
@@ -166,47 +171,43 @@ export default function ProductsPage() {
       </div>
 
       <h1 className="text-2xl md:text-3xl font-bold mb-6">
-        Showing results for:{" "}
-        <span className="text-yellow-600">{categoryParam || searchQuery || "All"}</span>
+        Showing results for{" "}
+        <span className="text-yellow-600">{categoryParam || searchQuery}</span>
       </h1>
 
-      <div className="flex flex-col md:flex-row gap-6 relative">
-        {/* 🔹 Filters Sidebar */}
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* ==== FILTER SIDEBAR ==== */}
         <aside
-          className={`bg-white rounded-xl shadow-md p-4 h-fit flex flex-col gap-4 md:w-64 md:static absolute top-0 left-0 w-11/12 mx-auto transition-all duration-300 z-20 ${
+          className={`bg-white rounded-xl shadow-md p-4 h-fit flex flex-col gap-4 md:w-64 md:static absolute w-10/12 z-20 ${
             showFilters ? "block" : "hidden md:block"
           }`}
         >
-          <h2 className="text-lg font-semibold mb-3">Filters</h2>
+          <h2 className="text-lg font-semibold">Filters</h2>
 
           {/* Brand Filter */}
-          <label className="block mb-3">
-            <span className="text-sm font-medium text-gray-700">Brand</span>
+          <label>
+            <span className="text-sm font-medium">Brand</span>
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2"
+              className="w-full mt-1 border rounded px-2 py-2"
             >
               <option value="all">All</option>
               {[...new Set(products.map((p) => p.brand))].map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
+                <option key={b}>{b}</option>
               ))}
             </select>
           </label>
 
           {/* Rating Filter */}
-          <div className="mb-3">
-            <span className="text-sm font-medium text-gray-700">
-              Minimum Rating
-            </span>
+          <div>
+            <span className="text-sm font-medium">Minimum Rating</span>
             <div className="flex gap-1 mt-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   onClick={() => setMinRating(star)}
-                  className={`px-2 py-1 rounded ${
+                  className={`px-3 py-1 rounded ${
                     minRating >= star
                       ? "bg-yellow-500 text-white"
                       : "bg-gray-200"
@@ -218,104 +219,82 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Price Range */}
-          <div className="mb-3">
-            <span className="text-sm font-medium text-gray-700">Price Range</span>
-            <div className="flex items-center gap-2 mt-2">
-              <input
-                type="number"
-                value={priceRange[0]}
-                min={0}
-                onChange={(e) =>
-                  setPriceRange([Number(e.target.value), priceRange[1]])
-                }
-                className="w-20 border rounded px-2 py-1"
-              />
-              <span>-</span>
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  setPriceRange([priceRange[0], Number(e.target.value)])
-                }
-                className="w-20 border rounded px-2 py-1"
-              />
-            </div>
-          </div>
-
-          {/* Partners */}
-          <div className="mb-3">
-            <span className="text-sm font-medium text-gray-700">Partners</span>
+          {/* Partners Auto–Generated */}
+          <div>
+            <span className="text-sm font-medium">Partners</span>
             <div className="flex flex-col gap-1 mt-2">
-              {partners.map((partner) => (
-                <label key={partner} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedPartners.includes(partner)}
-                    onChange={() => togglePartner(partner)}
-                  />
-                  {partner}
-                </label>
-              ))}
+              {partners.length === 0 ? (
+                <p className="text-xs text-gray-400">No partners found</p>
+              ) : (
+                partners.map((p) => (
+                  <label key={p} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedPartners.includes(p)}
+                      onChange={() => togglePartner(p)}
+                    />
+                    {p}
+                  </label>
+                ))
+              )}
             </div>
           </div>
 
           {/* Sort */}
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">
-              Sort by Price
-            </span>
+          <label>
+            <span className="text-sm font-medium">Sort by Price</span>
             <select
               value={priceSort}
               onChange={(e) => setPriceSort(e.target.value as any)}
-              className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2"
+              className="w-full mt-1 border rounded px-2 py-2"
             >
               <option value="none">None</option>
-              <option value="high">High to Low</option>
-              <option value="low">Low to High</option>
+              <option value="high">High → Low</option>
+              <option value="low">Low → High</option>
             </select>
           </label>
         </aside>
 
-        {/* 🔹 Products Section */}
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* ==== PRODUCT GRID ==== */}
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
           {loading ? (
-            Array.from({ length: 6 }).map((_, idx) => (
+            <>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl shadow p-4 animate-pulse"
+                >
+                  <div className="h-40 bg-gray-200 rounded" />
+                  <div className="mt-3 h-3 bg-gray-200 rounded w-3/4" />
+                </div>
+              ))}
+            </>
+          ) : filteredProducts.length ? (
+            filteredProducts.map((p) => (
               <div
-                key={idx}
-                className="bg-white rounded-xl shadow-md p-4 animate-pulse"
-              >
-                <div className="w-full h-40 bg-gray-200 rounded-lg"></div>
-                <div className="mt-3 h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="mt-2 h-4 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <div
-                key={product.id}
+                key={p.id}
                 className="bg-white rounded-xl shadow-md p-3 hover:shadow-lg transition"
               >
                 <img
-                  src={product.img}
-                  alt={product.name}
+                  src={p.img}
                   className="w-full h-40 object-cover rounded-lg"
+                  alt={p.name}
                 />
-                <h2 className="text-base font-semibold mt-2 line-clamp-2">
-                  {product.name}
-                </h2>
-                <p className="text-lg font-bold text-green-600">
-                  {product.price}
-                </p>
 
-                <button className="mt-3 w-full bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold py-2 rounded-lg">
+                <h2 className="text-sm font-semibold mt-2 line-clamp-2">
+                  {p.name}
+                </h2>
+
+                <p className="text-lg font-bold text-green-600">{p.price}</p>
+
+                <button className="mt-3 w-full bg-yellow-500 text-white py-2 rounded-lg">
                   View Details
                 </button>
               </div>
             ))
           ) : (
-            <p className="text-gray-600 col-span-full text-center">
-              No products found matching your filters.
+            <p className="text-center col-span-full text-gray-500">
+              No products match your filters.
             </p>
           )}
         </div>
