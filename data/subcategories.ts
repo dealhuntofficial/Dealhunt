@@ -36,7 +36,6 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Silver Jewelry", slug: "silver-jewelry" },
     { name: "Stone Jewelry", slug: "stone-jewelry" },
   ],
-  // minimal examples for other categories (expand as needed)
   bags: [
     { name: "Backpacks", slug: "backpacks" },
     { name: "Handbags", slug: "handbags" },
@@ -49,7 +48,7 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Premium Bags", slug: "premium-bags" },
     { name: "Duffel Bags", slug: "duffel-bags" },
   ],
-  // fallback small list for other categories
+  // fallback default
   default: [
     { name: "General", slug: "general" },
     { name: "New Arrivals", slug: "new-arrivals" },
