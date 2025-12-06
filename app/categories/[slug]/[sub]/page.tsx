@@ -17,9 +17,20 @@ export default async function SubcategoryDealsPage({ params, searchParams }: Pro
   if (searchParams?.merchant) qs.set("merchant", String(searchParams.merchant));
   if (searchParams?.sort) qs.set("sort", String(searchParams.sort));
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/deals?category=${encodeURIComponent(slug)}&subcategory=${encodeURIComponent(sub)}&${qs.toString()}`, { cache: "no-store" });
-  const json = res.ok ? await res.json() : { deals: [] };
-  const deals = json.deals || [];
+  let deals: any[] = [];
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/deals?category=${encodeURIComponent(slug)}&subcategory=${encodeURIComponent(sub)}&${qs.toString()}`, { cache: "no-store" });
+    if (res.ok) {
+      const json = await res.json();
+      deals = json.deals || [];
+    } else {
+      console.error("Deals fetch failed", res.status);
+      deals = [];
+    }
+  } catch (err) {
+    console.error("Server fetch error for subcategory deals:", err);
+    deals = [];
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
