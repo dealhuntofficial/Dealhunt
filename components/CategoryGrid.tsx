@@ -127,4 +127,4 @@ export default function CategoryGrid({ mode }: Props) {
       </div>
     </section>
   );
-  }
+}
