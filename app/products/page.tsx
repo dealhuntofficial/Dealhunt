@@ -11,7 +11,7 @@ interface ComparisonItem {
 }
 
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   price: string;
   img: string;
@@ -25,11 +25,15 @@ export const dynamic = "force-dynamic";
 
 export default function ProductsPage() {
   let searchQuery = "";
+  let categoryParam = "";
+
   try {
     const searchParams = useSearchParams();
-    searchQuery = searchParams?.get("search") || "";
+    categoryParam = searchParams?.get("category") || "";
+    searchQuery = searchParams?.get("search") || categoryParam || "";
   } catch (err) {
     searchQuery = "";
+    categoryParam = "";
   }
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -47,59 +51,68 @@ export default function ProductsPage() {
   useEffect(() => {
     setLoading(true);
 
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: "Rolex Submariner",
-        price: "₹7,50,000",
-        img: "https://via.placeholder.com/400x300",
-        brand: "Rolex",
-        rating: 4.7,
-        comparison: [
-          { site: "Amazon", price: "₹7,45,000", rating: 4.7 },
-          { site: "Flipkart", price: "₹7,52,000", rating: 4.5 },
-          { site: "TataCliq", price: "₹7,60,000", rating: 4.3 },
-        ],
-      },
-      {
-        id: 2,
-        name: "Casio G-Shock",
-        price: "₹8,999",
-        img: "https://via.placeholder.com/400x300",
-        brand: "Casio",
-        rating: 4.3,
-        comparison: [
-          { site: "Amazon", price: "₹8,799", rating: 4.4 },
-          { site: "Flipkart", price: "₹8,950", rating: 4.3 },
-          { site: "Myntra", price: "₹9,099", rating: 4.2 },
-        ],
-      },
-    ];
+    // Build API URL with category or search query
+    const params = new URLSearchParams();
+    if (categoryParam) params.set("category", categoryParam);
+    if (searchQuery && !categoryParam) params.set("q", searchQuery);
 
-    const timeout = setTimeout(() => {
-      setProducts(mockProducts);
+    const apiUrl = `/api/deals?${params.toString()}`;
 
-      const allPartners = [
-        ...new Set(mockProducts.flatMap((p) => p.comparison.map((c) => c.site))),
-      ];
-      setPartners(allPartners);
+    // fetch from our API (server-side route) — safe with try/catch
+    const fetchDeals = async () => {
+      try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          // fall back to mock data if available or set empty
+          setProducts([]);
+          setPartners([]);
+          setPriceRange([0, 0]);
+          setLoading(false);
+          return;
+        }
+        const json = await res.json();
+        const items = json.deals || [];
 
-      const allPrices = mockProducts.map((p) =>
-        Number(p.price.replace(/[^0-9]/g, ""))
-      );
-      const min = Math.min(...allPrices);
-      const max = Math.max(...allPrices);
-      setPriceRange([min, max]);
+        // map into Product shape if your API uses different keys
+        const mapped: Product[] = items.map((it: any, idx: number) => ({
+          id: it.id || idx,
+          name: it.title || it.name || "Unknown Product",
+          price: it.priceNow ? `₹${it.priceNow}` : it.price || "₹0",
+          img: it.image || "/images/placeholder.png",
+          comparison: it.comparison || [],
+          brand: it.brand || it.merchant || "Unknown",
+          rating: it.rating || 4.0,
+        }));
 
-      setLoading(false);
-    }, 1000);
+        setProducts(mapped);
 
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
+        const allPartners = [
+          ...new Set(mapped.flatMap((p) => p.comparison.map((c) => c.site))),
+        ];
+        setPartners(allPartners);
+
+        const allPrices = mapped.map((p) =>
+          Number(String(p.price).replace(/[^0-9]/g, ""))
+        );
+        const min = allPrices.length ? Math.min(...allPrices) : 0;
+        const max = allPrices.length ? Math.max(...allPrices) : 0;
+        setPriceRange([min, max]);
+      } catch (err) {
+        console.error("Fetch deals error:", err);
+        setProducts([]);
+        setPartners([]);
+        setPriceRange([0, 0]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeals();
+  }, [searchQuery, categoryParam]);
 
   // Apply filters
   let filteredProducts = products.filter((p) => {
-    const numericPrice = Number(p.price.replace(/[^0-9]/g, ""));
+    const numericPrice = Number(String(p.price).replace(/[^0-9]/g, ""));
     return (
       (selectedBrand === "all" || p.brand === selectedBrand) &&
       p.rating >= minRating &&
@@ -115,14 +128,14 @@ export default function ProductsPage() {
   if (priceSort === "high")
     filteredProducts.sort(
       (a, b) =>
-        Number(b.price.replace(/[^0-9]/g, "")) -
-        Number(a.price.replace(/[^0-9]/g, ""))
+        Number(String(b.price).replace(/[^0-9]/g, "")) -
+        Number(String(a.price).replace(/[^0-9]/g, ""))
     );
   else if (priceSort === "low")
     filteredProducts.sort(
       (a, b) =>
-        Number(a.price.replace(/[^0-9]/g, "")) -
-        Number(b.price.replace(/[^0-9]/g, ""))
+        Number(String(a.price).replace(/[^0-9]/g, "")) -
+        Number(String(b.price).replace(/[^0-9]/g, ""))
     );
 
   const togglePartner = (partner: string) => {
@@ -154,7 +167,7 @@ export default function ProductsPage() {
 
       <h1 className="text-2xl md:text-3xl font-bold mb-6">
         Showing results for:{" "}
-        <span className="text-yellow-600">{searchQuery}</span>
+        <span className="text-yellow-600">{categoryParam || searchQuery || "All"}</span>
       </h1>
 
       <div className="flex flex-col md:flex-row gap-6 relative">
