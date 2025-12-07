@@ -1,6 +1,9 @@
 // app/api/merchants/route.ts
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"; 
+// ↑ Forces this API route to run dynamically (fixes Request URL dynamic error)
+
 function getLogoForMerchant(name: string | undefined) {
   if (!name) return null;
   const n = name.toLowerCase();
@@ -16,7 +19,6 @@ function getLogoForMerchant(name: string | undefined) {
     snapdeal: "/images/partners/snapdeal.png",
   };
 
-  // best-effort normalize
   const key = Object.keys(map).find((k) => n.includes(k));
   return key ? map[key] : null;
 }
@@ -30,7 +32,6 @@ export async function GET(request: Request) {
     if (category) q.set("category", category);
     if (subcategory) q.set("subcategory", subcategory);
 
-    // Build internal deals URL (use base if provided)
     const base = process.env.NEXT_PUBLIC_BASE_URL || "";
     const dealsUrl = `${base}/api/deals?${q.toString()}`;
 
@@ -54,7 +55,6 @@ export async function GET(request: Request) {
         }
       });
 
-      // also try top-level merchant/merchantName fields
       const top = (it.merchant || it.seller || it.brand || "").toString().trim();
       if (top && !merchantSet.has(top)) {
         merchantSet.set(top, { name: top, logo: getLogoForMerchant(top) || undefined });
