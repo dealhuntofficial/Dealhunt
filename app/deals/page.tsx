@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 const deals = [
   { id: 1, title: "Omega Seamaster", price: "$2499", image: "/images/deals/deal1.jpg" },
@@ -10,17 +10,10 @@ const deals = [
 ];
 
 export default function DealsPage() {
-  const router = useRouter();
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Back Button */}
-      <button
-        onClick={() => router.push("/")}
-        className="mb-6 inline-flex items-center text-yellow-600 hover:text-yellow-700 font-semibold"
-      >
-        ← Back to Home
-      </button>
+
+      <BackButton />
 
       {/* Page Heading */}
       <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
@@ -48,4 +41,4 @@ export default function DealsPage() {
       </div>
     </div>
   );
-}
+      }
