@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { motion, Variants } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [localUser, setLocalUser] =
     useState<{ name: string; email?: string } | null>(null);
@@ -22,7 +24,6 @@ export default function AuthPage() {
     signIn(provider, { callbackUrl: "/" });
   };
 
-  /** FIX 1 — Proper Framer Motion Variants **/
   const cardVariants: Variants = {
     hidden: { opacity: 0, y: 18 },
     show: {
@@ -32,7 +33,6 @@ export default function AuthPage() {
     },
   };
 
-  /** FIX 2 — slide variants MUST be a valid Variant structure **/
   const slideVariant: Variants = {
     hidden: { opacity: 0, x: -40 },
     show: {
@@ -47,7 +47,18 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-yellow-400">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-yellow-400 p-4">
+
+      {/* 🔙 Back Button */}
+      <div className="w-full max-w-4xl mb-4">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-md transition"
+        >
+          ← Back
+        </button>
+      </div>
+
       <div className="w-full max-w-4xl p-6">
         <motion.div
           initial="hidden"
@@ -131,4 +142,4 @@ export default function AuthPage() {
       </div>
     </main>
   );
-        }
+}
