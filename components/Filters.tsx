@@ -1,3 +1,4 @@
+// File: components/Filters.tsx
 "use client";
 
 import React from "react";
@@ -94,4 +95,4 @@ export default function Filters({ filters, setFilters }: FiltersProps) {
 
     </div>
   );
-  }
+}
