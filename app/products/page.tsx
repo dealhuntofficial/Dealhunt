@@ -1,9 +1,8 @@
-// File: app/products/page.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import BackButton from "@/components/BackButton";
 
 interface ComparisonItem {
   site: string;
@@ -49,14 +48,11 @@ export default function ProductsPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 300000]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // ======================================
-  // FETCH PRODUCTS — with partner filter (client-side fetch uses relative URL)
-  // ======================================
+  // FETCH PRODUCTS
   useEffect(() => {
     setLoading(true);
 
     const params = new URLSearchParams();
-
     if (categoryParam) params.set("category", categoryParam);
     else if (searchQuery) params.set("q", searchQuery);
 
@@ -95,8 +91,7 @@ export default function ProductsPage() {
 
         if (prices.length > 0)
           setPriceRange([Math.min(...prices), Math.max(...prices)]);
-      } catch (err) {
-        console.log("Product fetch error", err);
+      } catch {
         setProducts([]);
       } finally {
         setLoading(false);
@@ -106,9 +101,7 @@ export default function ProductsPage() {
     loadProducts();
   }, [searchQuery, categoryParam, selectedPartners]);
 
-  // ================================
-  // FETCH MERCHANTS for filters (client-side)
-  // ================================
+  // FETCH MERCHANTS
   useEffect(() => {
     const loadPartners = async () => {
       try {
@@ -128,28 +121,27 @@ export default function ProductsPage() {
     loadPartners();
   }, [categoryParam, searchQuery]);
 
-  // ======================================
-  // LOCAL FILTERS (Brand, Rating, Price)
-  // ======================================
+  // LOCAL FILTERING
   let filteredProducts = products.filter((p) => {
     const numericPrice = Number(String(p.price).replace(/[^0-9]/g, ""));
-
     return (
       (selectedBrand === "all" || p.brand === selectedBrand) &&
       p.rating >= minRating &&
       numericPrice >= priceRange[0] &&
       numericPrice <= priceRange[1] &&
       (selectedPartners.length === 0 ||
-        selectedPartners.some((partner) =>
-          p.brand?.toLowerCase() === partner.toLowerCase() ||
-          p.comparison.some((c) => (c.site || "").toLowerCase() === partner.toLowerCase())
+        selectedPartners.some(
+          (partner) =>
+            p.brand?.toLowerCase() === partner.toLowerCase() ||
+            p.comparison.some(
+              (c) =>
+                (c.site || "").toLowerCase() === partner.toLowerCase()
+            )
         ))
     );
   });
 
-  // ======================================
   // PRICE SORT
-  // ======================================
   if (priceSort === "low") {
     filteredProducts.sort((a, b) => {
       const pa = Number(a.price.replace(/[^0-9]/g, ""));
@@ -172,20 +164,12 @@ export default function ProductsPage() {
     );
   };
 
-  // ======================================
   // UI
-  // ======================================
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-4 flex justify-between items-center">
-        <Link
-          href="/"
-          className="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow-md"
-        >
-          ← Back to Home
-        </Link>
+      <BackButton />
 
+      <div className="mb-4 flex justify-end items-center">
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="md:hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow-md"
@@ -202,7 +186,6 @@ export default function ProductsPage() {
       </h1>
 
       <div className="flex flex-col md:flex-row gap-6 relative">
-        {/* FILTER SIDEBAR */}
         <aside
           className={`bg-white rounded-xl shadow-md p-4 h-fit flex flex-col gap-4 md:w-64 md:static absolute top-0 left-0 w-11/12 mx-auto transition-all duration-300 z-20 ${
             showFilters ? "block" : "hidden md:block"
@@ -210,7 +193,6 @@ export default function ProductsPage() {
         >
           <h2 className="text-lg font-semibold mb-3">Filters</h2>
 
-          {/* BRAND FILTER */}
           <label>
             <span className="text-sm font-medium">Brand</span>
             <select
@@ -225,7 +207,6 @@ export default function ProductsPage() {
             </select>
           </label>
 
-          {/* RATING FILTER */}
           <div>
             <span className="text-sm font-medium">Min Rating</span>
             <div className="flex gap-1 mt-2">
@@ -245,7 +226,6 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* PARTNER FILTER */}
           <div>
             <span className="text-sm font-medium">Partners</span>
 
@@ -267,7 +247,6 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* SORT */}
           <label>
             <span className="text-sm font-medium">Sort by Price</span>
             <select
@@ -284,7 +263,6 @@ export default function ProductsPage() {
           </label>
         </aside>
 
-        {/* PRODUCT GRID */}
         <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => (
