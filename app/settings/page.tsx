@@ -12,13 +12,13 @@ export default function SettingsPage() {
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifOffers, setNotifOffers] = useState(true);
   const [notifReferral, setNotifReferral] = useState(true);
-
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const e = localStorage.getItem("notifEmail");
     const o = localStorage.getItem("notifOffers");
     const r = localStorage.getItem("notifReferral");
+
     if (e !== null) setNotifEmail(e === "true");
     if (o !== null) setNotifOffers(o === "true");
     if (r !== null) setNotifReferral(r === "true");
@@ -40,9 +40,11 @@ export default function SettingsPage() {
     localStorage.removeItem("notifEmail");
     localStorage.removeItem("notifOffers");
     localStorage.removeItem("notifReferral");
+
     setNotifEmail(false);
     setNotifOffers(false);
     setNotifReferral(false);
+
     alert("All saved preferences cleared!");
   };
 
@@ -51,13 +53,13 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!session?.user?.email || !session?.user?.name) {
+    if (!session?.user?.email) {
       alert("You must be signed in to request account deletion.");
       return;
     }
 
     const ok = confirm(
-      "Are you sure you want to request account deletion?"
+      "Are you sure you want to request account deletion? Support will process this soon."
     );
     if (!ok) return;
 
@@ -70,8 +72,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           // @ts-ignore
           userId: session?.user?.id,
-          // @ts-ignore
-          email: session?.user?.email,
+          email: session.user.email,
         }),
       });
 
@@ -92,7 +93,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
 
-      {/* GLOBAL BACK BUTTON */}
+      {/* Back Button */}
       <BackButton />
 
       <h1 className="text-3xl font-bold mb-6 text-yellow-600">Settings</h1>
@@ -101,11 +102,13 @@ export default function SettingsPage() {
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
         <h2 className="font-semibold text-lg">Preferences</h2>
 
-        <label className="flex items-center justify-between gap-3">
-          <div>
+        <label className="flex items-center justify-between">
+          <span>
             <div className="font-medium">Email Notifications</div>
-            <div className="text-sm text-gray-500">Receive account & offer emails</div>
-          </div>
+            <div className="text-sm text-gray-500">
+              Receive account & offer emails
+            </div>
+          </span>
           <input
             type="checkbox"
             checked={notifEmail}
@@ -114,11 +117,11 @@ export default function SettingsPage() {
           />
         </label>
 
-        <label className="flex items-center justify-between gap-3">
-          <div>
+        <label className="flex items-center justify-between">
+          <span>
             <div className="font-medium">Promotional Offers</div>
             <div className="text-sm text-gray-500">Get special deal alerts</div>
-          </div>
+          </span>
           <input
             type="checkbox"
             checked={notifOffers}
@@ -127,11 +130,13 @@ export default function SettingsPage() {
           />
         </label>
 
-        <label className="flex items-center justify-between gap-3">
-          <div>
+        <label className="flex items-center justify-between">
+          <span>
             <div className="font-medium">Referral Notifications</div>
-            <div className="text-sm text-gray-500">Updates about referral rewards</div>
-          </div>
+            <div className="text-sm text-gray-500">
+              Updates about referral rewards
+            </div>
+          </span>
           <input
             type="checkbox"
             checked={notifReferral}
@@ -142,21 +147,23 @@ export default function SettingsPage() {
 
         <button
           onClick={clearPreferences}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
         >
           Clear Preferences
         </button>
       </div>
 
-      {/* Account Management */}
+      {/* Account Section */}
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
         <h2 className="font-semibold text-lg">Account Management</h2>
 
-        <div className="bg-gray-50 p-3 rounded-md text-sm">
-          {session?.user?.email ? (
-            <>Signed in as <b>{session.user.email}</b></>
+        <div className="bg-gray-50 p-3 rounded-md">
+          {session?.user ? (
+            <p className="text-sm text-gray-700">
+              Signed in as <span className="font-medium">{session.user.email}</span>.
+            </p>
           ) : (
-            "You are not signed in."
+            <p className="text-sm text-gray-700">You are not signed in.</p>
           )}
         </div>
 
@@ -177,15 +184,51 @@ export default function SettingsPage() {
 
           <button
             onClick={handleDeleteAccount}
-            disabled={deleteLoading}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            disabled={deleteLoading}
           >
             {deleteLoading ? "Submitting..." : "Request Account Deletion"}
           </button>
         </div>
       </div>
 
-      {/* Removed old back button because global button added at top */}
+      {/* Privacy */}
+      <div className="bg-white p-4 rounded-lg shadow space-y-4">
+        <h2 className="font-semibold text-lg">Privacy & Support</h2>
+
+        <p className="text-sm text-gray-600">
+          View our{" "}
+          <a href="/privacy" className="text-yellow-600 underline">
+            Privacy Policy
+          </a>
+          .
+        </p>
+
+        <div className="space-y-2 text-sm">
+          <p>
+            💬{" "}
+            <a href="/contact" className="text-yellow-600 underline">
+              Contact Support
+            </a>
+          </p>
+
+          <p>
+            📝{" "}
+            <a href="/feedback" className="text-yellow-600 underline">
+              Share Your Feedback
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <div className="text-center">
+        <a
+          href="/"
+          className="inline-block bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-md"
+        >
+          Back to Home
+        </a>
+      </div>
     </div>
   );
-}
+      }
