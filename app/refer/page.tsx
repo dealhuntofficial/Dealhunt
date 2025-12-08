@@ -14,7 +14,7 @@ export default function ReferPage() {
   const { data: session, status } = useSession();
   const [copied, setCopied] = useState(false);
 
-  // 🚫 If not logged in → redirect to signin
+  // Redirect if not logged in
   useEffect(() => {
     if (status === "unauthenticated") signIn();
   }, [status]);
@@ -26,6 +26,7 @@ export default function ReferPage() {
       </div>
     );
 
+  // Dynamic referral code (you can modify later)
   const referralCode = "DEALHUNT50";
   const referralLink = `https://dealhunt.in/ref/${referralCode}`;
 
@@ -38,14 +39,14 @@ export default function ReferPage() {
   return (
     <main className="max-w-4xl mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold text-yellow-600">Refer & Earn</h1>
+
       <p className="mt-4 text-gray-600">
-        Invite friends to DealHunt and{" "}
-        <span className="text-yellow-600 font-semibold">
-          earn up to ₹50
-        </span>{" "}
-        for each successful referral!
+        Invite your friends to DealHunt and{" "}
+        <span className="text-yellow-600 font-semibold">earn up to ₹50</span> for
+        every successful referral!
       </p>
 
+      {/* Referral Link Box */}
       <div className="mt-8 bg-white p-6 rounded-lg shadow text-center">
         <p className="text-lg text-gray-700">Your Referral Link:</p>
 
@@ -56,6 +57,7 @@ export default function ReferPage() {
             value={referralLink}
             className="border border-gray-300 rounded-md px-3 py-2 w-full sm:w-96 text-gray-600"
           />
+
           <button
             onClick={copyToClipboard}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-md"
@@ -67,13 +69,14 @@ export default function ReferPage() {
         {copied && <p className="text-green-500 mt-2">Copied!</p>}
       </div>
 
+      {/* Social Share Section */}
       <div className="mt-8 text-center">
         <h2 className="text-xl font-semibold mb-4">Share via</h2>
 
         <div className="flex justify-center gap-4 text-2xl">
           <a
             href={`https://wa.me/?text=${encodeURIComponent(
-              `Check this out: ${referralLink}`
+              `Check out this amazing deal platform: ${referralLink}`
             )}`}
             target="_blank"
             className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full"
@@ -113,6 +116,7 @@ export default function ReferPage() {
         </div>
       </div>
 
+      {/* Back to Home */}
       <div className="mt-10 text-center">
         <a
           href="/"
