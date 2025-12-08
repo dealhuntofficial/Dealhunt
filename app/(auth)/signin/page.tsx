@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton"; // ✅ Global Back Button added
 
 export default function AuthPage() {
   const router = useRouter();
@@ -49,14 +50,9 @@ export default function AuthPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-yellow-400 p-4">
 
-      {/* 🔙 Back Button */}
+      {/* 🔙 Global Back Button */}
       <div className="w-full max-w-4xl mb-4">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-md transition"
-        >
-          ← Back
-        </button>
+        <BackButton />
       </div>
 
       <div className="w-full max-w-4xl p-6">
@@ -142,4 +138,4 @@ export default function AuthPage() {
       </div>
     </main>
   );
-}
+      }
