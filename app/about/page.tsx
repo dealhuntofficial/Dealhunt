@@ -2,10 +2,22 @@
 
 import Link from "next/link";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function AboutPage() {
+  const router = useRouter();
+
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+
+      {/* 🔙 Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md transition"
+      >
+        ← Back
+      </button>
+
       {/* 🟡 Hero Section */}
       <section className="text-center bg-gradient-to-r from-yellow-400 via-orange-300 to-red-400 p-12 rounded-xl text-white">
         <h1 className="text-4xl font-bold mb-4">About DealHunt</h1>
@@ -56,15 +68,6 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* ⬅️ Back to Home */}
-      <div className="text-center">
-        <Link
-          href="/"
-          className="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md"
-        >
-          Back to Home
-        </Link>
-      </div>
     </main>
   );
-      }
+}
