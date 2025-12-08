@@ -1,4 +1,4 @@
-// app/api/deals/route.ts
+// File: app/api/deals/route.ts
 import { NextResponse } from "next/server";
 import { mockDeals } from "@/data/mockDeals";
 
