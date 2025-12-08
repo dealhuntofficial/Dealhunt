@@ -1,19 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 export default function CartToHeartComingSoon() {
-  const router = useRouter();
-
   return (
     <main className="max-w-4xl mx-auto py-10 px-4 relative">
 
-      {/* BACK BUTTON (UNIVERSAL) */}
-      <button
-        onClick={() => router.back()}
-        className="absolute top-4 left-4 px-3 py-1.5 rounded-md bg-white/80 text-gray-800 text-sm font-medium shadow hover:bg-white transition"
-      >
-        ← Back
-      </button>
+      {/* BACK BUTTON (GLOBAL COMPONENT) */}
+      <BackButton />
 
       <h1 className="text-3xl font-bold text-yellow-600">Coming Soon</h1>
 
@@ -33,6 +28,7 @@ export default function CartToHeartComingSoon() {
           Back to Home
         </Link>
       </div>
+
     </main>
   );
 }
