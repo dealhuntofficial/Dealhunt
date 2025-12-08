@@ -1,25 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import Link from "next/link";
 
 export default function CategoriesPage() {
   const [open, setOpen] = useState<string | null>(null);
-  const router = useRouter();
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 relative">
 
-      {/* BACK BUTTON */}
-      <button
-        onClick={() => router.back()}
-        className="absolute top-4 left-4 px-3 py-1.5 rounded-md bg-white/80 text-gray-800 text-sm font-medium shadow hover:bg-white transition"
-      >
-        ← Back
-      </button>
+      {/* BACK BUTTON (GLOBAL) */}
+      <BackButton />
 
       <h1 className="text-3xl font-bold mb-10 text-center">All Categories</h1>
 
