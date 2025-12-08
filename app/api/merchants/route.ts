@@ -1,17 +1,11 @@
 // app/api/merchants/route.ts
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic"; 
-// Ensures API runs dynamically on Vercel Edge/Server
+export const dynamic = "force-dynamic";
 
-// -------------------------
-// Merchant Logo Mapper
-// -------------------------
 function getLogoForMerchant(name: string | undefined) {
   if (!name) return null;
-
-  const n = name.toLowerCase().replace(/\s+/g, "");
-
+  const n = name.toLowerCase();
   const map: Record<string, string> = {
     amazon: "/images/partners/amazon.png",
     flipkart: "/images/partners/flipkart.png",
@@ -28,67 +22,49 @@ function getLogoForMerchant(name: string | undefined) {
   return key ? map[key] : null;
 }
 
-// -------------------------
-// GET API
-// -------------------------
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-
     const category = url.searchParams.get("category") || "";
     const subcategory = url.searchParams.get("subcategory") || "";
 
-    const params = new URLSearchParams();
-    if (category) params.set("category", category);
-    if (subcategory) params.set("subcategory", subcategory);
+    // ✅ ALWAYS absolute URL (Render fix)
+    const base = process.env.NEXT_PUBLIC_BASE_URL || "https://dealhunt-1.onrender.com";
 
-    const base = process.env.NEXT_PUBLIC_BASE_URL || "";
-    const dealsUrl = `${base}/api/deals?${params.toString()}`;
+    const dealsUrl = new URL("/api/deals", base);
 
-    // Fetch deals
-    const res = await fetch(dealsUrl, { cache: "no-store" });
+    if (category) dealsUrl.searchParams.set("category", category);
+    if (subcategory) dealsUrl.searchParams.set("subcategory", subcategory);
 
-    if (!res.ok) {
-      console.warn("⚠ merchants route: deals API returned error");
-      return NextResponse.json({ merchants: [] });
-    }
+    // No trailing "&" — URL fully valid
+
+    const res = await fetch(dealsUrl.toString(), { cache: "no-store" });
+    if (!res.ok) return NextResponse.json({ merchants: [] });
 
     const json = await res.json();
-    const deals = json.deals || [];
+    const items = json.deals || [];
 
     const merchantSet = new Map<string, { name: string; logo?: string }>();
 
-    // Collect unique merchants from deals
-    for (const deal of deals) {
-      const comps = deal.comparison || [];
-
-      // Comparison merchants
-      for (const c of comps) {
+    items.forEach((it: any) => {
+      const comps = it.comparison || [];
+      comps.forEach((c: any) => {
         const name = (c.site || c.merchant || c.partner || "").toString().trim();
-        if (!name || merchantSet.has(name)) continue;
+        if (!name) return;
+        if (!merchantSet.has(name)) {
+          merchantSet.set(name, { name, logo: getLogoForMerchant(name) || undefined });
+        }
+      });
 
-        merchantSet.set(name, {
-          name,
-          logo: getLogoForMerchant(name) || undefined,
-        });
-      }
-
-      // Top-level merchant  
-      const top = (deal.merchant || deal.seller || deal.brand || "").toString().trim();
+      const top = (it.merchant || it.seller || it.brand || "").toString().trim();
       if (top && !merchantSet.has(top)) {
-        merchantSet.set(top, {
-          name: top,
-          logo: getLogoForMerchant(top) || undefined,
-        });
+        merchantSet.set(top, { name: top, logo: getLogoForMerchant(top) || undefined });
       }
-    }
-
-    return NextResponse.json({
-      merchants: Array.from(merchantSet.values()),
     });
 
+    return NextResponse.json({ merchants: Array.from(merchantSet.values()) });
   } catch (err) {
-    console.error("🔥 merchants API error:", err);
+    console.error("GET /api/merchants error:", err);
     return NextResponse.json({ merchants: [] });
   }
 }
