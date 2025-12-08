@@ -1,12 +1,24 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CartToHeartComingSoon() {
+  const router = useRouter();
+
   return (
-    <main className="max-w-4xl mx-auto py-10 px-4">
+    <main className="max-w-4xl mx-auto py-10 px-4 relative">
+
+      {/* BACK BUTTON (UNIVERSAL) */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-4 left-4 px-3 py-1.5 rounded-md bg-white/80 text-gray-800 text-sm font-medium shadow hover:bg-white transition"
+      >
+        ← Back
+      </button>
+
       <h1 className="text-3xl font-bold text-yellow-600">Coming Soon</h1>
-      <p className="mt-4 text-gray-600">
-        ❤️ Cart to Heart Program
-      </p>
+
+      <p className="mt-4 text-gray-600">❤️ Cart to Heart Program</p>
+
       <p className="mt-2 text-gray-700">
         Our unique program allows you to donate, support, and contribute to social causes while shopping.
         You can benefit from exclusive rewards and make a positive impact in areas like education, health,
