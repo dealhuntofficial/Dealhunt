@@ -46,7 +46,6 @@ export default function ContactPage() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
-
       <BackButton />
 
       <h1 className="text-3xl font-bold mb-6 text-yellow-500">
