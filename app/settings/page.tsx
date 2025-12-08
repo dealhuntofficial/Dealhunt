@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [notifEmail, setNotifEmail] = useState<boolean>(true);
-  const [notifOffers, setNotifOffers] = useState<boolean>(true);
-  const [notifReferral, setNotifReferral] = useState<boolean>(true);
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifOffers, setNotifOffers] = useState(true);
+  const [notifReferral, setNotifReferral] = useState(true);
 
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -56,7 +57,7 @@ export default function SettingsPage() {
     }
 
     const ok = confirm(
-      "Are you sure you want to request account deletion? This will create a deletion request. Our support will process it soon."
+      "Are you sure you want to request account deletion?"
     );
     if (!ok) return;
 
@@ -77,23 +78,23 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Account deletion request submitted. We will process it shortly.");
+        alert("Account deletion request submitted.");
       } else {
-        console.error(data);
         alert(data?.error || "Failed to submit request.");
       }
     } catch (err) {
-      console.error(err);
       alert("Network error. Try again.");
     } finally {
       setDeleteLoading(false);
     }
   };
 
-  const signedWithOAuth = Boolean(session?.user?.image || session?.user?.name);
-
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+
+      {/* GLOBAL BACK BUTTON */}
+      <BackButton />
+
       <h1 className="text-3xl font-bold mb-6 text-yellow-600">Settings</h1>
 
       {/* Preferences */}
@@ -139,40 +140,23 @@ export default function SettingsPage() {
           />
         </label>
 
-        <div className="pt-2">
-          <button
-            onClick={clearPreferences}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-          >
-            Clear Preferences
-          </button>
-        </div>
+        <button
+          onClick={clearPreferences}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          Clear Preferences
+        </button>
       </div>
 
       {/* Account Management */}
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
         <h2 className="font-semibold text-lg">Account Management</h2>
 
-        <div className="bg-gray-50 p-3 rounded-md">
-          {session?.user ? (
-            <>
-              <p className="text-sm text-gray-700">
-                {session?.user && session.user.email ? (
-                  <>
-                    Signed in as <span className="font-medium">{session.user.email}</span>.
-                    {session.user.image ? (
-                      <span> You use OAuth (Google) — password management is done via Google.</span>
-                    ) : (
-                      <span> If you signed up with email/password, change it from your account form.</span>
-                    )}
-                  </>
-                ) : (
-                  "Not signed in."
-                )}
-              </p>
-            </>
+        <div className="bg-gray-50 p-3 rounded-md text-sm">
+          {session?.user?.email ? (
+            <>Signed in as <b>{session.user.email}</b></>
           ) : (
-            <p className="text-sm text-gray-700">You are not signed in.</p>
+            "You are not signed in."
           )}
         </div>
 
@@ -193,38 +177,15 @@ export default function SettingsPage() {
 
           <button
             onClick={handleDeleteAccount}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             disabled={deleteLoading}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
             {deleteLoading ? "Submitting..." : "Request Account Deletion"}
           </button>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow space-y-4">
-        <h2 className="font-semibold text-lg">Privacy & Support</h2>
-        <p className="text-sm text-gray-600">
-          View our <a href="/privacy" className="text-yellow-600 underline">Privacy Policy</a>.
-        </p>
-
-        <div className="space-y-2 text-sm">
-          <p>
-            💬 <a href="/contact" className="text-yellow-600 underline">Contact Support</a>
-          </p>
-          <p>
-            📝 <a href="/feedback" className="text-yellow-600 underline">Share Your Feedback</a>
-          </p>
-        </div>
-      </div>
-
-      <div className="text-center">
-        <a
-          href="/"
-          className="inline-block bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-md"
-        >
-          Back to Home
-        </a>
-      </div>
+      {/* Removed old back button because global button added at top */}
     </div>
   );
 }
