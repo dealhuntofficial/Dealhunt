@@ -1,3 +1,4 @@
+// File: app/products/page.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -49,7 +50,7 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // ======================================
-  // FETCH PRODUCTS — with partner filter
+  // FETCH PRODUCTS — with partner filter (client-side fetch uses relative URL)
   // ======================================
   useEffect(() => {
     setLoading(true);
@@ -106,7 +107,7 @@ export default function ProductsPage() {
   }, [searchQuery, categoryParam, selectedPartners]);
 
   // ================================
-  // FETCH MERCHANTS for filters
+  // FETCH MERCHANTS for filters (client-side)
   // ================================
   useEffect(() => {
     const loadPartners = async () => {
@@ -137,7 +138,12 @@ export default function ProductsPage() {
       (selectedBrand === "all" || p.brand === selectedBrand) &&
       p.rating >= minRating &&
       numericPrice >= priceRange[0] &&
-      numericPrice <= priceRange[1]
+      numericPrice <= priceRange[1] &&
+      (selectedPartners.length === 0 ||
+        selectedPartners.some((partner) =>
+          p.brand?.toLowerCase() === partner.toLowerCase() ||
+          p.comparison.some((c) => (c.site || "").toLowerCase() === partner.toLowerCase())
+        ))
     );
   });
 
