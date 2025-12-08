@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import BackButton from "@/components/BackButton";
 
 export default function FeedbackPage() {
   const [name, setName] = useState("");
@@ -19,7 +20,11 @@ export default function FeedbackPage() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-6 text-yellow-500">Share Your Feedback</h1>
+      <BackButton />
+
+      <h1 className="text-3xl font-bold mb-6 text-yellow-500 mt-6">
+        Share Your Feedback
+      </h1>
 
       <div className="space-y-4 bg-white p-6 rounded-lg shadow">
         <input
@@ -46,4 +51,4 @@ export default function FeedbackPage() {
       </div>
     </div>
   );
-                                      }
+}
