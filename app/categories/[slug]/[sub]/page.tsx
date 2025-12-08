@@ -1,17 +1,15 @@
-// File: app/categories/[slug]/[sub]/page.tsx
 "use client";
 
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { useEffect, useState } from "react";
 
 type Props = { params: { slug: string; sub: string }; searchParams?: any };
 
 export default function SubcategoryDealsPage({ params, searchParams }: Props) {
-  const router = useRouter();
   const { slug, sub } = params;
 
   const category = categories.find((c) => c.slug === slug);
@@ -63,13 +61,7 @@ export default function SubcategoryDealsPage({ params, searchParams }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 relative">
 
-      {/* BACK BUTTON */}
-      <button
-        onClick={() => router.back()}
-        className="absolute top-4 left-4 px-3 py-1.5 rounded-md bg-white/80 text-gray-800 text-sm font-medium shadow hover:bg-white transition"
-      >
-        ← Back
-      </button>
+      <BackButton />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
 
