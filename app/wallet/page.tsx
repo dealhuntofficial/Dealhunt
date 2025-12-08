@@ -2,6 +2,7 @@
 
 import { useSession, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
+import BackButton from "@/components/BackButton";
 
 export default function WalletPage() {
   const { data: session, status } = useSession();
@@ -113,6 +114,10 @@ export default function WalletPage() {
 
   return (
     <main className="max-w-5xl mx-auto py-10 px-4 space-y-8">
+
+      {/* GLOBAL BACK BUTTON */}
+      <BackButton />
+
       <h1 className="text-3xl font-bold text-yellow-600">My Wallet</h1>
       <p className="text-gray-600">Track your DealHunt cashback & rewards.</p>
 
@@ -196,15 +201,7 @@ export default function WalletPage() {
         )}
       </div>
 
-      {/* Back Button */}
-      <div className="text-center">
-        <a
-          href="/"
-          className="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-md"
-        >
-          Back to Home
-        </a>
-      </div>
+      {/* REMOVED old Back to Home button */}
     </main>
   );
-      }
+}
