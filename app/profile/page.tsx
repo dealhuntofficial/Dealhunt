@@ -5,10 +5,12 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ name: string; email?: string }>({ name: "" });
+  const [user, setUser] = useState<{ name: string; email?: string }>({
+    name: "",
+  });
 
+  // Load saved user (mock login system)
   useEffect(() => {
-    // Check if user info exists in localStorage (mock login/signup)
     const storedUser = localStorage.getItem("dealhuntUser");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -40,6 +42,7 @@ export default function ProfilePage() {
       {!loggedIn ? (
         <div className="space-y-4">
           <p className="text-gray-600">You are not logged in.</p>
+
           <Link
             href="/signin"
             className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -48,9 +51,12 @@ export default function ProfilePage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          <p className="text-gray-700 font-semibold">Welcome, {user.name}!</p>
+        <div className="space-y-5">
+          <p className="text-gray-700 font-semibold text-lg">
+            Welcome, {user.name}!
+          </p>
 
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
@@ -58,10 +64,11 @@ export default function ProfilePage() {
             Logout
           </button>
 
-          <div className="mt-6 p-4 border rounded-lg bg-gray-50">
-            <h2 className="text-xl font-semibold mb-2">Profile Settings</h2>
-            <p className="text-gray-600 mb-2">
-              Update your preferences here.
+          {/* Settings Box */}
+          <div className="mt-6 p-5 border rounded-lg bg-gray-50 shadow-sm">
+            <h2 className="text-xl font-semibold mb-3">Profile Settings</h2>
+            <p className="text-gray-600 mb-3">
+              Manage your preferences and update your account options.
             </p>
             <button
               onClick={() => alert("Preferences updated (mock)")}
@@ -74,4 +81,4 @@ export default function ProfilePage() {
       )}
     </div>
   );
-}
+        }
