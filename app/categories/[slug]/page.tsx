@@ -1,3 +1,4 @@
+// File: app/categories/[slug]/page.tsx
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
@@ -15,10 +16,22 @@ export default async function CategoryDealsPage({ params, searchParams }: Props)
   if (searchParams?.maxPrice) qs.set("maxPrice", String(searchParams.maxPrice));
   if (searchParams?.merchant) qs.set("merchant", String(searchParams.merchant));
   if (searchParams?.sort) qs.set("sort", String(searchParams.sort));
+  if (searchParams?.q) qs.set("q", String(searchParams.q));
 
   let deals: any[] = [];
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/deals?category=${encodeURIComponent(slug)}&${qs.toString()}`, { cache: "no-store" });
+    const base = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
+    const url = new URL("/api/deals", base);
+    url.searchParams.set("category", slug);
+    // append QS only if it has params (avoid trailing & issues)
+    qs.toString().split("&").forEach((p) => {
+      if (p) {
+        const [k, v] = p.split("=");
+        if (k && v !== undefined) url.searchParams.set(k, decodeURIComponent(v));
+      }
+    });
+
+    const res = await fetch(url.toString(), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       deals = json.deals || [];
