@@ -1,10 +1,17 @@
+"use client";
+
+import BackButton from "@/components/BackButton";
+
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 px-6 py-16">
-      <div className="max-w-4xl mx-auto space-y-8">
-        
+      <div className="max-w-4xl mx-auto space-y-10">
+
+        {/* Back Button */}
+        <BackButton />
+
         {/* Header */}
-        <header className="text-center space-y-2">
+        <header className="text-center space-y-2 mt-6">
           <h1 className="text-4xl font-bold text-yellow-400">Privacy Policy</h1>
           <p className="text-gray-400 text-sm">Effective Date: October 10, 2025</p>
         </header>
@@ -73,16 +80,20 @@ export default function PrivacyPage() {
           <h2 className="text-2xl font-semibold text-yellow-300">7. Contact Us</h2>
           <p className="text-gray-300">
             Have questions? Contact us at:<br />
-            <a href="mailto:support@dealhunt.com" className="text-yellow-400 underline">
+            <a
+              href="mailto:support@dealhunt.com"
+              className="text-yellow-400 underline"
+            >
               support@dealhunt.com
             </a>
           </p>
         </section>
 
+        {/* Footer */}
         <footer className="text-center pt-8 border-t border-gray-700 text-gray-500 text-sm">
           © {new Date().getFullYear()} DealHunt — Cart to Heart. All rights reserved.
         </footer>
       </div>
     </main>
   );
-          }
+}
