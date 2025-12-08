@@ -1,22 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import React from "react";
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 export default function AboutPage() {
-  const router = useRouter();
-
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
 
-      {/* 🔙 Back Button */}
-      <button
-        onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md transition"
-      >
-        ← Back
-      </button>
+      <BackButton />
 
       {/* 🟡 Hero Section */}
       <section className="text-center bg-gradient-to-r from-yellow-400 via-orange-300 to-red-400 p-12 rounded-xl text-white">
@@ -37,8 +28,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold">Our Story</h2>
           <p>
             DealHunt started with a simple mission: to bring users the best
-            deals in one place, whether it's luxury products or daily
-            essentials.
+            deals in one place, whether it's luxury products or daily essentials.
           </p>
         </div>
       </section>
