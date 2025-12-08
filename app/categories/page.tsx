@@ -1,17 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import Link from "next/link";
 
 export default function CategoriesPage() {
   const [open, setOpen] = useState<string | null>(null);
+  const router = useRouter();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 relative">
 
-      <h1 className="text-3xl font-bold mb-6">All Categories</h1>
+      {/* BACK BUTTON */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-4 left-4 px-3 py-1.5 rounded-md bg-white/80 text-gray-800 text-sm font-medium shadow hover:bg-white transition"
+      >
+        ← Back
+      </button>
+
+      <h1 className="text-3xl font-bold mb-10 text-center">All Categories</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
         {categories.map(cat => (
@@ -33,7 +43,7 @@ export default function CategoriesPage() {
 
             {open === cat.slug && (
               <div className="mt-2 bg-gray-100 rounded-lg p-3 shadow-inner">
-                { (subCategories[cat.slug] || subCategories.default).map(sub => (
+                {(subCategories[cat.slug] || subCategories.default).map(sub => (
                   <Link
                     key={sub.slug}
                     href={`/categories/${cat.slug}/${sub.slug}`}
