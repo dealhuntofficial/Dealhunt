@@ -25,28 +25,24 @@ export default function SubcategoryDealsPage({ params, searchParams }: Props) {
     const fetchDeals = async () => {
       try {
         const qs = new URLSearchParams();
-
         if (searchParams?.minPrice) qs.set("minPrice", searchParams.minPrice);
         if (searchParams?.maxPrice) qs.set("maxPrice", searchParams.maxPrice);
         if (searchParams?.merchant) qs.set("merchant", searchParams.merchant);
         if (searchParams?.sort) qs.set("sort", searchParams.sort);
         if (searchParams?.q) qs.set("q", searchParams.q);
 
-        // -------- BASE URL FIX --------
         const base =
           process.env.NEXT_PUBLIC_BASE_URL ||
           process.env.BASE_URL ||
           `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
 
         const url = new URL("/api/deals", base);
-
         url.searchParams.set("category", slug);
         url.searchParams.set("subcategory", sub);
 
         qs.forEach((v, k) => url.searchParams.set(k, v));
 
         const res = await fetch(url.toString(), { cache: "no-store" });
-
         if (!res.ok) {
           setDeals([]);
           return;
@@ -70,10 +66,9 @@ export default function SubcategoryDealsPage({ params, searchParams }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
         {/* Sidebar */}
         <aside className="lg:col-span-1">
-          <FilterSidebar initial={searchParams} />
+          <FilterSidebar />
         </aside>
 
-        {/* Deals Section */}
         <section className="lg:col-span-3">
           <header className="mb-6">
             <h1 className="text-3xl font-bold">
