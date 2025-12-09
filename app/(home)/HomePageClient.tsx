@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import BannerAdSection from "@/components/BannerAdSection";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedDeals from "@/components/FeaturedDeals";
-import FeaturedProducts from "@/components/FeaturedProducts";
 import CartToHeartSection from "@/components/CartToHeartSection";
 import FloatingAIButtons from "@/components/FloatingAIButtons";
 import HeroBannerGeneral from "@/components/HeroBannerGeneral";
