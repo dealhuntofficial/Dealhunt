@@ -1,128 +1,129 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function FilterSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+  const [merchant, setMerchant] = useState<string>("");
+  const [sort, setSort] = useState<string>("");
+  const [query, setQuery] = useState<string>("");
 
-  const [filters, setFilters] = useState({
-    minPrice: "",
-    maxPrice: "",
-    partners: "",
-    rating: "",
-    sort: "",
-  });
-
-  // Load filter values from URL on first load
+  // Set values from URL on mount
   useEffect(() => {
-    setFilters({
-      minPrice: searchParams.get("minPrice") || "",
-      maxPrice: searchParams.get("maxPrice") || "",
-      partners: searchParams.get("partners") || "",
-      rating: searchParams.get("rating") || "",
-      sort: searchParams.get("sort") || "",
-    });
+    setMinPrice(searchParams.get("minPrice") || "");
+    setMaxPrice(searchParams.get("maxPrice") || "");
+    setMerchant(searchParams.get("merchant") || "");
+    setSort(searchParams.get("sort") || "");
+    setQuery(searchParams.get("q") || "");
   }, [searchParams]);
 
-  function applyFilters() {
+  const applyFilters = () => {
     const params = new URLSearchParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    if (merchant) params.set("merchant", merchant);
+    if (sort) params.set("sort", sort);
+    if (query) params.set("q", query);
 
-    router.push(`${window.location.pathname}?${params.toString()}`);
-  }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const clearFilters = () => {
+    router.push(pathname);
+    setMinPrice("");
+    setMaxPrice("");
+    setMerchant("");
+    setSort("");
+    setQuery("");
+  };
 
   return (
-    <aside className="w-full md:w-72 p-4 bg-white rounded-lg shadow-sm">
+    <div className="bg-white p-4 rounded-lg shadow sticky top-24">
+      <h3 className="text-xl font-semibold mb-4">Filters</h3>
 
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-gray-200 py-2 rounded mb-4"
-      >
-        {isOpen ? "Hide Filters" : "Show Filters"}
-      </button>
+      {/* Search */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Search</label>
+        <input
+          type="text"
+          value={query}
+          placeholder="Search title..."
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full border rounded p-2"
+        />
+      </div>
 
-      {isOpen && (
-        <div>
-          <h4 className="font-semibold mb-3">Filters</h4>
-
-          {/* Min Price */}
-          <div className="mb-3">
-            <label className="text-sm block mb-1">Min Price</label>
-            <input
-              value={filters.minPrice}
-              onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-              className="w-full border rounded px-2 py-1 text-sm"
-            />
-          </div>
-
-          {/* Max Price */}
-          <div className="mb-3">
-            <label className="text-sm block mb-1">Max Price</label>
-            <input
-              value={filters.maxPrice}
-              onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-              className="w-full border rounded px-2 py-1 text-sm"
-            />
-          </div>
-
-          {/* Partners */}
-          <div className="mb-3">
-            <label className="text-sm block mb-1">Store / Partner</label>
-            <input
-              value={filters.partners}
-              onChange={(e) => setFilters({ ...filters, partners: e.target.value })}
-              className="w-full border rounded px-2 py-1 text-sm"
-              placeholder="Amazon, Flipkart"
-            />
-          </div>
-
-          {/* Rating */}
-          <div className="mb-3">
-            <label className="text-sm block mb-1">Rating</label>
-            <select
-              value={filters.rating}
-              onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
-              className="w-full border rounded px-2 py-1 text-sm"
-            >
-              <option value="">All Ratings</option>
-              <option value="5">⭐⭐⭐⭐⭐ 5+</option>
-              <option value="4">⭐⭐⭐⭐ 4+</option>
-              <option value="3">⭐⭐⭐ 3+</option>
-              <option value="2">⭐⭐ 2+</option>
-              <option value="1">⭐ 1+</option>
-            </select>
-          </div>
-
-          {/* Sort */}
-          <div className="mb-3">
-            <label className="text-sm block mb-1">Sort</label>
-            <select
-              value={filters.sort}
-              onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-              className="w-full border rounded px-2 py-1 text-sm"
-            >
-              <option value="">Relevance</option>
-              <option value="price-asc">Price: Low → High</option>
-              <option value="price-desc">Price: High → Low</option>
-              <option value="discount-desc">Highest Discount</option>
-            </select>
-          </div>
-
-          <button
-            onClick={applyFilters}
-            className="w-full bg-blue-600 text-white py-2 rounded"
-          >
-            Apply Filters
-          </button>
+      {/* Price Range */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Price Range</label>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="w-1/2 border rounded p-2"
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="w-1/2 border rounded p-2"
+          />
         </div>
-      )}
-    </aside>
+      </div>
+
+      {/* Merchant */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Merchant</label>
+        <input
+          type="text"
+          placeholder="Amazon, Flipkart, etc."
+          value={merchant}
+          onChange={(e) => setMerchant(e.target.value)}
+          className="w-full border rounded p-2"
+        />
+      </div>
+
+      {/* Sort */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Sort</label>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="w-full border rounded p-2"
+        >
+          <option value="">Default</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+          <option value="latest">Latest</option>
+        </select>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-2 mt-4">
+        <button
+          onClick={applyFilters}
+          className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Apply
+        </button>
+
+        <button
+          onClick={clearFilters}
+          className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
   );
 }
