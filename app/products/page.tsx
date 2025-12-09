@@ -25,43 +25,25 @@ interface Product {
   rating?: number;
 }
 
-/**
- * ProductsPage (final, integrated with FilterSidebar)
- *
- * Responsibilities:
- * - Read filters from URLSearchParams (FilterSidebar writes them via router.push)
- * - Fetch /api/deals with those query params (server-side filtering if available)
- * - Map & render products
- * - Provide mobile show/hide for sidebar (keeps consistent UI across pages)
- * - Use BackButton component (shared)
- *
- * Important: FilterSidebar handles user input and updates the URL. This page
- * reacts to the URL params and fetches accordingly. No duplicate filters here.
- */
-
 export const dynamic = "force-dynamic";
 
 export default function ProductsPage() {
   const params = useSearchParams();
   const router = useRouter();
 
-  // Read primary search / category params
   const searchQuery = params.get("search") || params.get("q") || "";
   const categoryParam = params.get("category") || "";
 
-  // UI state
   const [loading, setLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  // Derived filter values from URL params (string values)
   const minPriceParam = params.get("minPrice") || "";
   const maxPriceParam = params.get("maxPrice") || "";
-  const partnersParam = params.get("partners") || ""; // comma separated
-  const ratingParam = params.get("rating") || ""; // "4" means 4+
-  const sortParam = params.get("sort") || params.get("sortBy") || ""; // e.g. price-asc
+  const partnersParam = params.get("partners") || "";
+  const ratingParam = params.get("rating") || "";
+  const sortParam = params.get("sort") || params.get("sortBy") || "";
 
-  // Convert partners to array
   const partnersArray = useMemo(
     () =>
       partnersParam
@@ -73,21 +55,18 @@ export default function ProductsPage() {
     [partnersParam]
   );
 
-  // Build API url based on params (so server does initial filtering/sorting)
   const apiUrl = useMemo(() => {
     const q = new URLSearchParams();
 
     if (categoryParam) q.set("category", categoryParam);
     if (searchQuery) q.set("q", searchQuery);
-
     if (minPriceParam) q.set("minPrice", minPriceParam);
     if (maxPriceParam) q.set("maxPrice", maxPriceParam);
     if (partnersParam) q.set("partners", partnersParam);
     if (ratingParam) q.set("rating", ratingParam);
     if (sortParam) q.set("sort", sortParam);
 
-    const base = `/api/deals?${q.toString()}`;
-    return base;
+    return `/api/deals?${q.toString()}`;
   }, [
     categoryParam,
     searchQuery,
@@ -98,7 +77,6 @@ export default function ProductsPage() {
     sortParam,
   ]);
 
-  // Fetch whenever apiUrl changes
   useEffect(() => {
     let mounted = true;
     setLoading(true);
@@ -147,52 +125,72 @@ export default function ProductsPage() {
     };
   }, [apiUrl]);
 
-  // Client-side fallback filters (applied on top of server results)
   const minPriceNum = Number(minPriceParam || 0);
   const maxPriceNum = maxPriceParam ? Number(maxPriceParam) : Number.POSITIVE_INFINITY;
   const minRatingNum = ratingParam ? Number(ratingParam) : 0;
 
+  // ✅ FIXED: Added parentheses around (a ?? b)
   const clientFiltered = useMemo(() => {
     return products
       .filter((p) => {
-        // price
-        const price = p.priceNow ?? Number(String(p.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        const price =
+          (p.priceNow ?? Number(String(p.price ?? "").replace(/[^0-9]/g, ""))) ||
+          0;
+
         if (minPriceParam && price < minPriceNum) return false;
         if (maxPriceParam && price > maxPriceNum) return false;
 
-        // rating
         if (minRatingNum && (p.rating ?? 0) < minRatingNum) return false;
 
-        // partners (match brand or comparison sites)
         if (partnersArray.length > 0) {
           const lowerPartners = partnersArray.map((x) => x.toLowerCase());
           const brandOk = p.brand ? lowerPartners.includes(p.brand.toLowerCase()) : false;
-          const compOk =
-            (p.comparison || []).some((c) =>
-              lowerPartners.includes((c.site || "").toLowerCase())
-            );
+          const compOk = (p.comparison || []).some((c) =>
+            lowerPartners.includes((c.site || "").toLowerCase())
+          );
           if (!brandOk && !compOk) return false;
         }
 
         return true;
       })
-      .slice(); // return shallow copy
-  }, [products, minPriceParam, maxPriceParam, minPriceNum, maxPriceNum, minRatingNum, partnersArray]);
+      .slice();
+  }, [
+    products,
+    minPriceParam,
+    maxPriceParam,
+    minPriceNum,
+    maxPriceNum,
+    minRatingNum,
+    partnersArray,
+  ]);
 
-  // Extra client-side sorting if server didn't handle it
   const finalList = useMemo(() => {
     const arr = clientFiltered.slice();
 
-    if (sortParam === "price-asc" || sortParam === "price-asc" || sortParam === "price-ascending") {
+    if (
+      sortParam === "price-asc" ||
+      sortParam === "price-ascending"
+    ) {
       arr.sort((a, b) => {
-        const pa = a.priceNow ?? Number(String(a.price ?? "").replace(/[^0-9]/g, "")) || 0;
-        const pb = b.priceNow ?? Number(String(b.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        const pa =
+          (a.priceNow ??
+            Number(String(a.price ?? "").replace(/[^0-9]/g, ""))) || 0;
+        const pb =
+          (b.priceNow ??
+            Number(String(b.price ?? "").replace(/[^0-9]/g, ""))) || 0;
         return pa - pb;
       });
-    } else if (sortParam === "price-desc" || sortParam === "price-descending") {
+    } else if (
+      sortParam === "price-desc" ||
+      sortParam === "price-descending"
+    ) {
       arr.sort((a, b) => {
-        const pa = a.priceNow ?? Number(String(a.price ?? "").replace(/[^0-9]/g, "")) || 0;
-        const pb = b.priceNow ?? Number(String(b.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        const pa =
+          (a.priceNow ??
+            Number(String(a.price ?? "").replace(/[^0-9]/g, ""))) || 0;
+        const pb =
+          (b.priceNow ??
+            Number(String(b.price ?? "").replace(/[^0-9]/g, ""))) || 0;
         return pb - pa;
       });
     }
@@ -200,7 +198,6 @@ export default function ProductsPage() {
     return arr;
   }, [clientFiltered, sortParam]);
 
-  // If user wants to quickly clear filters
   const clearFilters = () => {
     router.push(window.location.pathname);
   };
@@ -209,7 +206,6 @@ export default function ProductsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <BackButton />
 
-      {/* Controls row */}
       <div className="flex items-center justify-between gap-4 mt-4 mb-6">
         <div className="flex items-center gap-3">
           <button
@@ -234,20 +230,16 @@ export default function ProductsPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 relative">
-        {/* Sidebar */}
         <aside
           className={`bg-white rounded-xl shadow-md p-4 h-fit md:w-72 absolute md:static top-0 left-0 w-11/12 mx-auto transition-all duration-300 z-20 ${
             showFilters ? "block" : "hidden md:block"
           }`}
         >
-          {/* FilterSidebar component is expected to update URLSearchParams using router.push */}
           <FilterSidebar />
         </aside>
 
-        {/* Products grid */}
         <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
-            // skeletons
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
