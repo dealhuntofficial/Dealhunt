@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import BannerAdSection from "@/components/BannerAdSection";
@@ -14,7 +14,6 @@ import FilterSidebar from "@/components/FilterSidebar";
 
 export default function HomePageClient() {
   const params = useSearchParams();
-  const router = useRouter();
 
   const [deals, setDeals] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -35,16 +34,16 @@ export default function HomePageClient() {
           process.env.BASE_URL ||
           `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
 
+        // DEALS FETCH
         const dealsURL = new URL("/api/deals", base);
         qs.forEach((v, k) => dealsURL.searchParams.set(k, v));
-
         const dealsRes = await fetch(dealsURL.toString(), { cache: "no-store" });
         const dealsJson = await dealsRes.json();
         setDeals(dealsJson.deals || []);
 
+        // PRODUCTS FETCH
         const prodURL = new URL("/api/products", base);
         qs.forEach((v, k) => prodURL.searchParams.set(k, v));
-
         const prodRes = await fetch(prodURL.toString(), { cache: "no-store" });
         const prodJson = await prodRes.json();
         setProducts(prodJson.products || []);
@@ -61,20 +60,37 @@ export default function HomePageClient() {
   return (
     <main className="relative bg-gradient-to-b from-blue-50 to-white text-gray-900">
 
-      <div className="max-w-7xl mx-auto px-4 pt-6">
-        <FilterSidebar />
-      </div>
-
+      {/* HERO + ADS */}
       <HeroBannerGeneral />
       <BannerAdSection />
 
-      <FeaturedDeals externalDeals={deals} />
-
+      {/* CATEGORY + CART TO HEART */}
       <CategoryGrid mode="general" />
-
       <CartToHeartSection />
 
-      <FeaturedProducts mode="general" externalProducts={products} />
+      {/* ⭐ FILTER + FEATURED DEALS - Correct Location */}
+      <div className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        {/* LEFT SIDEBAR - Desktop */}
+        <div className="hidden md:block col-span-1">
+          <FilterSidebar />
+        </div>
+
+        {/* Mobile Filter */}
+        <div className="md:hidden col-span-1 mb-4">
+          <FilterSidebar mobile />
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="col-span-3">
+          <FeaturedDeals externalDeals={deals} />
+        </div>
+      </div>
+
+      {/* ⭐ FEATURED PRODUCTS BELOW DEALS */}
+      <div className="max-w-7xl mx-auto px-4 mt-6">
+        <FeaturedProducts mode="general" externalProducts={products} />
+      </div>
 
       <FloatingAIButtons />
     </main>
