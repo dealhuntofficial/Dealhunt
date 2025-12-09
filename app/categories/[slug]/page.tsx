@@ -11,38 +11,44 @@ type Props = { params: { slug: string }; searchParams?: any };
 
 export default function CategoryDealsPage({ params, searchParams }: Props) {
   const [deals, setDeals] = useState<any[]>([]);
-
   const slug = params.slug;
-  const category = categories.find((c) => c.slug === slug);
-  if (!category)
-    return <div className="p-8 text-center">Category not found</div>;
 
+  // Find category
+  const category = categories.find((c) => c.slug === slug);
+  if (!category) {
+    return <div className="p-8 text-center">Category not found</div>;
+  }
+
+  // Subcategories for sidebar
   const subs = subCategories[slug] || subCategories.default || [];
 
   useEffect(() => {
     const fetchDeals = async () => {
       try {
         const qs = new URLSearchParams();
+
         if (searchParams?.minPrice) qs.set("minPrice", searchParams.minPrice);
         if (searchParams?.maxPrice) qs.set("maxPrice", searchParams.maxPrice);
         if (searchParams?.merchant) qs.set("merchant", searchParams.merchant);
         if (searchParams?.sort) qs.set("sort", searchParams.sort);
         if (searchParams?.q) qs.set("q", searchParams.q);
 
+        // Environment fallbacks for API base URL
         const base =
           process.env.NEXT_PUBLIC_BASE_URL ||
           process.env.BASE_URL ||
           `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
 
+        // Build final URL
         const url = new URL("/api/deals", base);
         url.searchParams.set("category", slug);
 
-        qs.forEach((v, k) => {
-          url.searchParams.set(k, v);
-        });
+        qs.forEach((v, k) => url.searchParams.set(k, v));
 
         const res = await fetch(url.toString(), { cache: "no-store" });
+
         if (!res.ok) {
+          console.error("Fetch failed:", res.status);
           setDeals([]);
           return;
         }
@@ -84,6 +90,7 @@ export default function CategoryDealsPage({ params, searchParams }: Props) {
           </div>
         </aside>
 
+        {/* Deals Section */}
         <section className="lg:col-span-3">
           <header className="mb-6">
             <h1 className="text-3xl font-bold">{category.name} — Best Deals</h1>
@@ -98,7 +105,7 @@ export default function CategoryDealsPage({ params, searchParams }: Props) {
                 No deals found.
               </div>
             ) : (
-              deals.map((d: any) => <DealCard key={d.id} deal={d} />)
+              deals.map((deal: any) => <DealCard key={deal.id} deal={deal} />)
             )}
           </div>
         </section>
