@@ -1,98 +1,122 @@
-// File: components/Filters.tsx
 "use client";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import React from "react";
+export default function FilterSidebar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
-interface FiltersProps {
-  filters: any;
-  setFilters: (filters: any) => void;
-}
+  const [filters, setFilters] = useState({
+    minPrice: "",
+    maxPrice: "",
+    partners: "",
+    rating: "",
+    sort: "",
+  });
 
-export default function Filters({ filters, setFilters }: FiltersProps) {
-  const partnersList = [
-    "Amazon",
-    "Flipkart",
-    "Meesho",
-    "Myntra",
-    "Ajio",
-    "TataCliq",
-    "Croma",
-    "RelianceDigital",
-    "Snapdeal",
-  ];
+  useEffect(() => {
+    setFilters({
+      minPrice: searchParams.get("minPrice") || "",
+      maxPrice: searchParams.get("maxPrice") || "",
+      partners: searchParams.get("partners") || "",
+      rating: searchParams.get("rating") || "",
+      sort: searchParams.get("sort") || "",
+    });
+  }, [searchParams]);
 
-  const ratingList = [
-    { label: "1 ★ & above", value: 1 },
-    { label: "2 ★ & above", value: 2 },
-    { label: "3 ★ & above", value: 3 },
-    { label: "4 ★ & above", value: 4 },
-    { label: "5 ★ only", value: 5 },
-  ];
+  function applyFilters() {
+    const params = new URLSearchParams();
+
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v) params.set(k, v);
+    });
+
+    router.push(`${window.location.pathname}?${params.toString()}`);
+  }
 
   return (
-    <div className="w-full p-4 bg-white rounded-lg shadow-md space-y-4">
+    <div className="w-full">
+      {/* Mobile Accordion */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden w-full bg-gray-200 py-2 rounded mb-3"
+      >
+        {isOpen ? "Hide Filters" : "Show Filters"}
+      </button>
 
-      {/* Price Filter */}
-      <div>
-        <label className="font-semibold">Price Range</label>
-        <div className="flex gap-3 mt-2">
+      <div className={`${isOpen ? "block" : "hidden"} md:block bg-white rounded-lg p-4 shadow`}>
+        <h3 className="font-semibold text-lg mb-3">Filters</h3>
+
+        {/* Min Price */}
+        <div className="mb-3">
+          <label className="block text-sm mb-1">Min Price</label>
           <input
-            type="number"
-            placeholder="Min"
-            className="border p-2 rounded w-1/2"
-            value={filters.minPrice || ""}
-            onChange={(e) =>
-              setFilters({ ...filters, minPrice: e.target.value })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            className="border p-2 rounded w-1/2"
-            value={filters.maxPrice || ""}
-            onChange={(e) =>
-              setFilters({ ...filters, maxPrice: e.target.value })
-            }
+            className="border w-full rounded px-2 py-1"
+            value={filters.minPrice}
+            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
           />
         </div>
-      </div>
 
-      {/* Partners Filter */}
-      <div>
-        <label className="font-semibold">Partners</label>
-        <select
-          className="w-full border p-2 rounded mt-2"
-          value={filters.partner || ""}
-          onChange={(e) =>
-            setFilters({ ...filters, partner: e.target.value })
-          }
+        {/* Max Price */}
+        <div className="mb-3">
+          <label className="block text-sm mb-1">Max Price</label>
+          <input
+            className="border w-full rounded px-2 py-1"
+            value={filters.maxPrice}
+            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+          />
+        </div>
+
+        {/* Partners */}
+        <div className="mb-3">
+          <label className="block text-sm mb-1">Store / Partner</label>
+          <input
+            className="border w-full rounded px-2 py-1"
+            placeholder="Amazon, Flipkart"
+            value={filters.partners}
+            onChange={(e) => setFilters({ ...filters, partners: e.target.value })}
+          />
+        </div>
+
+        {/* Rating */}
+        <div className="mb-3">
+          <label className="block text-sm mb-1">Rating</label>
+          <select
+            className="border w-full rounded px-2 py-1"
+            value={filters.rating}
+            onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
+          >
+            <option value="">All</option>
+            <option value="5">⭐⭐⭐⭐⭐ 5+</option>
+            <option value="4">⭐⭐⭐⭐ 4+</option>
+            <option value="3">⭐⭐⭐ 3+</option>
+          </select>
+        </div>
+
+        {/* Sort */}
+        <div className="mb-3">
+          <label className="block text-sm mb-1">Sort</label>
+          <select
+            className="border w-full rounded px-2 py-1"
+            value={filters.sort}
+            onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+          >
+            <option value="">Relevance</option>
+            <option value="price-asc">Low → High</option>
+            <option value="price-desc">High → Low</option>
+            <option value="discount-desc">Highest Discount</option>
+          </select>
+        </div>
+
+        {/* Apply Button */}
+        <button
+          onClick={applyFilters}
+          className="w-full bg-blue-600 text-white py-2 rounded mt-2"
         >
-          <option value="">All Partners</option>
-          {partnersList.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
-        </select>
+          Apply Filters
+        </button>
       </div>
-
-      {/* Ratings Filter */}
-      <div>
-        <label className="font-semibold">Minimum Rating</label>
-        <select
-          className="w-full border p-2 rounded mt-2"
-          value={filters.minRating || ""}
-          onChange={(e) =>
-            setFilters({ ...filters, minRating: Number(e.target.value) })
-          }
-        >
-          <option value="">Any Rating</option>
-          {ratingList.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
     </div>
   );
 }
