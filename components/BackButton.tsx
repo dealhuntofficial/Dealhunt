@@ -1,4 +1,3 @@
-// /components/BackButton.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -9,8 +8,7 @@ export default function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 
-                 text-white px-4 py-2 rounded-md shadow-sm transition"
+      className="text-sm px-3 py-1.5 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-all shadow-sm"
     >
       ← Back
     </button>
