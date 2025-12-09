@@ -9,17 +9,17 @@ interface ProductType {
   image: string;
 }
 
-export default function GeneralDeals ({
+export default function GeneralDeals({
   mode,
   externalProducts,
 }: {
   mode: "luxury" | "general";
   externalProducts?: ProductType[];
-}) }
+}) {
   const [visibleCount, setVisibleCount] = useState(4);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const luxuryProducts = [
+  const luxuryProducts: ProductType[] = [
     { id: 1, title: "Omega Seamaster", price: "$2499", image: "/images/deals/deal1.jpg" },
     { id: 2, title: "Rolex Daytona", price: "$12999", image: "/images/deals/deal2.jpg" },
     { id: 3, title: "Tag Heuer Carrera", price: "$3499", image: "/images/deals/deal4.jpg" },
@@ -28,16 +28,16 @@ export default function GeneralDeals ({
     { id: 6, title: "Prada Sunglasses", price: "$899", image: "/images/deals/deal6.jpg" },
   ];
 
-  const generalProducts = [
+  const generalProducts: ProductType[] = [
     { id: 101, title: "Nike Air Max", price: "$120", image: "/images/general/shoe.jpg" },
-    { id: 102, title: "Casio Watch", price: "$99", imageg: "/images/general/watch.jpg" },
+    { id: 102, title: "Casio Watch", price: "$99", image: "/images/general/watch.jpg" },
     { id: 103, title: "Axe Perfume", price: "$25", image: "/images/general/perfume.jpg" },
     { id: 104, title: "Levi’s Bag", price: "$75", image: "/images/general/bag.jpg" },
     { id: 105, title: "Adidas T-Shirt", price: "$45", image: "/images/general/tshirt.jpg" },
     { id: 106, title: "Boat Earbuds", price: "$35", image: "/images/general/earbuds.jpg" },
   ];
 
-  // 🔥 PRIORITY: If API products exist, use them. Else fallback.
+  // Priority: API products → else fallback
   const products: ProductType[] =
     externalProducts && externalProducts.length > 0
       ? externalProducts
@@ -100,7 +100,9 @@ export default function GeneralDeals ({
                 className="w-full h-48 object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="p-3 text-center">
-                <h3 className="font-semibold text-gray-800 truncate">{prod.title}</h3>
+                <h3 className="font-semibold text-gray-800 truncate">
+                  {prod.title}
+                </h3>
                 <p
                   className={`font-bold ${
                     mode === "luxury" ? "text-yellow-600" : "text-blue-600"
