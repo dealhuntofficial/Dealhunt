@@ -1,8 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/BackButton";
+import FilterSidebar from "@/components/FilterSidebar";
 
 interface ComparisonItem {
   site: string;
@@ -12,259 +13,241 @@ interface ComparisonItem {
 
 interface Product {
   id: number | string;
-  name: string;
-  price: string;
-  img: string;
-  comparison: ComparisonItem[];
-  brand: string;
-  rating: number;
+  title: string;
+  name?: string;
+  priceNow?: number;
+  price?: string;
+  img?: string;
+  image?: string;
+  comparison?: ComparisonItem[];
+  brand?: string;
+  merchant?: string;
+  rating?: number;
 }
+
+/**
+ * ProductsPage (final, integrated with FilterSidebar)
+ *
+ * Responsibilities:
+ * - Read filters from URLSearchParams (FilterSidebar writes them via router.push)
+ * - Fetch /api/deals with those query params (server-side filtering if available)
+ * - Map & render products
+ * - Provide mobile show/hide for sidebar (keeps consistent UI across pages)
+ * - Use BackButton component (shared)
+ *
+ * Important: FilterSidebar handles user input and updates the URL. This page
+ * reacts to the URL params and fetches accordingly. No duplicate filters here.
+ */
 
 export const dynamic = "force-dynamic";
 
 export default function ProductsPage() {
-  let searchQuery = "";
-  let categoryParam = "";
+  const params = useSearchParams();
+  const router = useRouter();
 
-  try {
-    const params = useSearchParams();
-    categoryParam = params?.get("category") || "";
-    searchQuery = params?.get("search") || categoryParam || "";
-  } catch {
-    categoryParam = "";
-    searchQuery = "";
-  }
+  // Read primary search / category params
+  const searchQuery = params.get("search") || params.get("q") || "";
+  const categoryParam = params.get("category") || "";
 
+  // UI state
+  const [loading, setLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  const [selectedBrand, setSelectedBrand] = useState("all");
-  const [minRating, setMinRating] = useState(0);
-  const [priceSort, setPriceSort] = useState<"high" | "low" | "none">("none");
+  // Derived filter values from URL params (string values)
+  const minPriceParam = params.get("minPrice") || "";
+  const maxPriceParam = params.get("maxPrice") || "";
+  const partnersParam = params.get("partners") || ""; // comma separated
+  const ratingParam = params.get("rating") || ""; // "4" means 4+
+  const sortParam = params.get("sort") || params.get("sortBy") || ""; // e.g. price-asc
 
-  const [partners, setPartners] = useState<string[]>([]);
-  const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
+  // Convert partners to array
+  const partnersArray = useMemo(
+    () =>
+      partnersParam
+        ? partnersParam
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+    [partnersParam]
+  );
 
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300000]);
-  const [showFilters, setShowFilters] = useState(false);
+  // Build API url based on params (so server does initial filtering/sorting)
+  const apiUrl = useMemo(() => {
+    const q = new URLSearchParams();
 
-  // FETCH PRODUCTS
+    if (categoryParam) q.set("category", categoryParam);
+    if (searchQuery) q.set("q", searchQuery);
+
+    if (minPriceParam) q.set("minPrice", minPriceParam);
+    if (maxPriceParam) q.set("maxPrice", maxPriceParam);
+    if (partnersParam) q.set("partners", partnersParam);
+    if (ratingParam) q.set("rating", ratingParam);
+    if (sortParam) q.set("sort", sortParam);
+
+    const base = `/api/deals?${q.toString()}`;
+    return base;
+  }, [
+    categoryParam,
+    searchQuery,
+    minPriceParam,
+    maxPriceParam,
+    partnersParam,
+    ratingParam,
+    sortParam,
+  ]);
+
+  // Fetch whenever apiUrl changes
   useEffect(() => {
+    let mounted = true;
     setLoading(true);
 
-    const params = new URLSearchParams();
-    if (categoryParam) params.set("category", categoryParam);
-    else if (searchQuery) params.set("q", searchQuery);
-
-    if (selectedPartners.length > 0)
-      params.set("partners", selectedPartners.join(","));
-
-    const apiUrl = `/api/deals?${params.toString()}`;
-
-    const loadProducts = async () => {
+    const load = async () => {
       try {
         const res = await fetch(apiUrl);
         if (!res.ok) {
+          if (!mounted) return;
           setProducts([]);
           setLoading(false);
           return;
         }
-
         const json = await res.json();
-        const list = json.deals || [];
+        const list: any[] = json.deals || [];
 
         const mapped: Product[] = list.map((it: any, idx: number) => ({
-          id: it.id || idx,
-          name: it.title || it.name,
-          price: it.priceNow ? `₹${it.priceNow}` : it.price || "₹0",
-          img: it.image || "/images/placeholder.png",
-          comparison: it.comparison || [],
-          brand: it.brand || it.merchant || "Unknown",
-          rating: it.rating || 4,
+          id: it.id ?? idx,
+          title: it.title ?? it.name ?? `Product ${idx + 1}`,
+          name: it.title ?? it.name,
+          priceNow: typeof it.priceNow === "number" ? it.priceNow : undefined,
+          price: it.price ?? (it.priceNow ? `₹${it.priceNow}` : undefined),
+          img: it.image ?? it.img ?? "/images/placeholder.png",
+          image: it.image ?? it.img,
+          comparison: it.comparison ?? [],
+          brand: it.brand ?? it.merchant ?? "Unknown",
+          merchant: it.merchant,
+          rating: it.rating ?? 4,
         }));
 
+        if (!mounted) return;
         setProducts(mapped);
-
-        const prices = mapped.map((p) =>
-          Number(String(p.price).replace(/[^0-9]/g, ""))
-        );
-
-        if (prices.length > 0)
-          setPriceRange([Math.min(...prices), Math.max(...prices)]);
-      } catch {
+      } catch (err) {
+        console.error("Products fetch error:", err);
+        if (!mounted) return;
         setProducts([]);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
-    loadProducts();
-  }, [searchQuery, categoryParam, selectedPartners]);
+    load();
 
-  // FETCH MERCHANTS
-  useEffect(() => {
-    const loadPartners = async () => {
-      try {
-        const q = new URLSearchParams();
-        if (categoryParam) q.set("category", categoryParam);
-
-        const res = await fetch(`/api/merchants?${q.toString()}`);
-        const json = await res.json();
-
-        const arr = (json.merchants || []).map((m: any) => m.name);
-        setPartners(arr);
-      } catch {
-        setPartners([]);
-      }
+    return () => {
+      mounted = false;
     };
+  }, [apiUrl]);
 
-    loadPartners();
-  }, [categoryParam, searchQuery]);
+  // Client-side fallback filters (applied on top of server results)
+  const minPriceNum = Number(minPriceParam || 0);
+  const maxPriceNum = maxPriceParam ? Number(maxPriceParam) : Number.POSITIVE_INFINITY;
+  const minRatingNum = ratingParam ? Number(ratingParam) : 0;
 
-  // LOCAL FILTERING
-  let filteredProducts = products.filter((p) => {
-    const numericPrice = Number(String(p.price).replace(/[^0-9]/g, ""));
-    return (
-      (selectedBrand === "all" || p.brand === selectedBrand) &&
-      p.rating >= minRating &&
-      numericPrice >= priceRange[0] &&
-      numericPrice <= priceRange[1] &&
-      (selectedPartners.length === 0 ||
-        selectedPartners.some(
-          (partner) =>
-            p.brand?.toLowerCase() === partner.toLowerCase() ||
-            p.comparison.some(
-              (c) =>
-                (c.site || "").toLowerCase() === partner.toLowerCase()
-            )
-        ))
-    );
-  });
+  const clientFiltered = useMemo(() => {
+    return products
+      .filter((p) => {
+        // price
+        const price = p.priceNow ?? Number(String(p.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        if (minPriceParam && price < minPriceNum) return false;
+        if (maxPriceParam && price > maxPriceNum) return false;
 
-  // PRICE SORT
-  if (priceSort === "low") {
-    filteredProducts.sort((a, b) => {
-      const pa = Number(a.price.replace(/[^0-9]/g, ""));
-      const pb = Number(b.price.replace(/[^0-9]/g, ""));
-      return pa - pb;
-    });
-  }
+        // rating
+        if (minRatingNum && (p.rating ?? 0) < minRatingNum) return false;
 
-  if (priceSort === "high") {
-    filteredProducts.sort((a, b) => {
-      const pa = Number(a.price.replace(/[^0-9]/g, ""));
-      const pb = Number(b.price.replace(/[^0-9]/g, ""));
-      return pb - pa;
-    });
-  }
+        // partners (match brand or comparison sites)
+        if (partnersArray.length > 0) {
+          const lowerPartners = partnersArray.map((x) => x.toLowerCase());
+          const brandOk = p.brand ? lowerPartners.includes(p.brand.toLowerCase()) : false;
+          const compOk =
+            (p.comparison || []).some((c) =>
+              lowerPartners.includes((c.site || "").toLowerCase())
+            );
+          if (!brandOk && !compOk) return false;
+        }
 
-  const togglePartner = (p: string) => {
-    setSelectedPartners((prev) =>
-      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]
-    );
+        return true;
+      })
+      .slice(); // return shallow copy
+  }, [products, minPriceParam, maxPriceParam, minPriceNum, maxPriceNum, minRatingNum, partnersArray]);
+
+  // Extra client-side sorting if server didn't handle it
+  const finalList = useMemo(() => {
+    const arr = clientFiltered.slice();
+
+    if (sortParam === "price-asc" || sortParam === "price-asc" || sortParam === "price-ascending") {
+      arr.sort((a, b) => {
+        const pa = a.priceNow ?? Number(String(a.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        const pb = b.priceNow ?? Number(String(b.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        return pa - pb;
+      });
+    } else if (sortParam === "price-desc" || sortParam === "price-descending") {
+      arr.sort((a, b) => {
+        const pa = a.priceNow ?? Number(String(a.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        const pb = b.priceNow ?? Number(String(b.price ?? "").replace(/[^0-9]/g, "")) || 0;
+        return pb - pa;
+      });
+    }
+
+    return arr;
+  }, [clientFiltered, sortParam]);
+
+  // If user wants to quickly clear filters
+  const clearFilters = () => {
+    router.push(window.location.pathname);
   };
 
-  // UI
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <BackButton />
 
-      <div className="mb-4 flex justify-end items-center">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="md:hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow-md"
-        >
-          {showFilters ? "Hide Filters" : "Show Filters"}
-        </button>
+      {/* Controls row */}
+      <div className="flex items-center justify-between gap-4 mt-4 mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowFilters((s) => !s)}
+            className="md:hidden bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-md text-sm"
+            aria-expanded={showFilters}
+          >
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </button>
+
+          <button
+            onClick={clearFilters}
+            className="hidden sm:inline-block text-sm px-2 py-1 rounded bg-gray-100 hover:bg-gray-200"
+          >
+            Clear Filters
+          </button>
+        </div>
+
+        <div className="text-sm text-gray-600">
+          {finalList.length} result{finalList.length !== 1 ? "s" : ""}
+        </div>
       </div>
 
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">
-        Showing results for:{" "}
-        <span className="text-yellow-600">
-          {categoryParam || searchQuery || "All"}
-        </span>
-      </h1>
-
       <div className="flex flex-col md:flex-row gap-6 relative">
+        {/* Sidebar */}
         <aside
-          className={`bg-white rounded-xl shadow-md p-4 h-fit flex flex-col gap-4 md:w-64 md:static absolute top-0 left-0 w-11/12 mx-auto transition-all duration-300 z-20 ${
+          className={`bg-white rounded-xl shadow-md p-4 h-fit md:w-72 absolute md:static top-0 left-0 w-11/12 mx-auto transition-all duration-300 z-20 ${
             showFilters ? "block" : "hidden md:block"
           }`}
         >
-          <h2 className="text-lg font-semibold mb-3">Filters</h2>
-
-          <label>
-            <span className="text-sm font-medium">Brand</span>
-            <select
-              className="w-full border mt-1 rounded px-3 py-2"
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-            >
-              <option value="all">All</option>
-              {[...new Set(products.map((p) => p.brand))].map((b) => (
-                <option key={b}>{b}</option>
-              ))}
-            </select>
-          </label>
-
-          <div>
-            <span className="text-sm font-medium">Min Rating</span>
-            <div className="flex gap-1 mt-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  onClick={() => setMinRating(star)}
-                  className={`px-2 py-1 rounded ${
-                    minRating >= star
-                      ? "bg-yellow-500 text-white"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  {star}⭐
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <span className="text-sm font-medium">Partners</span>
-
-            <div className="flex flex-col gap-1 mt-2">
-              {partners.length === 0 ? (
-                <p className="text-xs text-gray-400">No partners found</p>
-              ) : (
-                partners.map((p) => (
-                  <label key={p} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedPartners.includes(p)}
-                      onChange={() => togglePartner(p)}
-                    />
-                    {p}
-                  </label>
-                ))
-              )}
-            </div>
-          </div>
-
-          <label>
-            <span className="text-sm font-medium">Sort by Price</span>
-            <select
-              className="w-full border mt-1 rounded px-3 py-2"
-              value={priceSort}
-              onChange={(e) =>
-                setPriceSort(e.target.value as "high" | "low" | "none")
-              }
-            >
-              <option value="none">None</option>
-              <option value="low">Low → High</option>
-              <option value="high">High → Low</option>
-            </select>
-          </label>
+          {/* FilterSidebar component is expected to update URLSearchParams using router.push */}
+          <FilterSidebar />
         </aside>
 
+        {/* Products grid */}
         <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
+            // skeletons
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -275,29 +258,41 @@ export default function ProductsPage() {
                 <div className="mt-2 h-4 bg-gray-200 rounded w-1/2"></div>
               </div>
             ))
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white rounded-xl shadow-md p-3 hover:shadow-lg transition"
-              >
-                <img
-                  src={p.img}
-                  alt={p.name}
-                  className="w-full h-40 object-cover rounded-lg"
-                />
+          ) : finalList.length > 0 ? (
+            finalList.map((p) => {
+              const priceLabel =
+                p.priceNow !== undefined
+                  ? `₹${p.priceNow}`
+                  : p.price ?? "₹0";
 
-                <h2 className="mt-2 text-base font-semibold line-clamp-2">
-                  {p.name}
-                </h2>
+              const imageSrc = p.img ?? p.image ?? "/images/placeholder.png";
 
-                <p className="text-lg font-bold text-green-600">{p.price}</p>
+              return (
+                <div
+                  key={p.id}
+                  className="bg-white rounded-xl shadow-md p-3 hover:shadow-lg transition"
+                >
+                  <img
+                    src={imageSrc}
+                    alt={p.title || p.name || String(p.id)}
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
 
-                <button className="mt-3 w-full bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 rounded-lg">
-                  View Details
-                </button>
-              </div>
-            ))
+                  <h2 className="mt-2 text-base font-semibold line-clamp-2">
+                    {p.title ?? p.name}
+                  </h2>
+
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-lg font-bold text-green-600">{priceLabel}</p>
+                    <p className="text-sm text-yellow-600">⭐ {p.rating ?? 4}</p>
+                  </div>
+
+                  <button className="mt-3 w-full bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 rounded-lg">
+                    View Details
+                  </button>
+                </div>
+              );
+            })
           ) : (
             <p className="text-gray-500 col-span-full text-center">
               No products found.
