@@ -2,39 +2,48 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const luxuryProducts = [
-  { id: 1, title: "Omega Seamaster", price: "$2499", image: "/images/deals/deal1.jpg" },
-  { id: 2, title: "Rolex Daytona", price: "$12999", image: "/images/deals/deal2.jpg" },
-  { id: 3, title: "Tag Heuer Carrera", price: "$3499", image: "/images/deals/deal4.jpg" },
-  { id: 4, title: "Gucci Diamond Bag", price: "$5299", image: "/images/deals/deal3.jpg" },
-  { id: 5, title: "Cartier Bracelet", price: "$2299", image: "/images/deals/deal5.jpg" },
-  { id: 6, title: "Prada Sunglasses", price: "$899", image: "/images/deals/deal6.jpg" },
-];
-
-const generalProducts = [
-  { id: 101, title: "Nike Air Max", price: "$120", image: "/images/general/shoe.jpg" },
-  { id: 102, title: "Casio Watch", price: "$99", image: "/images/general/watch.jpg" },
-  { id: 103, title: "Axe Perfume", price: "$25", image: "/images/general/perfume.jpg" },
-  { id: 104, title: "Levi’s Bag", price: "$75", image: "/images/general/bag.jpg" },
-  { id: 105, title: "Adidas T-Shirt", price: "$45", image: "/images/general/tshirt.jpg" },
-  { id: 106, title: "Boat Earbuds", price: "$35", image: "/images/general/earbuds.jpg" },
-];
+interface ProductType {
+  id: number | string;
+  title: string;
+  price: string | number;
+  image: string;
+}
 
 export default function FeaturedProducts({
   mode,
-  externalProducts = [],   // ✅ NEW PROP ADDED
+  externalProducts,
 }: {
   mode: "luxury" | "general";
-  externalProducts?: any[];
+  externalProducts?: ProductType[];
 }) {
   const [visibleCount, setVisibleCount] = useState(4);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // DEFAULT PRODUCTS
-  const defaultProducts = mode === "luxury" ? luxuryProducts : generalProducts;
+  const luxuryProducts = [
+    { id: 1, title: "Omega Seamaster", price: "$2499", image: "/images/deals/deal1.jpg" },
+    { id: 2, title: "Rolex Daytona", price: "$12999", image: "/images/deals/deal2.jpg" },
+    { id: 3, title: "Tag Heuer Carrera", price: "$3499", image: "/images/deals/deal4.jpg" },
+    { id: 4, title: "Gucci Diamond Bag", price: "$5299", image: "/images/deals/deal3.jpg" },
+    { id: 5, title: "Cartier Bracelet", price: "$2299", image: "/images/deals/deal5.jpg" },
+    { id: 6, title: "Prada Sunglasses", price: "$899", image: "/images/deals/deal6.jpg" },
+  ];
 
-  // FINAL PRODUCTS (external → fallback to default)
-  const products = externalProducts.length > 0 ? externalProducts : defaultProducts;
+  const generalProducts = [
+    { id: 101, title: "Nike Air Max", price: "$120", image: "/images/general/shoe.jpg" },
+    { id: 102, title: "Casio Watch", price: "$99", image: "/images/general/watch.jpg" },
+    { id: 103, title: "Axe Perfume", price: "$25", image: "/images/general/perfume.jpg" },
+    { id: 104, title: "Levi’s Bag", price: "$75", image: "/images/general/bag.jpg" },
+    { id: 105, title: "Adidas T-Shirt", price: "$45", image: "/images/general/tshirt.jpg" },
+    { id: 106, title: "Boat Earbuds", price: "$35", image: "/images/general/earbuds.jpg" },
+  ];
+
+  // 🔥 PRIORITY: If API products exist, use them. Else fallback.
+  const products: ProductType[] =
+    externalProducts && externalProducts.length > 0
+      ? externalProducts
+      : mode === "luxury"
+      ? luxuryProducts
+      : generalProducts;
 
   useEffect(() => {
     setVisibleCount(4);
@@ -87,6 +96,7 @@ export default function FeaturedProducts({
               <img
                 src={prod.image}
                 alt={prod.title}
+                loading="lazy"
                 className="w-full h-48 object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="p-3 text-center">
