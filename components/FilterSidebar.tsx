@@ -145,4 +145,4 @@ export default function FilterSidebar({ mobile = false }) {
       </div>
     </>
   );
-}
+    }
