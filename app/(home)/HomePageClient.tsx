@@ -75,9 +75,9 @@ export default function HomePageClient() {
         <FeaturedDeals externalDeals={deals} />
       </div>
 
-      {/* ⭐ FEATURED PRODUCTS */}
+      {/* ⭐ GENERAL DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
-        <FeaturedProducts mode="general" externalProducts={products} />
+        <GeneralDeals mode="general" externalProducts={products} />
       </div>
 
       {/* ⭐⭐ FILTERS – EXACTLY BELOW FEATURED PRODUCTS */}
