@@ -2,14 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { deals as defaultDeals } from "@/data/deals";
 
+interface DealItem {
+  title: string;
+  image: string;
+  store: string;
+  link?: string;
+}
+
 interface FeaturedDealsProps {
-  externalDeals?: any[];
+  externalDeals?: DealItem[];
 }
 
 export default function FeaturedDeals({ externalDeals }: FeaturedDealsProps) {
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<DealItem[]>([]);
 
   useEffect(() => {
     if (externalDeals && externalDeals.length > 0) {
@@ -28,12 +36,17 @@ export default function FeaturedDeals({ externalDeals }: FeaturedDealsProps) {
           <Link
             key={i}
             href={deal.link || "#"}
-            className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition"
+            className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition block"
           >
-            <img
-              src={deal.image}
-              className="w-full h-40 object-cover rounded-lg"
-            />
+            <div className="w-full h-40 relative">
+              <Image
+                src={deal.image}
+                alt={deal.title}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </div>
+
             <h3 className="mt-3 font-semibold">{deal.title}</h3>
             <p className="text-sm text-gray-600">{deal.store}</p>
           </Link>
