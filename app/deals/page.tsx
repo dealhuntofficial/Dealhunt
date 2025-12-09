@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { deals as defaultDeals } from "@/data/deals";
+import { deals as defaultDeals } from "@/data/mockDeals";
 
 interface DealItem {
   title: string;
