@@ -20,14 +20,25 @@ const generalProducts = [
   { id: 106, title: "Boat Earbuds", price: "$35", image: "/images/general/earbuds.jpg" },
 ];
 
-export default function FeaturedProducts({ mode }: { mode: "luxury" | "general" }) {
+export default function FeaturedProducts({
+  mode,
+  externalProducts = [],   // ✅ NEW PROP ADDED
+}: {
+  mode: "luxury" | "general";
+  externalProducts?: any[];
+}) {
   const [visibleCount, setVisibleCount] = useState(4);
   const observerRef = useRef<HTMLDivElement | null>(null);
-  const products = mode === "luxury" ? luxuryProducts : generalProducts;
+
+  // DEFAULT PRODUCTS
+  const defaultProducts = mode === "luxury" ? luxuryProducts : generalProducts;
+
+  // FINAL PRODUCTS (external → fallback to default)
+  const products = externalProducts.length > 0 ? externalProducts : defaultProducts;
 
   useEffect(() => {
     setVisibleCount(4);
-  }, [mode]);
+  }, [mode, externalProducts]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,7 +63,6 @@ export default function FeaturedProducts({ mode }: { mode: "luxury" | "general" 
       }`}
     >
       <div className="max-w-7xl mx-auto px-4">
-        {/* ✅ Fixed Heading */}
         <h2
           className={`text-2xl font-bold mb-6 text-center ${
             mode === "luxury" ? "text-yellow-700" : "text-blue-800"
@@ -61,7 +71,6 @@ export default function FeaturedProducts({ mode }: { mode: "luxury" | "general" 
           {mode === "luxury" ? "✨ Luxury Deals" : "🛒 General Deals"}
         </h2>
 
-        {/* Product Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {products.slice(0, visibleCount).map((prod, index) => (
             <div
@@ -78,7 +87,6 @@ export default function FeaturedProducts({ mode }: { mode: "luxury" | "general" 
               <img
                 src={prod.image}
                 alt={prod.title}
-                loading="lazy"
                 className="w-full h-48 object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="p-3 text-center">
@@ -95,7 +103,6 @@ export default function FeaturedProducts({ mode }: { mode: "luxury" | "general" 
           ))}
         </div>
 
-        {/* Infinite Scroll Trigger */}
         <div ref={observerRef} className="h-10"></div>
       </div>
 
