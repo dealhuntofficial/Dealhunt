@@ -9,13 +9,13 @@ interface ProductType {
   image: string;
 }
 
-export default function FeaturedProducts({
+export default function GeneralDeals ({
   mode,
   externalProducts,
 }: {
   mode: "luxury" | "general";
   externalProducts?: ProductType[];
-}) {
+}) }
   const [visibleCount, setVisibleCount] = useState(4);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
@@ -30,7 +30,7 @@ export default function FeaturedProducts({
 
   const generalProducts = [
     { id: 101, title: "Nike Air Max", price: "$120", image: "/images/general/shoe.jpg" },
-    { id: 102, title: "Casio Watch", price: "$99", image: "/images/general/watch.jpg" },
+    { id: 102, title: "Casio Watch", price: "$99", imageg: "/images/general/watch.jpg" },
     { id: 103, title: "Axe Perfume", price: "$25", image: "/images/general/perfume.jpg" },
     { id: 104, title: "Levi’s Bag", price: "$75", image: "/images/general/bag.jpg" },
     { id: 105, title: "Adidas T-Shirt", price: "$45", image: "/images/general/tshirt.jpg" },
