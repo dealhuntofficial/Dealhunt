@@ -17,7 +17,7 @@ export default function HomePageClient() {
 
   const [deals, setDeals] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
-  const [showFilters, setShowFilters] = useState(false); // ⭐ toggle filter
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,14 +35,13 @@ export default function HomePageClient() {
           process.env.BASE_URL ||
           `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
 
-        // Fetch Featured Deals
+        // ---- FETCH FEATURED DEALS ----
         const dealsURL = new URL("/api/deals", base);
-        qs.forEach((v, k) => dealsURL.searchParams.set(k, v));
         const dealsRes = await fetch(dealsURL.toString(), { cache: "no-store" });
         const dealsJson = await dealsRes.json();
         setDeals(dealsJson.deals || []);
 
-        // Fetch General Deals Products
+        // ---- FETCH GENERAL DEALS / PRODUCTS (FILTERED) ----
         const prodURL = new URL("/api/products", base);
         qs.forEach((v, k) => prodURL.searchParams.set(k, v));
         const prodRes = await fetch(prodURL.toString(), { cache: "no-store" });
@@ -65,34 +64,32 @@ export default function HomePageClient() {
       <HeroBannerGeneral />
       <BannerAdSection />
 
-      {/* CATEGORY + CART TO HEART */}
-      <CategoryGrid mode="general" />
-      <CartToHeartSection />
-
-      {/* ⭐ FEATURED DEALS */}
+      {/* ⭐ FEATURED DEALS AT THE OLD LOCATION */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <FeaturedDeals externalDeals={deals} />
       </div>
 
-      {/* ⭐⭐⭐ FILTERS (exactly below Featured Deals) */}
-      <div className="max-w-7xl mx-auto px-4 mt-8">
+      {/* CATEGORY + CART TO HEART */}
+      <CategoryGrid mode="general" />
+      <CartToHeartSection />
 
-        {/* Show / Hide Filter Btn */}
+      {/* ⭐ FILTER BUTTON */}
+      <div className="max-w-7xl mx-auto px-4 mt-6">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg w-full md:w-auto font-medium"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg w-full md:w-auto"
         >
           {showFilters ? "Hide Filters" : "Show Filters"}
         </button>
 
-        {/* Actual Filter Box */}
         {showFilters && (
           <div className="mt-4">
+            {/* Desktop */}
             <div className="hidden md:block">
               <FilterSidebar />
             </div>
 
-            {/* Mobile Filter */}
+            {/* Mobile */}
             <div className="md:hidden">
               <FilterSidebar mobile />
             </div>
@@ -100,12 +97,12 @@ export default function HomePageClient() {
         )}
       </div>
 
-      {/* ⭐ GENERAL DEALS WITH INFINITE SCROLL */}
-      <div className="max-w-7xl mx-auto px-4 mt-10">
+      {/* ⭐ GENERAL DEALS (FILTERED) */}
+      <div className="max-w-7xl mx-auto px-4 mt-6">
         <GeneralDeals mode="general" externalProducts={products} />
       </div>
 
       <FloatingAIButtons />
     </main>
   );
-}
+      }
