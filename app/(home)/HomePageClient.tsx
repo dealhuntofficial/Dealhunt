@@ -41,7 +41,7 @@ export default function HomePageClient() {
         const dealsJson = await dealsRes.json();
         setDeals(dealsJson.deals || []);
 
-        // ---- FETCH GENERAL DEALS / PRODUCTS (FILTERED) ----
+        // ---- FETCH FILTERED PRODUCTS (GENERAL DEALS) ----
         const prodURL = new URL("/api/products", base);
         qs.forEach((v, k) => prodURL.searchParams.set(k, v));
         const prodRes = await fetch(prodURL.toString(), { cache: "no-store" });
@@ -64,7 +64,7 @@ export default function HomePageClient() {
       <HeroBannerGeneral />
       <BannerAdSection />
 
-      {/* ⭐ FEATURED DEALS AT THE OLD LOCATION */}
+      {/* ⭐ FEATURED DEALS (Correct position) */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <FeaturedDeals externalDeals={deals} />
       </div>
@@ -73,7 +73,7 @@ export default function HomePageClient() {
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* ⭐ FILTER BUTTON */}
+      {/* ⭐ FILTERS */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -97,7 +97,7 @@ export default function HomePageClient() {
         )}
       </div>
 
-      {/* ⭐ GENERAL DEALS (FILTERED) */}
+      {/* ⭐ GENERAL DEALS (Filtered & only once rendered) */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <GeneralDeals mode="general" externalProducts={products} />
       </div>
