@@ -14,7 +14,8 @@ export default function FilterSidebar({ mobile = false }) {
   const [sort, setSort] = useState<string>("");
   const [query, setQuery] = useState<string>("");
 
-  const [open, setOpen] = useState(false); // 👈 show/hide toggle
+  // ❌ REMOVE OPEN STATE (homepage already controls show/hide)
+  // const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setMinPrice(searchParams.get("minPrice") || "");
@@ -34,7 +35,6 @@ export default function FilterSidebar({ mobile = false }) {
     if (query) params.set("q", query);
 
     router.push(`${pathname}?${params.toString()}`);
-    setOpen(false);
   };
 
   const clearFilters = () => {
@@ -44,26 +44,13 @@ export default function FilterSidebar({ mobile = false }) {
     setMerchant("");
     setSort("");
     setQuery("");
-    setOpen(false);
   };
 
   return (
     <>
-      {/* Mobile toggle button */}
-      {mobile && (
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-full bg-blue-600 text-white py-2 rounded mb-2"
-        >
-          {open ? "Hide Filters" : "Show Filters"}
-        </button>
-      )}
+      {/* NO TOGGLE BUTTON — HOMEPAGE HAS ITS OWN BUTTON */}
 
-      {/* Sidebar */}
-      <div
-        className={`bg-white p-4 rounded-lg shadow transition-all duration-300
-        ${mobile ? (open ? "block" : "hidden") : "block"} `}
-      >
+      <div className="bg-white p-4 rounded-lg shadow transition-all duration-300">
         <h3 className="text-xl font-semibold mb-4">Filters</h3>
 
         {/* Search */}
@@ -145,4 +132,4 @@ export default function FilterSidebar({ mobile = false }) {
       </div>
     </>
   );
-    }
+}
