@@ -28,13 +28,14 @@ export default function HomePageClient() {
         const dealsJson = await dealsRes.json();
         setDeals(dealsJson.deals || []);
 
-        // ⭐ FETCH GENERAL DEALS (NO FILTER LOGIC)
+        // ⭐ FETCH GENERAL DEALS
         const prodURL = new URL("/api/products", base);
         const prodRes = await fetch(prodURL.toString(), { cache: "no-store" });
         const prodJson = await prodRes.json();
         setProducts(prodJson.products || []);
 
-      } catch {
+      } catch (error) {
+        console.error("Home fetch error:", error);
         setDeals([]);
         setProducts([]);
       }
@@ -46,16 +47,16 @@ export default function HomePageClient() {
   return (
     <main className="relative bg-gradient-to-b from-blue-50 to-white text-gray-900">
 
-      {/* HERO + ADS */}
+      {/* HERO + TOP BANNERS */}
       <HeroBannerGeneral />
       <BannerAdSection />
 
-      {/* ⭐ FEATURED DEALS (Correct position restored) */}
+      {/* ⭐ FEATURED DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <FeaturedDeals externalDeals={deals} />
       </div>
 
-      {/* CATEGORY + CART TO HEART */}
+      {/* ⭐ CATEGORIES + CART TO HEART */}
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
@@ -64,6 +65,7 @@ export default function HomePageClient() {
         <GeneralDeals mode="general" externalProducts={products} />
       </div>
 
+      {/* AI BUTTONS */}
       <FloatingAIButtons />
     </main>
   );
