@@ -28,17 +28,19 @@ export const dynamic = "force-dynamic";
 
 export default function ProductsPageClient() {
   const params = useSearchParams();
+
   const searchQuery = params.get("search") || params.get("q") || "";
   const categoryParam = params.get("category") || "";
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
 
-  // ⭐ SIMPLE API URL (NO FILTER PARAMS)
-  const apiUrl = `/api/deals?${new URLSearchParams({
-    ...(categoryParam ? { category: categoryParam } : {}),
-    ...(searchQuery ? { q: searchQuery } : {})
-  }).toString()}`;
+  // ⭐ Build API URL (Minimal – Clean – No Filter Params)
+  const queryObject: any = {};
+  if (categoryParam) queryObject.category = categoryParam;
+  if (searchQuery) queryObject.q = searchQuery;
+
+  const apiUrl = `/api/deals?${new URLSearchParams(queryObject).toString()}`;
 
   useEffect(() => {
     let mounted = true;
@@ -46,17 +48,20 @@ export default function ProductsPageClient() {
 
     const load = async () => {
       try {
-        const res = await fetch(apiUrl);
+        const res = await fetch(apiUrl, { cache: "no-store" });
+
         if (!res.ok) {
-          if (!mounted) return;
-          setProducts([]);
-          setLoading(false);
+          if (mounted) {
+            setProducts([]);
+            setLoading(false);
+          }
           return;
         }
+
         const json = await res.json();
         const list: any[] = json.deals || [];
 
-        const mapped: Product[] = list.map((it: any, idx: number) => ({
+        const mapped: Product[] = list.map((it, idx) => ({
           id: it.id ?? idx,
           title: it.title ?? it.name ?? `Product ${idx + 1}`,
           name: it.title ?? it.name,
@@ -70,43 +75,44 @@ export default function ProductsPageClient() {
           rating: it.rating ?? 4,
         }));
 
-        if (!mounted) return;
-        setProducts(mapped);
-      } catch (err) {
-        console.error("Products fetch error:", err);
-        if (!mounted) return;
-        setProducts([]);
+        if (mounted) {
+          setProducts(mapped);
+        }
+      } catch (error) {
+        console.error("Products fetch error:", error);
+        if (mounted) setProducts([]);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
     load();
-    return () => { mounted = false };
+
+    return () => {
+      mounted = false;
+    };
   }, [apiUrl]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <BackButton />
 
+      {/* Top Header */}
       <div className="flex items-center justify-between gap-4 mt-4 mb-6">
-        <h1 className="text-lg font-semibold">
-          Products
-        </h1>
+        <h1 className="text-lg font-semibold">Products</h1>
 
         <div className="text-sm text-gray-600">
           {products.length} result{products.length !== 1 ? "s" : ""}
         </div>
       </div>
 
+      {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
+        {/* Skeleton */}
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl shadow-md p-4 animate-pulse"
-            >
+            <div key={i} className="bg-white rounded-xl shadow-md p-4 animate-pulse">
               <div className="w-full h-40 bg-gray-200 rounded"></div>
               <div className="mt-3 h-4 bg-gray-200 rounded w-3/4"></div>
               <div className="mt-2 h-4 bg-gray-200 rounded w-1/2"></div>
@@ -115,9 +121,7 @@ export default function ProductsPageClient() {
         ) : products.length > 0 ? (
           products.map((p) => {
             const priceLabel =
-              p.priceNow !== undefined
-                ? `₹${p.priceNow}`
-                : p.price ?? "₹0";
+              p.priceNow !== undefined ? `₹${p.priceNow}` : p.price ?? "₹0";
 
             const imageSrc = p.img ?? p.image ?? "/images/placeholder.png";
 
@@ -138,7 +142,7 @@ export default function ProductsPageClient() {
 
                 <div className="flex items-center justify-between mt-2">
                   <p className="text-lg font-bold text-green-600">{priceLabel}</p>
-                  <p className="text-sm text-yellow-600">⭐ {p.rating ?? 4}</p>
+                  <p className="text-sm text-yellow-600">⭐ {p.rating}</p>
                 </div>
 
                 <button className="mt-3 w-full bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 rounded-lg">
