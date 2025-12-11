@@ -3,13 +3,12 @@
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
-import FilterSidebar from "@/components/FilterSidebar";
 import BackButton from "@/components/BackButton";
 import { useEffect, useState } from "react";
 
-type Props = { params: { slug: string; sub: string }; searchParams?: any };
+type Props = { params: { slug: string; sub: string } };
 
-export default function SubcategoryDealsPage({ params, searchParams }: Props) {
+export default function SubcategoryDealsPage({ params }: Props) {
   const { slug, sub } = params;
 
   // Category
@@ -28,26 +27,16 @@ export default function SubcategoryDealsPage({ params, searchParams }: Props) {
   useEffect(() => {
     const fetchDeals = async () => {
       try {
-        const qs = new URLSearchParams();
-
-        if (searchParams?.minPrice) qs.set("minPrice", searchParams.minPrice);
-        if (searchParams?.maxPrice) qs.set("maxPrice", searchParams.maxPrice);
-        if (searchParams?.merchant) qs.set("merchant", searchParams.merchant);
-        if (searchParams?.sort) qs.set("sort", searchParams.sort);
-        if (searchParams?.q) qs.set("q", searchParams.q);
-
         // Base URL fallback system
         const base =
           process.env.NEXT_PUBLIC_BASE_URL ||
           process.env.BASE_URL ||
           `https://${process.env.RENDER_EXTERNAL_URL || "dealhunt-1.onrender.com"}`;
 
-        // Final URL
+        // Final URL (NO FILTERS AT ALL)
         const url = new URL("/api/deals", base);
         url.searchParams.set("category", slug);
         url.searchParams.set("subcategory", sub);
-
-        qs.forEach((v, k) => url.searchParams.set(k, v));
 
         const res = await fetch(url.toString(), { cache: "no-store" });
 
@@ -66,20 +55,17 @@ export default function SubcategoryDealsPage({ params, searchParams }: Props) {
     };
 
     fetchDeals();
-  }, [slug, sub, searchParams]);
+  }, [slug, sub]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 relative">
       <BackButton />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
-        {/* Sidebar */}
-        <aside className="lg:col-span-1">
-          <FilterSidebar />
-        </aside>
+        {/* Sidebar removed entirely */}
 
         {/* Deals Section */}
-        <section className="lg:col-span-3">
+        <section className="lg:col-span-4">
           <header className="mb-6">
             <h1 className="text-3xl font-bold">
               {category.name} — {subCat.name}
