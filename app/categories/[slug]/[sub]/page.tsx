@@ -5,6 +5,8 @@ import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
 import BackButton from "@/components/BackButton";
 import { useEffect, useState } from "react";
+import useFilters from "@/hooks/useFilters";
+import FilterSidebar from "@/components/FilterSidebar";
 
 type Props = { params: { slug: string; sub: string } };
 
@@ -18,23 +20,16 @@ export default function SubcategoryDealsPage({ params }: Props) {
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --------------------------
-  // 🔥 FILTER STATES
-  // --------------------------
-  const [sort, setSort] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [store, setStore] = useState("");
-  const [rating, setRating] = useState("");
-  const [inStock, setInStock] = useState(false);
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  // NEW FILTER SYSTEM
+  const { read } = useFilters();
+  const filters = read(); // { q, minPrice, maxPrice, merchant, sort, ... }
 
   if (!category || !subCat) {
     return <div className="p-8 text-center">Not found</div>;
   }
 
   // --------------------------
-  // 📌 FETCH DEALS
+  // 📌 FETCH DEALS (NOW USING GLOBAL FILTERS)
   // --------------------------
   useEffect(() => {
     const fetchDeals = async () => {
@@ -48,16 +43,19 @@ export default function SubcategoryDealsPage({ params }: Props) {
 
         const url = new URL("/api/deals", base);
 
+        // Required
         url.searchParams.set("category", slug);
         url.searchParams.set("subcategory", sub);
 
-        if (sort) url.searchParams.set("sort", sort);
-        if (discount) url.searchParams.set("discount", discount);
-        if (store) url.searchParams.set("store", store);
-        if (rating) url.searchParams.set("rating", rating);
-        if (inStock) url.searchParams.set("inStock", "true");
-        if (minPrice) url.searchParams.set("minPrice", minPrice);
-        if (maxPrice) url.searchParams.set("maxPrice", maxPrice);
+        // GLOBAL FILTERS (auto applied)
+        if (filters.q) url.searchParams.set("q", filters.q);
+        if (filters.minPrice) url.searchParams.set("minPrice", filters.minPrice);
+        if (filters.maxPrice) url.searchParams.set("maxPrice", filters.maxPrice);
+        if (filters.merchant) url.searchParams.set("merchant", filters.merchant);
+        if (filters.sort) url.searchParams.set("sort", filters.sort);
+        if (filters.minDiscount) url.searchParams.set("minDiscount", filters.minDiscount);
+        if (filters.maxDiscount) url.searchParams.set("maxDiscount", filters.maxDiscount);
+        if (filters.rating) url.searchParams.set("rating", filters.rating);
 
         const res = await fetch(url.toString(), { cache: "no-store" });
         const data = await res.json();
@@ -72,116 +70,30 @@ export default function SubcategoryDealsPage({ params }: Props) {
     };
 
     fetchDeals();
-  }, [slug, sub, sort, discount, store, rating, inStock, minPrice, maxPrice]);
+  }, [
+    slug,
+    sub,
+    filters.q,
+    filters.minPrice,
+    filters.maxPrice,
+    filters.merchant,
+    filters.sort,
+    filters.minDiscount,
+    filters.maxDiscount,
+    filters.rating,
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 relative">
       <BackButton />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
-        
+
         {/* -------------------------------------- */}
-        {/* 🧿 LEFT SIDEBAR FILTERS */}
+        {/* 🧿 LEFT SIDEBAR FILTERS (REPLACED WITH NEW) */}
         {/* -------------------------------------- */}
-        <aside className="bg-white p-4 rounded shadow h-fit lg:col-span-1">
-          <h3 className="text-lg font-semibold mb-4">Filters</h3>
-
-          {/* Sort */}
-          <div className="mb-4">
-            <label className="font-medium">Sort By</label>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="w-full mt-1 border rounded p-2"
-            >
-              <option value="">Default</option>
-              <option value="latest">Latest</option>
-              <option value="low-high">Price: Low to High</option>
-              <option value="high-low">Price: High to Low</option>
-              <option value="discount">Highest Discount</option>
-            </select>
-          </div>
-
-          {/* Discount */}
-          <div className="mb-4">
-            <label className="font-medium">Minimum Discount</label>
-            <select
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              className="w-full mt-1 border rounded p-2"
-            >
-              <option value="">Any</option>
-              <option value="10">10%+</option>
-              <option value="30">30%+</option>
-              <option value="50">50%+</option>
-              <option value="70">70%+</option>
-            </select>
-          </div>
-
-          {/* Store */}
-          <div className="mb-4">
-            <label className="font-medium">Store</label>
-            <select
-              value={store}
-              onChange={(e) => setStore(e.target.value)}
-              className="w-full mt-1 border rounded p-2"
-            >
-              <option value="">All</option>
-              <option value="amazon">Amazon</option>
-              <option value="flipkart">Flipkart</option>
-              <option value="myntra">Myntra</option>
-              <option value="ajio">Ajio</option>
-              <option value="meesho">Meesho</option>
-            </select>
-          </div>
-
-          {/* Ratings */}
-          <div className="mb-4">
-            <label className="font-medium">Rating</label>
-            <select
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-              className="w-full mt-1 border rounded p-2"
-            >
-              <option value="">Any</option>
-              <option value="3">3★+</option>
-              <option value="4">4★+</option>
-              <option value="4.5">4.5★+</option>
-            </select>
-          </div>
-
-          {/* In Stock */}
-          <div className="flex items-center mb-4">
-            <input
-              type="checkbox"
-              checked={inStock}
-              onChange={() => setInStock(!inStock)}
-              className="mr-2"
-            />
-            <label className="font-medium">In Stock Only</label>
-          </div>
-
-          {/* Price Range */}
-          <div className="mb-4">
-            <label className="font-medium">Price Range</label>
-            <div className="flex gap-2 mt-1">
-              <input
-                type="number"
-                placeholder="Min"
-                className="w-1/2 border p-2 rounded"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                className="w-1/2 border p-2 rounded"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-              />
-            </div>
-          </div>
-
+        <aside className="h-fit lg:col-span-1">
+          <FilterSidebar />
         </aside>
 
         {/* -------------------------------------- */}
