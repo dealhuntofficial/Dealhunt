@@ -29,18 +29,19 @@ export const dynamic = "force-dynamic";
 export default function ProductsPageClient() {
   const params = useSearchParams();
 
+  // Basic query params (NO FILTERS)
   const searchQuery = params.get("search") || params.get("q") || "";
   const categoryParam = params.get("category") || "";
 
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
 
-  // ⭐ Build API URL (Minimal – Clean – No Filter Params)
-  const queryObject: any = {};
+  // Build API Query
+  const queryObject: Record<string, string> = {};
   if (categoryParam) queryObject.category = categoryParam;
   if (searchQuery) queryObject.q = searchQuery;
 
-  const apiUrl = `/api/deals?${new URLSearchParams(queryObject).toString()}`;
+  const apiUrl = `/api/deals?${new URLSearchParams(queryObject)}`;
 
   useEffect(() => {
     let mounted = true;
@@ -75,9 +76,7 @@ export default function ProductsPageClient() {
           rating: it.rating ?? 4,
         }));
 
-        if (mounted) {
-          setProducts(mapped);
-        }
+        if (mounted) setProducts(mapped);
       } catch (error) {
         console.error("Products fetch error:", error);
         if (mounted) setProducts([]);
@@ -97,10 +96,9 @@ export default function ProductsPageClient() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <BackButton />
 
-      {/* Top Header */}
+      {/* Header */}
       <div className="flex items-center justify-between gap-4 mt-4 mb-6">
         <h1 className="text-lg font-semibold">Products</h1>
-
         <div className="text-sm text-gray-600">
           {products.length} result{products.length !== 1 ? "s" : ""}
         </div>
@@ -152,12 +150,9 @@ export default function ProductsPageClient() {
             );
           })
         ) : (
-          <p className="text-gray-500 col-span-full text-center">
-            No products found.
-          </p>
+          <p className="text-gray-500 col-span-full text-center">No products found.</p>
         )}
 
       </div>
     </div>
   );
-}
