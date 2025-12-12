@@ -46,7 +46,6 @@ export default function HomePageClient() {
 
   return (
     <main className="relative bg-gradient-to-b from-blue-50 to-white text-gray-900">
-
       {/* HERO + TOP BANNERS */}
       <HeroBannerGeneral />
       <BannerAdSection />
