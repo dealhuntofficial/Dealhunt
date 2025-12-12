@@ -1,68 +1,88 @@
-// File: app/api/deals/route.ts
 import { NextResponse } from "next/server";
-import { mockDeals } from "@/data/mockDeals";
-
-export const dynamic = "force-dynamic";
+import dbConnect from "@/lib/dbConnect";
+import Deal from "@/models/Deal";
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
+    await dbConnect();
 
-    const category = url.searchParams.get("category") || undefined;
-    const subcategory = url.searchParams.get("subcategory") || undefined;
-    const minPrice = Number(url.searchParams.get("minPrice") || 0);
-    const maxPrice = Number(url.searchParams.get("maxPrice") || 0);
-    const merchant = url.searchParams.get("merchant") || undefined;
-    const sort = url.searchParams.get("sort") || undefined;
-    const q = url.searchParams.get("q") || undefined;
+    const { searchParams } = new URL(req.url);
 
-    // ⭐ PAGINATION ADDED
-    const page = Number(url.searchParams.get("page") || 1);
-    const limit = Number(url.searchParams.get("limit") || 20);
-    const start = (page - 1) * limit;
-    const end = start + limit;
+    const category = searchParams.get("category");
+    const subcategory = searchParams.get("subcategory");
 
-    let items = mockDeals.slice();
+    const query: any = {};
 
-    // ⭐ FILTERS
-    if (category) items = items.filter((d) => d.category === category);
-    if (subcategory) items = items.filter((d) => d.subcategory === subcategory);
+    if (category) query.category = category;
+    if (subcategory) query.subcategory = subcategory;
 
-    if (merchant) {
-      items = items.filter((d) =>
-        d.merchant?.toLowerCase().includes(merchant.toLowerCase())
-      );
+    // Global filters
+    if (searchParams.get("q"))
+      query.title = { $regex: searchParams.get("q"), $options: "i" };
+
+    if (searchParams.get("minPrice"))
+      query.final_price = { $gte: Number(searchParams.get("minPrice")) };
+
+    if (searchParams.get("maxPrice"))
+      query.final_price = {
+        ...(query.final_price || {}),
+        $lte: Number(searchParams.get("maxPrice"))
+      };
+
+    if (searchParams.get("merchant"))
+      query.merchant = searchParams.get("merchant");
+
+    if (searchParams.get("rating"))
+      query.rating = { $gte: Number(searchParams.get("rating")) };
+
+    if (searchParams.get("minDiscount"))
+      query.discount_percent = {
+        $gte: Number(searchParams.get("minDiscount"))
+      };
+
+    if (searchParams.get("maxDiscount"))
+      query.discount_percent = {
+        ...(query.discount_percent || {}),
+        $lte: Number(searchParams.get("maxDiscount"))
+      };
+
+    // --------------------------------------------
+    // ⭐ NEW: REAL BRAND FILTERING
+    // --------------------------------------------
+    const realBrands = [
+      "Apple",
+      "Samsung",
+      "OnePlus",
+      "Boat",
+      "Sony",
+      "Puma",
+      "Nike",
+      "Adidas",
+      "Lenovo",
+      "Dell",
+      "HP"
+    ];
+
+    if (subcategory === "real-brand") {
+      query.merchant = { $in: realBrands };
     }
 
-    if (q) {
-      items = items.filter((d) =>
-        d.title.toLowerCase().includes(q.toLowerCase())
-      );
-    }
+    // --------------------------------------------
 
-    if (minPrice) items = items.filter((d) => d.priceNow >= minPrice);
-    if (maxPrice) items = items.filter((d) => d.priceNow <= maxPrice);
+    // Sorting
+    let sort: any = {};
+    const sortParam = searchParams.get("sort");
 
-    // ⭐ SORTING
-    if (sort === "price-asc") items.sort((a, b) => a.priceNow - b.priceNow);
-    else if (sort === "price-desc") items.sort((a, b) => b.priceNow - a.priceNow);
-    else if (sort === "discount-desc")
-      items.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+    if (sortParam === "price_low") sort.final_price = 1;
+    if (sortParam === "price_high") sort.final_price = -1;
+    if (sortParam === "discount") sort.discount_percent = -1;
+    if (sortParam === "newest") sort.createdAt = -1;
 
-    // ⭐ APPLY PAGINATION
-    const paginated = items.slice(start, end);
+    const deals = await Deal.find(query).sort(sort);
 
-    return NextResponse.json({
-      total: items.length,
-      page,
-      limit,
-      totalPages: Math.ceil(items.length / limit),
-      deals: paginated
-    });
-  } catch (err: any) {
-    return NextResponse.json(
-      { deals: [], error: err.message || "Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ deals });
+  } catch (err) {
+    console.error("API DEAL ERROR:", err);
+    return NextResponse.json({ deals: [] });
   }
 }
