@@ -6,7 +6,18 @@ import DealCard from "@/components/DealCard";
 import BackButton from "@/components/BackButton";
 import { useEffect, useState } from "react";
 
-type Props = { params: { slug: string } };
+/* ---------------- TYPES ---------------- */
+type Filters = {
+  minPrice: string;
+  rating: string;
+  sort: string;
+  subcategory: string;
+  merchant: string;
+};
+
+type Props = {
+  params: { slug: string };
+};
 
 export default function CategoryDealsPage({ params }: Props) {
   const slug = params.slug;
@@ -16,32 +27,40 @@ export default function CategoryDealsPage({ params }: Props) {
 
   const [deals, setDeals] = useState<any[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
-  const [filters, setFilters] = useState<any>({
+
+  const [filters, setFilters] = useState<Filters>({
     minPrice: "",
     rating: "",
     sort: "",
     subcategory: "",
-    brand: ""
+    merchant: ""
   });
 
   useEffect(() => {
     const fetchDeals = async () => {
-      const base =
-        process.env.NEXT_PUBLIC_BASE_URL ||
-        `https://${process.env.RENDER_EXTERNAL_URL}`;
+      try {
+        const base =
+          process.env.NEXT_PUBLIC_BASE_URL ||
+          `https://${process.env.RENDER_EXTERNAL_URL}`;
 
-      const url = new URL("/api/deals", base);
-      url.searchParams.set("category", slug);
+        const url = new URL("/api/deals", base);
+        url.searchParams.set("category", slug);
 
-      Object.entries(filters).forEach(([k, v]) => {
-        if (v) url.searchParams.set(k, v as string);
-      });
+        (Object.entries(filters) as [keyof Filters, string][])
+          .forEach(([k, v]) => {
+            if (v) url.searchParams.set(k, v);
+          });
 
-      const res = await fetch(url.toString(), { cache: "no-store" });
-      const data = await res.json();
+        const res = await fetch(url.toString(), { cache: "no-store" });
+        const data = await res.json();
 
-      setDeals(data.deals || []);
-      setBrands(data.brands || []);
+        setDeals(data.deals || []);
+        setBrands(data.brands || []);
+      } catch (e) {
+        console.error(e);
+        setDeals([]);
+        setBrands([]);
+      }
     };
 
     fetchDeals();
@@ -55,13 +74,16 @@ export default function CategoryDealsPage({ params }: Props) {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
 
-        {/* LEFT – PRICE / RATING */}
+        {/* LEFT */}
         <aside className="bg-white p-4 rounded-xl shadow">
-          <h4 className="font-semibold mb-3">Sort & Price</h4>
+          <h4 className="font-semibold mb-3">Sort & Rating</h4>
 
           <select
             className="w-full mb-3 border rounded p-2"
-            onChange={e => setFilters(f => ({ ...f, sort: e.target.value }))}
+            value={filters.sort}
+            onChange={e =>
+              setFilters(prev => ({ ...prev, sort: e.target.value }))
+            }
           >
             <option value="">Sort</option>
             <option value="price_low">Price: Low → High</option>
@@ -71,7 +93,10 @@ export default function CategoryDealsPage({ params }: Props) {
 
           <select
             className="w-full border rounded p-2"
-            onChange={e => setFilters(f => ({ ...f, rating: e.target.value }))}
+            value={filters.rating}
+            onChange={e =>
+              setFilters(prev => ({ ...prev, rating: e.target.value }))
+            }
           >
             <option value="">Rating</option>
             <option value="4">4★ & above</option>
@@ -79,17 +104,14 @@ export default function CategoryDealsPage({ params }: Props) {
           </select>
         </aside>
 
-        {/* MIDDLE – SUBCATEGORIES */}
+        {/* MIDDLE */}
         <section className="lg:col-span-2">
           <div className="flex flex-wrap gap-2 mb-6">
             {subs.map(s => (
               <button
                 key={s.slug}
                 onClick={() =>
-                  setFilters(f => ({
-                    ...f,
-                    subcategory: s.slug === "real-brand" ? "real-brand" : s.slug
-                  }))
+                  setFilters(prev => ({ ...prev, subcategory: s.slug }))
                 }
                 className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
               >
@@ -99,13 +121,17 @@ export default function CategoryDealsPage({ params }: Props) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {deals.map(d => (
-              <DealCard key={d._id} deal={d} />
-            ))}
+            {deals.length === 0 ? (
+              <div className="col-span-full text-center text-gray-500">
+                No deals found
+              </div>
+            ) : (
+              deals.map(d => <DealCard key={d._id} deal={d} />)
+            )}
           </div>
         </section>
 
-        {/* RIGHT – REAL BRANDS */}
+        {/* RIGHT */}
         <aside className="bg-white p-4 rounded-xl shadow">
           <h4 className="font-semibold mb-3">Real Brands</h4>
 
@@ -113,7 +139,7 @@ export default function CategoryDealsPage({ params }: Props) {
             <button
               key={b}
               onClick={() =>
-                setFilters(f => ({ ...f, merchant: b }))
+                setFilters(prev => ({ ...prev, merchant: b }))
               }
               className="block w-full text-left text-sm py-1 hover:underline"
             >
@@ -121,7 +147,8 @@ export default function CategoryDealsPage({ params }: Props) {
             </button>
           ))}
         </aside>
+
       </div>
     </div>
   );
-}
+            }
