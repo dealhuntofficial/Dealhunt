@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { categories } from "@/data/categories";
 import { subCategories } from "@/data/subcategories";
 import DealCard from "@/components/DealCard";
