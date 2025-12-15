@@ -1,5 +1,20 @@
 // data/subcategories.ts
-export const subCategories: Record<string, { name: string; slug: string }[]> = {
+type SubCat = { name: string; slug: string };
+
+const COMMON_10: SubCat[] = [
+  { name: "Top Deals", slug: "top-deals" },
+  { name: "New Arrivals", slug: "new-arrivals" },
+  { name: "Best Sellers", slug: "best-sellers" },
+  { name: "Budget Picks", slug: "budget-picks" },
+  { name: "Premium", slug: "premium" },
+  { name: "Trending", slug: "trending" },
+  { name: "Limited Time", slug: "limited-time" },
+  { name: "Most Rated", slug: "most-rated" },
+  { name: "Value for Money", slug: "value-for-money" },
+  { name: "Real Brands", slug: "real-brand" },
+];
+
+export const subCategories: Record<string, SubCat[]> = {
   watches: [
     { name: "Smart Watches", slug: "smart-watches" },
     { name: "Analog Watches", slug: "analog-watches" },
@@ -10,7 +25,7 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Leather Strap", slug: "leather-strap" },
     { name: "Kids Watches", slug: "kids-watches" },
     { name: "Classic Watches", slug: "classic-watches" },
-    { name: "Waterproof", slug: "waterproof" },
+    { name: "Real Brands", slug: "real-brand" },
   ],
   perfumes: [
     { name: "Men Perfume", slug: "men-perfume" },
@@ -22,7 +37,7 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Pocket Sprays", slug: "pocket-sprays" },
     { name: "Gift Sets", slug: "gift-sets" },
     { name: "Attars", slug: "attars" },
-    { name: "Sample Packs", slug: "sample-packs" },
+    { name: "Real Brands", slug: "real-brand" },
   ],
   jewelry: [
     { name: "Rings", slug: "rings" },
@@ -34,7 +49,7 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Kids Jewelry", slug: "kids-jewelry" },
     { name: "Gold Jewelry", slug: "gold-jewelry" },
     { name: "Silver Jewelry", slug: "silver-jewelry" },
-    { name: "Stone Jewelry", slug: "stone-jewelry" },
+    { name: "Real Brands", slug: "real-brand" },
   ],
   bags: [
     { name: "Backpacks", slug: "backpacks" },
@@ -45,15 +60,7 @@ export const subCategories: Record<string, { name: string; slug: string }[]> = {
     { name: "Sling Bags", slug: "sling-bags" },
     { name: "Wallets", slug: "wallets" },
     { name: "Kids Bags", slug: "kids-bags" },
-    { name: "Premium Bags", slug: "premium-bags" },
-    { name: "Duffel Bags", slug: "duffel-bags" },
+    { name: "Real Brands", slug: "real-brand" },
   ],
-  // fallback default
-  default: [
-    { name: "General", slug: "general" },
-    { name: "New Arrivals", slug: "new-arrivals" },
-    { name: "Best Sellers", slug: "best-sellers" },
-    { name: "Budget Picks", slug: "budget-picks" },
-    { name: "Top Rated", slug: "top-rated" },
-  ],
+  default: COMMON_10,
 };
