@@ -1,4 +1,3 @@
-// app/categories/[slug]/page.tsx
 "use client";
 
 import { categories } from "@/data/categories";
@@ -8,8 +7,10 @@ import BackButton from "@/components/BackButton";
 import { useEffect, useState } from "react";
 
 type Filters = {
-  rating: string;
   sort: string;
+  rating: string;
+  minPrice: string;
+  maxPrice: string;
   subcategory: string;
   merchant: string;
 };
@@ -23,11 +24,14 @@ export default function CategoryDealsPage({ params }: Props) {
 
   const [deals, setDeals] = useState<any[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
+
   const [filters, setFilters] = useState<Filters>({
-    rating: "",
     sort: "",
+    rating: "",
+    minPrice: "",
+    maxPrice: "",
     subcategory: "",
-    merchant: "",
+    merchant: ""
   });
 
   useEffect(() => {
@@ -60,11 +64,16 @@ export default function CategoryDealsPage({ params }: Props) {
       <BackButton />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
+
+        {/* LEFT – SORT / PRICE / RATING */}
         <aside className="bg-white p-4 rounded-xl shadow">
+          <h4 className="font-semibold mb-3">Filters</h4>
+
+          {/* SORT */}
           <select
             className="w-full mb-3 border rounded p-2"
             onChange={e =>
-              setFilters(prev => ({ ...prev, sort: e.target.value }))
+              setFilters(f => ({ ...f, sort: e.target.value }))
             }
           >
             <option value="">Sort</option>
@@ -73,27 +82,54 @@ export default function CategoryDealsPage({ params }: Props) {
             <option value="discount">Best Discount</option>
           </select>
 
+          {/* PRICE RANGE */}
+          <input
+            type="number"
+            placeholder="Min Price"
+            className="w-full mb-2 border rounded p-2"
+            onChange={e =>
+              setFilters(f => ({ ...f, minPrice: e.target.value }))
+            }
+          />
+
+          <input
+            type="number"
+            placeholder="Max Price"
+            className="w-full mb-3 border rounded p-2"
+            onChange={e =>
+              setFilters(f => ({ ...f, maxPrice: e.target.value }))
+            }
+          />
+
+          {/* RATING */}
           <select
             className="w-full border rounded p-2"
             onChange={e =>
-              setFilters(prev => ({ ...prev, rating: e.target.value }))
+              setFilters(f => ({ ...f, rating: e.target.value }))
             }
           >
             <option value="">Rating</option>
-            <option value="4">4★ & above</option>
+            <option value="1">1★ & above</option>
+            <option value="2">2★ & above</option>
             <option value="3">3★ & above</option>
+            <option value="4">4★ & above</option>
+            <option value="5">5★ only</option>
           </select>
         </aside>
 
+        {/* CENTER – SUBCATEGORIES */}
         <section className="lg:col-span-2">
           <div className="flex flex-wrap gap-2 mb-6">
             {subs.map(s => (
               <button
                 key={s.slug}
                 onClick={() =>
-                  setFilters(prev => ({ ...prev, subcategory: s.slug }))
+                  setFilters(f => ({
+                    ...f,
+                    subcategory: s.slug
+                  }))
                 }
-                className="px-3 py-1 bg-gray-100 rounded"
+                className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
               >
                 {s.name}
               </button>
@@ -101,25 +137,31 @@ export default function CategoryDealsPage({ params }: Props) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {deals.map(d => (
-              <DealCard key={d.id} deal={d} />
-            ))}
+            {deals.length === 0 ? (
+              <p className="text-gray-500">No deals found</p>
+            ) : (
+              deals.map(d => <DealCard key={d.id} deal={d} />)
+            )}
           </div>
         </section>
 
+        {/* RIGHT – REAL BRANDS */}
         <aside className="bg-white p-4 rounded-xl shadow">
+          <h4 className="font-semibold mb-3">Real Brands</h4>
+
           {brands.map(b => (
             <button
               key={b}
               onClick={() =>
-                setFilters(prev => ({ ...prev, merchant: b }))
+                setFilters(f => ({ ...f, merchant: b }))
               }
-              className="block w-full text-left text-sm py-1"
+              className="block w-full text-left text-sm py-1 hover:underline"
             >
               {b}
             </button>
           ))}
         </aside>
+
       </div>
     </div>
   );
