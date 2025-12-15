@@ -1,4 +1,3 @@
-// data/mockDeals.ts
 export const mockDeals = [
   {
     id: "w1",
@@ -11,6 +10,7 @@ export const mockDeals = [
     discount: 40,
     dealUrl: "https://example.com/deal/w1",
     merchant: "Amazon",
+    rating: 4.3, // ✅ ADD THIS
   },
   {
     id: "w2",
@@ -23,6 +23,7 @@ export const mockDeals = [
     discount: 25,
     dealUrl: "https://example.com/deal/w2",
     merchant: "Flipkart",
+    rating: 4.0, // ✅
   },
   {
     id: "s1",
@@ -35,6 +36,6 @@ export const mockDeals = [
     discount: 15,
     dealUrl: "https://example.com/deal/s1",
     merchant: "Meesho",
+    rating: 3.8, // ✅
   },
 ];
-
