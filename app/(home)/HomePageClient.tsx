@@ -9,7 +9,7 @@ import CartToHeartSection from "@/components/CartToHeartSection";
 import FloatingAIButtons from "@/components/FloatingAIButtons";
 import HeroBannerGeneral from "@/components/HeroBannerGeneral";
 import GeneralDeals from "@/components/GeneralDeals";
-import FiltersBar from '../../components/FiltersBar';
+import FiltersBar from "@/components/FiltersBar";
 
 export default function HomePageClient() {
   const [deals, setDeals] = useState<any[]>([]);
@@ -68,4 +68,4 @@ export default function HomePageClient() {
       <FloatingAIButtons />
     </main>
   );
-}
+                 }
