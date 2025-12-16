@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import BannerAdSection from "@/components/BannerAdSection";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedDeals from "@/components/FeaturedDeals";
@@ -17,29 +16,22 @@ export default function HomePageClient() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const base =
-          process.env.NEXT_PUBLIC_BASE_URL ||
-          `https://${process.env.RENDER_EXTERNAL_URL}`;
+      const base =
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        `https://${process.env.RENDER_EXTERNAL_URL}`;
 
-        const [dealsRes, prodRes] = await Promise.all([
-          fetch(`${base}/api/deals`, { cache: "no-store" }),
-          fetch(`${base}/api/products`, { cache: "no-store" }),
-        ]);
+      const dealsRes = await fetch(`${base}/api/deals`, { cache: "no-store" });
+      const prodRes = await fetch(`${base}/api/products`, { cache: "no-store" });
 
-        setDeals((await dealsRes.json()).deals || []);
-        setProducts((await prodRes.json()).products || []);
-      } catch {
-        setDeals([]);
-        setProducts([]);
-      }
+      setDeals((await dealsRes.json()).deals || []);
+      setProducts((await prodRes.json()).products || []);
     };
 
     fetchData();
   }, []);
 
   return (
-    <main className="relative bg-gradient-to-b from-blue-50 to-white">
+    <main className="bg-gradient-to-b from-blue-50 to-white">
       <HeroBannerGeneral />
       <BannerAdSection />
 
@@ -50,8 +42,8 @@ export default function HomePageClient() {
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* ✅ FILTER BAR FOR GENERAL DEALS */}
-      <FiltersBar category="general" />
+      {/* ✅ FILTERS WITH CATEGORY (VERY IMPORTANT) */}
+      <FiltersBar category="others" />
 
       <div className="max-w-7xl mx-auto px-4 mt-4">
         <GeneralDeals mode="general" externalProducts={products} />
@@ -60,4 +52,4 @@ export default function HomePageClient() {
       <FloatingAIButtons />
     </main>
   );
-      }
+}
