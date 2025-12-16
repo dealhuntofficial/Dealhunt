@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-// ✅ EXACT case-sensitive import
-import { subCategories } from "../data/subCategories";
+import { subCategories } from "@/config/subCategories";
 
 interface Merchant {
   id: string;
@@ -26,6 +24,8 @@ export default function FiltersBar({
 
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
 
   /* ---------------- FETCH MERCHANTS ---------------- */
   useEffect(() => {
@@ -65,14 +65,28 @@ export default function FiltersBar({
           <option value="newest">Newest</option>
           <option value="price_low">Price: Low → High</option>
           <option value="price_high">Price: High → Low</option>
+
+          <optgroup label="Price Range">
+            <option value="0-499">₹0 – ₹499</option>
+            <option value="500-999">₹500 – ₹999</option>
+            <option value="1000-1999">₹1000 – ₹1999</option>
+          </optgroup>
+
+          <optgroup label="Partners">
+            {merchants.map((m) => (
+              <option key={m.id} value={`merchant:${m.name}`}>
+                {m.name}
+              </option>
+            ))}
+          </optgroup>
         </select>
 
-        {/* BRAND */}
+        {/* REAL BRAND */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("brand", e.target.value)}
         >
-          <option value="">Brand</option>
+          <option value="">Real Brand</option>
           {brands.map((b) => (
             <option key={b.id} value={b.name}>
               {b.name}
@@ -80,13 +94,13 @@ export default function FiltersBar({
           ))}
         </select>
 
-        {/* SUBCATEGORY */}
+        {/* FILTERS (SUBCATEGORY) */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("subcategory", e.target.value)}
         >
           <option value="">Filters</option>
-          {(subCategories[category ?? ""] ?? []).map((sc) => (
+          {(subCategories[category || ""] || []).map((sc) => (
             <option key={sc.slug} value={sc.slug}>
               {sc.name}
             </option>
@@ -105,4 +119,4 @@ export default function FiltersBar({
       </div>
     </div>
   );
-    }
+}
