@@ -27,13 +27,9 @@ export default function HomePageClient() {
           fetch(`${base}/api/products`, { cache: "no-store" }),
         ]);
 
-        const dealsJson = await dealsRes.json();
-        const prodJson = await prodRes.json();
-
-        setDeals(dealsJson.deals || []);
-        setProducts(prodJson.products || []);
-      } catch (err) {
-        console.error("Home fetch error", err);
+        setDeals((await dealsRes.json()).deals || []);
+        setProducts((await prodRes.json()).products || []);
+      } catch {
         setDeals([]);
         setProducts([]);
       }
@@ -44,23 +40,19 @@ export default function HomePageClient() {
 
   return (
     <main className="relative bg-gradient-to-b from-blue-50 to-white">
-      {/* HERO + BANNERS */}
       <HeroBannerGeneral />
       <BannerAdSection />
 
-      {/* FEATURED DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <FeaturedDeals externalDeals={deals} />
       </div>
 
-      {/* CATEGORIES */}
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* 🔥 FIXED FILTER BAR (SAME AS CATEGORY PAGE) */}
-      <FiltersBar context="general" />
+      {/* ✅ FILTER BAR FOR GENERAL DEALS */}
+      <FiltersBar category="general" />
 
-      {/* GENERAL DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-4">
         <GeneralDeals mode="general" externalProducts={products} />
       </div>
@@ -68,4 +60,4 @@ export default function HomePageClient() {
       <FloatingAIButtons />
     </main>
   );
-                 }
+      }
