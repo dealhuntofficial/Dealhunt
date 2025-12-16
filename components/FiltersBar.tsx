@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { subCategories } from '../data/subCategories'; // ✅ Corrected path
-
+const { subCategories } = require('../../data/subCategories');
 interface Merchant {
   id: string;
   name: string;
