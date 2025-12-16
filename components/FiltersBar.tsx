@@ -24,8 +24,6 @@ export default function FiltersBar({
 
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
-  const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
 
   /* ---------------- FETCH MERCHANTS ---------------- */
   useEffect(() => {
@@ -33,7 +31,8 @@ export default function FiltersBar({
 
     fetch(`/api/merchants?category=${category}`)
       .then((r) => r.json())
-      .then((d) => setMerchants(d.merchants || []));
+      .then((d) => setMerchants(d.merchants || []))
+      .catch(() => setMerchants([]));
   }, [category]);
 
   /* ---------------- FETCH BRANDS ---------------- */
@@ -42,7 +41,8 @@ export default function FiltersBar({
 
     fetch(`/api/brands?category=${category}`)
       .then((r) => r.json())
-      .then((d) => setBrands(d.brands || []));
+      .then((d) => setBrands(d.brands || []))
+      .catch(() => setBrands([]));
   }, [category]);
 
   /* ---------------- UPDATE URL ---------------- */
@@ -56,7 +56,7 @@ export default function FiltersBar({
     <div className="sticky top-0 z-30 bg-white border-b shadow-sm">
       <div className="flex gap-3 overflow-x-auto px-4 py-3">
 
-        {/* SORT */}
+        {/* SORT + PRICE + PARTNERS */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("sort", e.target.value)}
@@ -94,7 +94,7 @@ export default function FiltersBar({
           ))}
         </select>
 
-        {/* FILTERS (SUBCATEGORY) */}
+        {/* SUBCATEGORIES */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("subcategory", e.target.value)}
@@ -116,7 +116,8 @@ export default function FiltersBar({
           <option value="4">4★ & above</option>
           <option value="3">3★ & above</option>
         </select>
+
       </div>
     </div>
   );
-}
+  }
