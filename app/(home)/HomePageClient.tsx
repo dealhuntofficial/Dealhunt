@@ -17,35 +17,50 @@ export default function HomePageClient() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const base =
-        process.env.NEXT_PUBLIC_BASE_URL ||
-        `https://${process.env.RENDER_EXTERNAL_URL}`;
+      try {
+        const base =
+          process.env.NEXT_PUBLIC_BASE_URL ||
+          `https://${process.env.RENDER_EXTERNAL_URL}`;
 
-      const dealsRes = await fetch(`${base}/api/deals`, { cache: "no-store" });
-      const prodRes = await fetch(`${base}/api/products`, { cache: "no-store" });
+        const [dealsRes, prodRes] = await Promise.all([
+          fetch(`${base}/api/deals`, { cache: "no-store" }),
+          fetch(`${base}/api/products`, { cache: "no-store" }),
+        ]);
 
-      setDeals((await dealsRes.json()).deals || []);
-      setProducts((await prodRes.json()).products || []);
+        const dealsJson = await dealsRes.json();
+        const prodJson = await prodRes.json();
+
+        setDeals(dealsJson.deals || []);
+        setProducts(prodJson.products || []);
+      } catch (err) {
+        console.error("Home fetch error", err);
+        setDeals([]);
+        setProducts([]);
+      }
     };
 
     fetchData();
   }, []);
 
   return (
-    <main className="bg-gradient-to-b from-blue-50 to-white">
+    <main className="relative bg-gradient-to-b from-blue-50 to-white">
+      {/* HERO + BANNERS */}
       <HeroBannerGeneral />
       <BannerAdSection />
 
+      {/* FEATURED DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-6">
         <FeaturedDeals externalDeals={deals} />
       </div>
 
+      {/* CATEGORIES */}
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* 🔥 FILTERS FOR GENERAL DEALS */}
-      <FiltersBar />
+      {/* 🔥 FIXED FILTER BAR (SAME AS CATEGORY PAGE) */}
+      <FiltersBar context="general" />
 
+      {/* GENERAL DEALS */}
       <div className="max-w-7xl mx-auto px-4 mt-4">
         <GeneralDeals mode="general" externalProducts={products} />
       </div>
