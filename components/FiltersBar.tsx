@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { subCategories } from '../../data/subCategories';
+import { subCategories } from '../data/subCategories'; // ✅ Corrected path
 
 interface Merchant {
   id: string;
@@ -119,4 +119,4 @@ export default function FiltersBar({
       </div>
     </div>
   );
-}
+    }
