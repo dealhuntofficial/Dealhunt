@@ -18,9 +18,7 @@ export default function ProductsPageClient() {
 
     fetch(apiUrl, { cache: "no-store" })
       .then((res) => res.json())
-      .then((json) => {
-        if (mounted) setProducts(json.deals || []);
-      })
+      .then((json) => mounted && setProducts(json.deals || []))
       .catch(() => mounted && setProducts([]))
       .finally(() => mounted && setLoading(false));
 
@@ -33,8 +31,8 @@ export default function ProductsPageClient() {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <BackButton />
 
-      {/* 🔥 FIXED FILTER BAR (CATEGORY PAGE LOGIC) */}
-      <FiltersBar context="products" />
+      {/* ✅ FILTER BAR SAME AS CATEGORY PAGE */}
+      <FiltersBar category="products" />
 
       <div className="flex justify-between mt-6 mb-4">
         <h1 className="font-semibold text-lg">Products</h1>
@@ -80,4 +78,4 @@ export default function ProductsPageClient() {
       </div>
     </div>
   );
-}
+            }
