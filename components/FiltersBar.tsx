@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { subCategories } from "@/config/subCategories";
+import { subCategories } from "@/data/subCategories";
 
 interface Merchant {
   id: string;
