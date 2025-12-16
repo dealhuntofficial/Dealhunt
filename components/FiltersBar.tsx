@@ -1,91 +1,118 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { subCategories } from "@/config/subCategories";
 
-export default function FiltersBar({
-  showCategoryFilters = false,
+interface Merchant {
+  id: string;
+  name: string;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+}
+
+export default function DealsFilterBar({
+  category,
 }: {
-  showCategoryFilters?: boolean;
+  category?: string;
 }) {
   const router = useRouter();
   const params = useSearchParams();
 
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [merchant, setMerchant] = useState("");
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
 
+  /* ---------------- FETCH MERCHANTS ---------------- */
+  useEffect(() => {
+    if (!category) return;
+
+    fetch(`/api/merchants?category=${category}`)
+      .then((r) => r.json())
+      .then((d) => setMerchants(d.merchants || []));
+  }, [category]);
+
+  /* ---------------- FETCH BRANDS ---------------- */
+  useEffect(() => {
+    if (!category) return;
+
+    fetch(`/api/brands?category=${category}`)
+      .then((r) => r.json())
+      .then((d) => setBrands(d.brands || []));
+  }, [category]);
+
+  /* ---------------- UPDATE URL ---------------- */
   const updateParam = (key: string, value: string) => {
-    const q = new URLSearchParams(params.toString());
-    value ? q.set(key, value) : q.delete(key);
-    router.push(`?${q.toString()}`, { scroll: false });
+    const p = new URLSearchParams(params.toString());
+    value ? p.set(key, value) : p.delete(key);
+    router.push(`?${p.toString()}`);
   };
 
   return (
     <div className="sticky top-0 z-30 bg-white border-b shadow-sm">
-      <div className="flex gap-3 overflow-x-auto px-4 py-3 no-scrollbar">
+      <div className="flex gap-3 overflow-x-auto px-4 py-3">
 
-        {/* SORT */}
+        {/* ================= SORT ================= */}
         <select
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="filter-chip"
           onChange={(e) => updateParam("sort", e.target.value)}
-          defaultValue=""
         >
           <option value="">Sort</option>
           <option value="newest">Newest</option>
           <option value="price_low">Price: Low → High</option>
           <option value="price_high">Price: High → Low</option>
+
+          {/* Manual Price inside SORT */}
+          <optgroup label="Price Range">
+            <option value="0-499">₹0 – ₹499</option>
+            <option value="500-999">₹500 – ₹999</option>
+            <option value="1000-1999">₹1000 – ₹1999</option>
+          </optgroup>
+
+          {/* Partners inside SORT */}
+          <optgroup label="Partners">
+            {merchants.map((m) => (
+              <option key={m.id} value={`merchant:${m.name}`}>
+                {m.name}
+              </option>
+            ))}
+          </optgroup>
         </select>
 
-        {/* REAL BRAND */}
+        {/* ================= REAL BRAND ================= */}
         <select
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="filter-chip"
           onChange={(e) => updateParam("brand", e.target.value)}
-          defaultValue=""
         >
           <option value="">Real Brand</option>
-          <option value="nike">Nike</option>
-          <option value="adidas">Adidas</option>
-          <option value="puma">Puma</option>
+          {brands.map((b) => (
+            <option key={b.id} value={b.name}>
+              {b.name}
+            </option>
+          ))}
         </select>
 
-        {/* FILTERS */}
-        <div className="flex gap-2">
-          <input
-            type="number"
-            placeholder="Min ₹"
-            className="w-20 border rounded-lg px-2 py-2 text-sm"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            onBlur={() => updateParam("minPrice", minPrice)}
-          />
-          <input
-            type="number"
-            placeholder="Max ₹"
-            className="w-20 border rounded-lg px-2 py-2 text-sm"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            onBlur={() => updateParam("maxPrice", maxPrice)}
-          />
-        </div>
-
-        {/* PARTNERS */}
-        <input
-          type="text"
-          placeholder="Partner"
-          className="border rounded-lg px-3 py-2 text-sm"
-          value={merchant}
-          onChange={(e) => {
-            setMerchant(e.target.value);
-            updateParam("merchant", e.target.value);
-          }}
-        />
-
-        {/* RATINGS */}
+        {/* ================= FILTERS (SUBCATEGORY) ================= */}
         <select
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="filter-chip"
+          onChange={(e) => updateParam("subcategory", e.target.value)}
+        >
+          <option value="">Filters</option>
+          {(subCategories[category || ""] || []).map((sc) => (
+            <option key={sc.slug} value={sc.slug}>
+              {sc.name}
+            </option>
+          ))}
+        </select>
+
+        {/* ================= RATINGS ================= */}
+        <select
+          className="filter-chip"
           onChange={(e) => updateParam("rating", e.target.value)}
-          defaultValue=""
         >
           <option value="">Ratings</option>
           <option value="4">4★ & above</option>
