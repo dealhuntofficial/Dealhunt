@@ -14,7 +14,7 @@ interface Brand {
   name: string;
 }
 
-export default function DealsFilterBar({
+export default function FiltersBar({
   category,
 }: {
   category?: string;
@@ -56,7 +56,7 @@ export default function DealsFilterBar({
     <div className="sticky top-0 z-30 bg-white border-b shadow-sm">
       <div className="flex gap-3 overflow-x-auto px-4 py-3">
 
-        {/* ================= SORT ================= */}
+        {/* SORT */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("sort", e.target.value)}
@@ -66,14 +66,12 @@ export default function DealsFilterBar({
           <option value="price_low">Price: Low → High</option>
           <option value="price_high">Price: High → Low</option>
 
-          {/* Manual Price inside SORT */}
           <optgroup label="Price Range">
             <option value="0-499">₹0 – ₹499</option>
             <option value="500-999">₹500 – ₹999</option>
             <option value="1000-1999">₹1000 – ₹1999</option>
           </optgroup>
 
-          {/* Partners inside SORT */}
           <optgroup label="Partners">
             {merchants.map((m) => (
               <option key={m.id} value={`merchant:${m.name}`}>
@@ -83,7 +81,7 @@ export default function DealsFilterBar({
           </optgroup>
         </select>
 
-        {/* ================= REAL BRAND ================= */}
+        {/* REAL BRAND */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("brand", e.target.value)}
@@ -96,7 +94,7 @@ export default function DealsFilterBar({
           ))}
         </select>
 
-        {/* ================= FILTERS (SUBCATEGORY) ================= */}
+        {/* FILTERS (SUBCATEGORY) */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("subcategory", e.target.value)}
@@ -109,7 +107,7 @@ export default function DealsFilterBar({
           ))}
         </select>
 
-        {/* ================= RATINGS ================= */}
+        {/* RATINGS */}
         <select
           className="filter-chip"
           onChange={(e) => updateParam("rating", e.target.value)}
