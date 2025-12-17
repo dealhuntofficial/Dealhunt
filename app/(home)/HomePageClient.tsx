@@ -7,8 +7,8 @@ import FeaturedDeals from "@/components/FeaturedDeals";
 import CartToHeartSection from "@/components/CartToHeartSection";
 import FloatingAIButtons from "@/components/FloatingAIButtons";
 import HeroBannerGeneral from "@/components/HeroBannerGeneral";
-import GeneralDeals from "@/components/GeneralDeals";
 import FiltersBar from "@/components/FiltersBar";
+import ProductsSection from "@/components/ProductsSection";
 
 export default function HomePageClient() {
   const [deals, setDeals] = useState<any[]>([]);
@@ -31,7 +31,7 @@ export default function HomePageClient() {
   }, []);
 
   return (
-    <main className="bg-gradient-to-b from-blue-50 to-white">
+    <main>
       <HeroBannerGeneral />
       <BannerAdSection />
 
@@ -42,14 +42,13 @@ export default function HomePageClient() {
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* ✅ FILTERS WITH CATEGORY (VERY IMPORTANT) */}
+      {/* 🔥 PRODUCTS FILTER */}
       <FiltersBar category="others" />
 
-      <div className="max-w-7xl mx-auto px-4 mt-4">
-        <GeneralDeals mode="general" externalProducts={products} />
-      </div>
+      {/* 🔥 PRODUCTS SECTION */}
+      <ProductsSection externalProducts={products} />
 
       <FloatingAIButtons />
     </main>
   );
-}
+        }
