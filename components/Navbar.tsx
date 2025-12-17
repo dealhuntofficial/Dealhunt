@@ -48,7 +48,7 @@ export default function Navbar() {
     setSearchQuery(item);
     setSuggestions([]);
     setDrawerOpen(false);
-    router.push(`/products?search=${encodeURIComponent(item)}`);
+    router.push(`/#products?search=${encodeURIComponent(item)}`);
   };
 
   const handleCameraClick = () => fileInputRef.current?.click();
@@ -281,7 +281,7 @@ export default function Navbar() {
 
             <nav className="mt-8 flex flex-col gap-4">
               <button onClick={() => handleNavigate("/")} className="text-yellow-500 font-semibold text-left">Home</button>
-              <button onClick={() => handleNavigate("/products")} className="text-yellow-500 font-semibold text-left">Products</button>
+              <button onClick={() => handleNavigate("/#products")} className="text-yellow-500 font-semibold text-left">Products</button>
               <button onClick={() => handleNavigate("/refer")} className="text-yellow-500 font-semibold text-left">Refer & Earn</button>
               <button onClick={() => handleNavigate("/wallet")} className="text-yellow-500 font-semibold text-left">Wallet</button>
               <button onClick={() => handleNavigate("/settings")} className="text-yellow-500 font-semibold text-left">Settings</button>
