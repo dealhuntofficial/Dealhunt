@@ -30,7 +30,7 @@ export default function HeroBannerGeneral() {
       {/* CTA Button */}
       <div className="relative z-10 mb-10">
         <a
-          href="/#products"
+          href="/deals"
           className="bg-blue-600 hover:bg-blue-500 text-white font-semibold 
                      px-7 py-3 rounded-full shadow-lg transition transform 
                      hover:scale-105 inline-block"
