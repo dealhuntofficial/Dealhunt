@@ -63,6 +63,7 @@ const deals: Deal[] = [
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
+  const search = searchParams.get("search");
   const category = searchParams.get("category");
   const subcategory = searchParams.get("subcategory");
   const merchant = searchParams.get("merchant");
@@ -73,6 +74,16 @@ export async function GET(req: Request) {
   const sort = searchParams.get("sort");
 
   let filtered = [...deals];
+
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(
+      d =>
+        d.title.toLowerCase().includes(q) ||
+        d.brand.toLowerCase().includes(q) ||
+        d.subcategory.toLowerCase().includes(q)
+    );
+  }
 
   if (category) filtered = filtered.filter(d => d.category === category);
   if (subcategory) filtered = filtered.filter(d => d.subcategory === subcategory);
@@ -94,4 +105,4 @@ export async function GET(req: Request) {
     merchants,
     brands,
   });
-}
+    }
