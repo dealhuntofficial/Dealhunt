@@ -15,12 +15,11 @@ type Deal = {
 export default function CategoryDealsPage({ params }: Props) {
   const slug = params.slug;
   const category = categories.find(c => c.slug === slug);
-
-  const subs = subCategories[slug] || subCategories.default;
+  const subs = subCategories[slug] || subCategories.others;
 
   const [deals, setDeals] = useState<Deal[]>([]);
   const [partners, setPartners] = useState<string[]>([]);
-  const [realBrands, setRealBrands] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState<{
@@ -30,7 +29,7 @@ export default function CategoryDealsPage({ params }: Props) {
     rating?: string;
     subcategory?: string;
     merchant?: string;
-    realBrand?: boolean;
+    brand?: string;
   }>({});
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function CategoryDealsPage({ params }: Props) {
         url.searchParams.set("category", slug);
 
         Object.entries(filters).forEach(([k, v]) => {
-          if (v) url.searchParams.set(k, v as string);
+          if (v) url.searchParams.set(k, v);
         });
 
         const res = await fetch(url.toString(), { cache: "no-store" });
@@ -54,9 +53,8 @@ export default function CategoryDealsPage({ params }: Props) {
 
         setDeals(data.deals || []);
         setPartners(data.merchants || []);
-        setRealBrands(data.realBrands || []);
-      } catch (e) {
-        console.error(e);
+        setBrands(data.brands || []);
+      } catch {
         setDeals([]);
       } finally {
         setLoading(false);
@@ -72,13 +70,9 @@ export default function CategoryDealsPage({ params }: Props) {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <BackButton />
 
-      {/* ================= FILTER BAR ================= */}
       <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
-
-        {/* SORT */}
         <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
           <summary className="font-medium cursor-pointer">Sort</summary>
-
           <select
             className="w-full mt-2 border rounded p-1"
             onChange={e => setFilters(f => ({ ...f, sort: e.target.value }))}
@@ -87,10 +81,7 @@ export default function CategoryDealsPage({ params }: Props) {
             <option value="newest">Newest</option>
             <option value="price_low">Price: Low → High</option>
             <option value="price_high">Price: High → Low</option>
-            <option value="discount">Best Discount</option>
           </select>
-
-          {/* MANUAL PRICE */}
           <div className="mt-2 flex gap-2">
             <input
               placeholder="Min"
@@ -103,8 +94,6 @@ export default function CategoryDealsPage({ params }: Props) {
               onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value }))}
             />
           </div>
-
-          {/* PARTNERS */}
           <select
             className="w-full mt-2 border rounded p-1"
             onChange={e => setFilters(f => ({ ...f, merchant: e.target.value }))}
@@ -116,25 +105,27 @@ export default function CategoryDealsPage({ params }: Props) {
           </select>
         </details>
 
-        {/* REAL BRAND */}
         <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
-          <summary className="font-medium cursor-pointer">Real Brand</summary>
+          <summary className="font-medium cursor-pointer">Brand</summary>
           <div className="mt-2 space-y-1">
-            {realBrands.map(b => (
-              <button
-                key={b}
-                className="block text-sm hover:underline"
-                onClick={() =>
-                  setFilters(f => ({ ...f, realBrand: true, merchant: b }))
-                }
-              >
-                {b}
-              </button>
-            ))}
+            {brands.length === 0 ? (
+              <div className="text-xs text-gray-500">
+                No brands available for selected merchant
+              </div>
+            ) : (
+              brands.map(b => (
+                <button
+                  key={b}
+                  className="block text-sm hover:underline"
+                  onClick={() => setFilters(f => ({ ...f, brand: b }))}
+                >
+                  {b}
+                </button>
+              ))
+            )}
           </div>
         </details>
 
-        {/* FILTERS (SUBCATEGORIES) */}
         <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
           <summary className="font-medium cursor-pointer">Filters</summary>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -142,9 +133,7 @@ export default function CategoryDealsPage({ params }: Props) {
               <button
                 key={s.slug}
                 className="text-xs px-2 py-1 bg-gray-100 rounded"
-                onClick={() =>
-                  setFilters(f => ({ ...f, subcategory: s.slug }))
-                }
+                onClick={() => setFilters(f => ({ ...f, subcategory: s.slug }))}
               >
                 {s.name}
               </button>
@@ -152,26 +141,20 @@ export default function CategoryDealsPage({ params }: Props) {
           </div>
         </details>
 
-        {/* RATINGS */}
         <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
           <summary className="font-medium cursor-pointer">Ratings</summary>
-          <div className="mt-2 space-y-1">
-            {[1, 2, 3, 4, 5].map(r => (
-              <button
-                key={r}
-                className="block text-sm hover:underline"
-                onClick={() =>
-                  setFilters(f => ({ ...f, rating: String(r) }))
-                }
-              >
-                {r}★ & above
-              </button>
-            ))}
-          </div>
+          {[1, 2, 3, 4, 5].map(r => (
+            <button
+              key={r}
+              className="block text-sm hover:underline"
+              onClick={() => setFilters(f => ({ ...f, rating: String(r) }))}
+            >
+              {r}★ & above
+            </button>
+          ))}
         </details>
       </div>
 
-      {/* ================= DEALS ================= */}
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading...</div>
       ) : deals.length === 0 ? (
@@ -185,4 +168,4 @@ export default function CategoryDealsPage({ params }: Props) {
       )}
     </div>
   );
-    }
+}
