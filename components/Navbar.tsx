@@ -44,7 +44,7 @@ export default function Navbar() {
     const res = await fetch(`/api/deals?search=${encodeURIComponent(query)}`);
     const data = await res.json();
 
-    if (data.deals.length > 0) {
+    if (data.deals && data.deals.length > 0) {
       setSuggestions(
         data.deals.slice(0, 5).map((d: any) => ({
           type: "deal",
@@ -53,9 +53,9 @@ export default function Navbar() {
       );
     } else {
       setSuggestions(
-        Object.entries(MERCHANT_SEARCH_URLS).map(([m, fn]) => ({
+        Object.entries(MERCHANT_SEARCH_URLS).map(([merchant, fn]) => ({
           type: "merchant",
-          label: `Search "${query}" on ${m}`,
+          label: `Search "${query}" on ${merchant}`,
           url: fn(query),
         }))
       );
@@ -171,4 +171,4 @@ export default function Navbar() {
       )}
     </header>
   );
-}
+  }
