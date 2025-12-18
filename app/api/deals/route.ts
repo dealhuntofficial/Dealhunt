@@ -62,7 +62,6 @@ const deals: Deal[] = [
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-
   const search = searchParams.get("search");
 
   let filtered = [...deals];
