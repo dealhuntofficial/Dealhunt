@@ -42,13 +42,15 @@ export default function HomePageClient() {
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* 🔥 PRODUCTS FILTER */}
+      {/* PRODUCTS FILTER */}
       <FiltersBar category="others" />
 
-      {/* 🔥 PRODUCTS SECTION */}
-      <ProductsSection externalProducts={products} />
+      {/* PRODUCTS SECTION */}
+      <section id="products">
+        <ProductsSection externalProducts={products} />
+      </section>
 
       <FloatingAIButtons />
     </main>
   );
-        }
+      }
