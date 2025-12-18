@@ -15,13 +15,14 @@ import { useRouter } from "next/navigation";
 
 type Suggestion =
   | { type: "deal"; label: string }
-  | { type: "merchant"; label: string; url: string };
+  | { type: "merchant"; label: string; url: string }
+  | { type: "empty"; label: string };
 
 const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
-  amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
-  flipkart: q => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
-  myntra: q => `https://www.myntra.com/${encodeURIComponent(q)}`,
-  meesho: q => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
+  Amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
+  Flipkart: q => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
+  Myntra: q => `https://www.myntra.com/${encodeURIComponent(q)}`,
+  Meesho: q => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
 };
 
 export default function Navbar() {
@@ -52,20 +53,20 @@ export default function Navbar() {
         }))
       );
     } else {
-      setSuggestions(
-        Object.entries(MERCHANT_SEARCH_URLS).map(([merchant, fn]) => ({
-          type: "merchant",
-          label: `Search "${query}" on ${merchant}`,
+      const merchantSuggestions = Object.entries(MERCHANT_SEARCH_URLS).map(
+        ([name, fn]) => ({
+          type: "merchant" as const,
+          label: `Search "${query}" on ${name}`,
           url: fn(query),
-        }))
+        })
+      );
+
+      setSuggestions(
+        merchantSuggestions.length > 0
+          ? merchantSuggestions
+          : [{ type: "empty", label: "No results found" }]
       );
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    fetchSuggestions(value);
   };
 
   const handleSelect = (item: Suggestion) => {
@@ -74,8 +75,14 @@ export default function Navbar() {
 
     if (item.type === "deal") {
       router.push(`/#products?search=${encodeURIComponent(item.label)}`);
-    } else {
+    } else if (item.type === "merchant") {
       window.open(item.url, "_blank");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      fetchSuggestions(searchQuery);
     }
   };
 
@@ -109,25 +116,35 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white shadow">
       <input ref={fileInputRef} type="file" hidden />
 
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold">
           <span className="text-yellow-500">Deal</span>Hunt
         </Link>
 
-        <div className="hidden md:block w-1/3 relative">
+        {/* SEARCH BAR (DESKTOP + MOBILE) */}
+        <div className="flex-1 mx-4 relative">
           <input
             value={searchQuery}
-            onChange={handleChange}
-            placeholder="Search products..."
-            className="w-full border rounded-full px-4 py-2"
+            onChange={e => {
+              setSearchQuery(e.target.value);
+              fetchSuggestions(e.target.value);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Search products, brands, deals..."
+            className="w-full border rounded-full px-4 py-2 text-sm"
           />
 
+          {/* TAGLINE (FIXED FOR MOBILE) */}
+          <p className="text-xs text-gray-500 mt-1 hidden sm:block">
+            Compare prices • Best deals • Trusted merchants
+          </p>
+
           {suggestions.length > 0 && (
-            <ul className="absolute bg-white w-full shadow mt-1 rounded z-50">
+            <ul className="absolute bg-white w-full shadow mt-2 rounded z-50">
               {suggestions.map((s, i) => (
                 <li
                   key={i}
-                  onClick={() => handleSelect(s)}
+                  onClick={() => s.type !== "empty" && handleSelect(s)}
                   className="px-4 py-2 hover:bg-yellow-100 cursor-pointer text-sm"
                 >
                   {s.label}
@@ -142,18 +159,13 @@ export default function Navbar() {
               className={listening ? "text-red-500" : ""}
               onClick={handleMicClick}
             />
-            <FiSearch
-              onClick={() =>
-                searchQuery &&
-                handleSelect({ type: "deal", label: searchQuery })
-              }
-            />
+            <FiSearch onClick={() => fetchSuggestions(searchQuery)} />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <FiUser onClick={() => router.push("/signin")} />
-          <span>Hi, {displayName}</span>
+          <span className="hidden sm:block">Hi, {displayName}</span>
           <FiMoreVertical onClick={() => setDrawerOpen(true)} />
         </div>
       </div>
@@ -171,4 +183,4 @@ export default function Navbar() {
       )}
     </header>
   );
-  }
+     }
