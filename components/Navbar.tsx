@@ -42,30 +42,47 @@ export default function Navbar() {
       return;
     }
 
-    const res = await fetch(`/api/deals?search=${encodeURIComponent(query)}`);
-    const data = await res.json();
+    try {
+      const res = await fetch(`/api/deals?search=${encodeURIComponent(query)}`);
+      const data = await res.json();
 
-    if (data.deals && data.deals.length > 0) {
-      setSuggestions(
-        data.deals.slice(0, 5).map((d: any) => ({
-          type: "deal",
-          label: d.title,
-        }))
-      );
-    } else {
-      const merchantSuggestions = Object.entries(MERCHANT_SEARCH_URLS).map(
-        ([name, fn]) => ({
+      if (data.deals && data.deals.length > 0) {
+        setSuggestions(
+          data.deals.slice(0, 5).map((d: any) => ({
+            type: "deal",
+            label: d.title,
+          }))
+        );
+      } else {
+        const merchantSuggestions = Object.entries(
+          MERCHANT_SEARCH_URLS
+        ).map(([name, fn]) => ({
           type: "merchant" as const,
           label: `Search "${query}" on ${name}`,
           url: fn(query),
-        })
-      );
+        }));
 
-      setSuggestions(
-        merchantSuggestions.length > 0
-          ? merchantSuggestions
-          : [{ type: "empty", label: "No results found" }]
-      );
+        setSuggestions(
+          merchantSuggestions.length > 0
+            ? merchantSuggestions
+            : [{ type: "empty", label: "No results found" }]
+        );
+      }
+    } catch {
+      setSuggestions([{ type: "empty", label: "No results found" }]);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    fetchSuggestions(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      router.push(`/#products?search=${encodeURIComponent(searchQuery)}`);
+      setSuggestions([]);
     }
   };
 
@@ -77,12 +94,6 @@ export default function Navbar() {
       router.push(`/#products?search=${encodeURIComponent(item.label)}`);
     } else if (item.type === "merchant") {
       window.open(item.url, "_blank");
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchQuery.trim()) {
-      fetchSuggestions(searchQuery);
     }
   };
 
@@ -116,35 +127,48 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white shadow">
       <input ref={fileInputRef} type="file" hidden />
 
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      {/* MOBILE VIEW */}
+      <div className="md:hidden px-4 py-3 text-center">
+        <h1 className="text-2xl font-bold">
+          <span className="text-yellow-500">Deal</span>Hunt
+        </h1>
+        <p className="text-xs text-gray-500 mt-1">
+          Find best deals from all top stores
+        </p>
+
+        <div className="relative mt-3">
+          <input
+            value={searchQuery}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Search products..."
+            className="w-full border rounded-full px-4 py-2 pr-10"
+          />
+          <FiSearch className="absolute right-3 top-3 text-gray-500" />
+        </div>
+      </div>
+
+      {/* DESKTOP VIEW */}
+      <div className="hidden md:flex max-w-7xl mx-auto px-6 py-3 justify-between items-center">
         <Link href="/" className="text-2xl font-bold">
           <span className="text-yellow-500">Deal</span>Hunt
         </Link>
 
-        {/* SEARCH BAR (DESKTOP + MOBILE) */}
-        <div className="flex-1 mx-4 relative">
+        <div className="w-1/3 relative">
           <input
             value={searchQuery}
-            onChange={e => {
-              setSearchQuery(e.target.value);
-              fetchSuggestions(e.target.value);
-            }}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder="Search products, brands, deals..."
-            className="w-full border rounded-full px-4 py-2 text-sm"
+            placeholder="Search products..."
+            className="w-full border rounded-full px-4 py-2"
           />
 
-          {/* TAGLINE (FIXED FOR MOBILE) */}
-          <p className="text-xs text-gray-500 mt-1 hidden sm:block">
-            Compare prices • Best deals • Trusted merchants
-          </p>
-
           {suggestions.length > 0 && (
-            <ul className="absolute bg-white w-full shadow mt-2 rounded z-50">
+            <ul className="absolute bg-white w-full shadow mt-1 rounded z-50">
               {suggestions.map((s, i) => (
                 <li
                   key={i}
-                  onClick={() => s.type !== "empty" && handleSelect(s)}
+                  onClick={() => handleSelect(s)}
                   className="px-4 py-2 hover:bg-yellow-100 cursor-pointer text-sm"
                 >
                   {s.label}
@@ -159,17 +183,17 @@ export default function Navbar() {
               className={listening ? "text-red-500" : ""}
               onClick={handleMicClick}
             />
-            <FiSearch onClick={() => fetchSuggestions(searchQuery)} />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <FiUser onClick={() => router.push("/signin")} />
-          <span className="hidden sm:block">Hi, {displayName}</span>
+          <span>Hi, {displayName}</span>
           <FiMoreVertical onClick={() => setDrawerOpen(true)} />
         </div>
       </div>
 
+      {/* DRAWER */}
       {drawerOpen && (
         <aside className="fixed right-0 top-0 w-72 h-full bg-white shadow p-6 z-50">
           <FiX onClick={() => setDrawerOpen(false)} />
@@ -183,4 +207,4 @@ export default function Navbar() {
       )}
     </header>
   );
-     }
+}
