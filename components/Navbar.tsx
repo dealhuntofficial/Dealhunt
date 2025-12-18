@@ -15,8 +15,7 @@ import { useRouter } from "next/navigation";
 
 type Suggestion =
   | { type: "deal"; label: string }
-  | { type: "merchant"; label: string; url: string }
-  | { type: "empty"; label: string };
+  | { type: "merchant"; label: string; url: string };
 
 const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
   Amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
@@ -42,34 +41,24 @@ export default function Navbar() {
       return;
     }
 
-    try {
-      const res = await fetch(`/api/deals?search=${encodeURIComponent(query)}`);
-      const data = await res.json();
+    const res = await fetch(`/api/deals?search=${encodeURIComponent(query)}`);
+    const data = await res.json();
 
-      if (data.deals && data.deals.length > 0) {
-        setSuggestions(
-          data.deals.slice(0, 5).map((d: any) => ({
-            type: "deal",
-            label: d.title,
-          }))
-        );
-      } else {
-        const merchantSuggestions = Object.entries(
-          MERCHANT_SEARCH_URLS
-        ).map(([name, fn]) => ({
-          type: "merchant" as const,
+    if (data.deals && data.deals.length > 0) {
+      setSuggestions(
+        data.deals.slice(0, 6).map((d: any) => ({
+          type: "deal",
+          label: d.title,
+        }))
+      );
+    } else {
+      setSuggestions(
+        Object.entries(MERCHANT_SEARCH_URLS).map(([name, fn]) => ({
+          type: "merchant",
           label: `Search "${query}" on ${name}`,
           url: fn(query),
-        }));
-
-        setSuggestions(
-          merchantSuggestions.length > 0
-            ? merchantSuggestions
-            : [{ type: "empty", label: "No results found" }]
-        );
-      }
-    } catch {
-      setSuggestions([{ type: "empty", label: "No results found" }]);
+        }))
+      );
     }
   };
 
@@ -79,22 +68,20 @@ export default function Navbar() {
     fetchSuggestions(value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchQuery.trim()) {
-      router.push(`/#products?search=${encodeURIComponent(searchQuery)}`);
-      setSuggestions([]);
-    }
-  };
-
   const handleSelect = (item: Suggestion) => {
     setSuggestions([]);
     setDrawerOpen(false);
 
     if (item.type === "deal") {
       router.push(`/#products?search=${encodeURIComponent(item.label)}`);
-    } else if (item.type === "merchant") {
+    } else {
       window.open(item.url, "_blank");
     }
+  };
+
+  const handleEnterSearch = () => {
+    if (!searchQuery) return;
+    handleSelect({ type: "deal", label: searchQuery });
   };
 
   const handleMicClick = () => {
@@ -124,87 +111,110 @@ export default function Navbar() {
     : "Guest";
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow">
-      <input ref={fileInputRef} type="file" hidden />
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md">
+      <input type="file" ref={fileInputRef} hidden />
 
-      {/* MOBILE VIEW */}
-      <div className="md:hidden px-4 py-3 text-center">
-        <h1 className="text-2xl font-bold">
-          <span className="text-yellow-500">Deal</span>Hunt
-        </h1>
-        <p className="text-xs text-gray-500 mt-1">
-          Find best deals from all top stores
-        </p>
+      <div className="max-w-7xl mx-auto px-6 py-3 w-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          {/* Logo + Tagline */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <Link href="/" className="text-2xl font-bold tracking-wide">
+              <span className="text-yellow-500">Deal</span>Hunt
+            </Link>
+            <p className="text-sm font-semibold bg-gradient-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
+              Saving you money with verified deals
+            </p>
+          </div>
 
-        <div className="relative mt-3">
-          <input
-            value={searchQuery}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Search products..."
-            className="w-full border rounded-full px-4 py-2 pr-10"
-          />
-          <FiSearch className="absolute right-3 top-3 text-gray-500" />
-        </div>
-      </div>
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-1 justify-center px-4 mt-3 md:mt-0">
+            <div className="relative w-full max-w-md">
+              <input
+                value={searchQuery}
+                onChange={handleChange}
+                onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
+                placeholder="Search products..."
+                className="w-full px-4 pr-28 py-2 rounded-full border focus:ring-2 focus:ring-yellow-500"
+              />
 
-      {/* DESKTOP VIEW */}
-      <div className="hidden md:flex max-w-7xl mx-auto px-6 py-3 justify-between items-center">
-        <Link href="/" className="text-2xl font-bold">
-          <span className="text-yellow-500">Deal</span>Hunt
-        </Link>
+              {suggestions.length > 0 && (
+                <ul className="absolute w-full bg-white shadow-md rounded-b-md mt-1 z-50">
+                  {suggestions.map((s, i) => (
+                    <li
+                      key={i}
+                      onClick={() => handleSelect(s)}
+                      className="px-4 py-2 hover:bg-yellow-100 cursor-pointer text-sm"
+                    >
+                      {s.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-        <div className="w-1/3 relative">
-          <input
-            value={searchQuery}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Search products..."
-            className="w-full border rounded-full px-4 py-2"
-          />
+              <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+                <FiCamera />
+                <FiMic
+                  onClick={handleMicClick}
+                  className={listening ? "text-red-500" : ""}
+                />
+                <FiSearch onClick={handleEnterSearch} />
+              </div>
+            </div>
+          </div>
 
-          {suggestions.length > 0 && (
-            <ul className="absolute bg-white w-full shadow mt-1 rounded z-50">
-              {suggestions.map((s, i) => (
-                <li
-                  key={i}
-                  onClick={() => handleSelect(s)}
-                  className="px-4 py-2 hover:bg-yellow-100 cursor-pointer text-sm"
-                >
-                  {s.label}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="absolute right-3 top-2 flex gap-2">
-            <FiCamera />
-            <FiMic
-              className={listening ? "text-red-500" : ""}
-              onClick={handleMicClick}
-            />
+          {/* Desktop Right Icons */}
+          <div className="hidden md:flex items-center gap-3">
+            <FiUser onClick={() => router.push("/signin")} />
+            <span>Hi, {displayName}</span>
+            <FiMoreVertical onClick={() => setDrawerOpen(true)} />
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <FiUser onClick={() => router.push("/signin")} />
+        {/* Mobile Search */}
+        <div className="md:hidden mt-3 relative">
+          <input
+            value={searchQuery}
+            onChange={handleChange}
+            onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
+            placeholder="Search products..."
+            className="w-full px-4 pr-28 py-2 rounded-full border"
+          />
+          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+            <FiCamera />
+            <FiMic
+              onClick={handleMicClick}
+              className={listening ? "text-red-500" : ""}
+            />
+            <FiSearch onClick={handleEnterSearch} />
+          </div>
+        </div>
+
+        {/* Mobile Profile */}
+        <div className="flex justify-end gap-2 mt-2 md:hidden">
           <span>Hi, {displayName}</span>
+          <FiUser onClick={() => router.push("/signin")} />
           <FiMoreVertical onClick={() => setDrawerOpen(true)} />
         </div>
       </div>
 
-      {/* DRAWER */}
+      {/* Drawer */}
       {drawerOpen && (
-        <aside className="fixed right-0 top-0 w-72 h-full bg-white shadow p-6 z-50">
-          <FiX onClick={() => setDrawerOpen(false)} />
-          <nav className="mt-6 flex flex-col gap-4">
-            <button onClick={() => router.push("/")}>Home</button>
-            <button onClick={() => router.push("/#products")}>Products</button>
-            <button onClick={() => router.push("/refer")}>Refer & Earn</button>
-            <button onClick={() => router.push("/wallet")}>Wallet</button>
-          </nav>
-        </aside>
+        <>
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setDrawerOpen(false)}
+          />
+          <aside className="fixed right-0 top-0 w-72 h-full bg-white p-6 shadow-xl">
+            <FiX onClick={() => setDrawerOpen(false)} />
+            <nav className="mt-6 flex flex-col gap-4">
+              <button onClick={() => router.push("/")}>Home</button>
+              <button onClick={() => router.push("/#products")}>Products</button>
+              <button onClick={() => router.push("/refer")}>Refer & Earn</button>
+              <button onClick={() => router.push("/wallet")}>Wallet</button>
+            </nav>
+          </aside>
+        </>
       )}
     </header>
   );
-}
+  }
