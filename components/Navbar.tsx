@@ -13,9 +13,13 @@ import {
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+/* ================= TYPES ================= */
+
 type Suggestion =
   | { type: "deal"; label: string }
   | { type: "merchant"; label: string; url: string };
+
+/* ================= MERCHANT FALLBACK ================= */
 
 const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
   Amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
@@ -23,6 +27,8 @@ const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
   Myntra: q => `https://www.myntra.com/${encodeURIComponent(q)}`,
   Meesho: q => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
 };
+
+/* ================= COMPONENT ================= */
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -35,7 +41,7 @@ export default function Navbar() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  /* ---------------- SEARCH LOGIC ---------------- */
+  /* ================= SEARCH ================= */
 
   const fetchSuggestions = async (query: string) => {
     if (!query.trim()) {
@@ -86,7 +92,7 @@ export default function Navbar() {
     handleSelect({ type: "deal", label: searchQuery });
   };
 
-  /* ---------------- CAMERA SEARCH ---------------- */
+  /* ================= CAMERA SEARCH (OPTION 1 – FREE) ================= */
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
@@ -96,18 +102,12 @@ export default function Navbar() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Option-1: user confirmation based search
-    const keyword = prompt(
-      "Enter product name from image (eg. iPhone 15, Nike Shoes)"
+    alert(
+      "Image selected ✔️\n\nImage search via AI will be added later.\nFor now please search using keywords."
     );
-
-    if (keyword) {
-      setSearchQuery(keyword);
-      fetchSuggestions(keyword);
-    }
   };
 
-  /* ---------------- MIC SEARCH ---------------- */
+  /* ================= VOICE SEARCH ================= */
 
   const handleMicClick = () => {
     const SpeechRecognition =
@@ -135,11 +135,11 @@ export default function Navbar() {
     ? session.user.name.split(" ").slice(0, 2).join(" ")
     : "Guest";
 
-  /* ---------------- UI ---------------- */
+  /* ================= UI ================= */
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md">
-      {/* CAMERA INPUT */}
+      {/* hidden file input */}
       <input
         type="file"
         accept="image/*"
@@ -148,11 +148,11 @@ export default function Navbar() {
         hidden
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-3">
+      <div className="max-w-7xl mx-auto px-6 py-3 w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
-          {/* Logo + Tagline */}
-          <div className="flex flex-col items-center md:items-start">
-            <Link href="/" className="text-2xl font-bold">
+          {/* LOGO + TAGLINE */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <Link href="/" className="text-2xl font-bold tracking-wide">
               <span className="text-yellow-500">Deal</span>Hunt
             </Link>
             <p className="text-sm font-semibold bg-gradient-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
@@ -160,7 +160,7 @@ export default function Navbar() {
             </p>
           </div>
 
-          {/* Desktop Search */}
+          {/* DESKTOP SEARCH */}
           <div className="hidden md:flex flex-1 justify-center px-4 mt-3 md:mt-0">
             <div className="relative w-full max-w-md">
               <input
@@ -168,11 +168,11 @@ export default function Navbar() {
                 onChange={handleChange}
                 onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
                 placeholder="Search products..."
-                className="w-full px-4 pr-28 py-2 rounded-full border"
+                className="w-full px-4 pr-28 py-2 rounded-full border focus:ring-2 focus:ring-yellow-500"
               />
 
               {suggestions.length > 0 && (
-                <ul className="absolute w-full bg-white shadow-md mt-1 z-50">
+                <ul className="absolute w-full bg-white shadow-md rounded-b-md mt-1 z-50">
                   {suggestions.map((s, i) => (
                     <li
                       key={i}
@@ -186,10 +186,7 @@ export default function Navbar() {
               )}
 
               <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-                <FiCamera
-                  className="cursor-pointer"
-                  onClick={handleCameraClick}
-                />
+                <FiCamera onClick={handleCameraClick} />
                 <FiMic
                   onClick={handleMicClick}
                   className={listening ? "text-red-500" : ""}
@@ -199,14 +196,59 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Desktop Right */}
+          {/* DESKTOP RIGHT */}
           <div className="hidden md:flex items-center gap-3">
             <FiUser onClick={() => router.push("/signin")} />
             <span>Hi, {displayName}</span>
             <FiMoreVertical onClick={() => setDrawerOpen(true)} />
           </div>
         </div>
+
+        {/* MOBILE SEARCH */}
+        <div className="md:hidden mt-3 relative">
+          <input
+            value={searchQuery}
+            onChange={handleChange}
+            onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
+            placeholder="Search products..."
+            className="w-full px-4 pr-28 py-2 rounded-full border"
+          />
+          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+            <FiCamera onClick={handleCameraClick} />
+            <FiMic
+              onClick={handleMicClick}
+              className={listening ? "text-red-500" : ""}
+            />
+            <FiSearch onClick={handleEnterSearch} />
+          </div>
+        </div>
+
+        {/* MOBILE PROFILE */}
+        <div className="flex justify-end gap-2 mt-2 md:hidden">
+          <span>Hi, {displayName}</span>
+          <FiUser onClick={() => router.push("/signin")} />
+          <FiMoreVertical onClick={() => setDrawerOpen(true)} />
+        </div>
       </div>
+
+      {/* DRAWER */}
+      {drawerOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setDrawerOpen(false)}
+          />
+          <aside className="fixed right-0 top-0 w-72 h-full bg-white p-6 shadow-xl">
+            <FiX onClick={() => setDrawerOpen(false)} />
+            <nav className="mt-6 flex flex-col gap-4">
+              <button onClick={() => router.push("/")}>Home</button>
+              <button onClick={() => router.push("/#products")}>Products</button>
+              <button onClick={() => router.push("/refer")}>Refer & Earn</button>
+              <button onClick={() => router.push("/wallet")}>Wallet</button>
+            </nav>
+          </aside>
+        </>
+      )}
     </header>
   );
-      }
+}
