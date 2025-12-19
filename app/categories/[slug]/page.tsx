@@ -40,7 +40,7 @@ export default function CategoryDealsPage({
     <div className="max-w-7xl mx-auto px-4 py-6">
       <BackButton />
 
-      {/* 🔥 FIX: FiltersBar ko sirf category diya */}
+      {/* ✅ Filters always visible */}
       <FiltersBar category={params.slug} />
 
       {loading ? (
