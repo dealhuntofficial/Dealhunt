@@ -1,20 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { subCategories as STATIC_SUBS } from "@/data/subcategories";
-
-type SubCat = {
-  slug: string;
-  name: string;
-};
+import { subCategories } from "@/data/subcategories";
 
 type Props = {
   category?: string;
-  subcategories?: SubCat[]; // ✅ NEW (optional)
+  subcategories?: { slug: string; name: string }[];
 };
 
-export default function FiltersBar({ category, subcategories }: Props) {
+function FiltersBarInner({ category, subcategories }: Props) {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -44,16 +39,16 @@ export default function FiltersBar({ category, subcategories }: Props) {
       });
   }, [category]);
 
-  const finalSubCategories =
+  const subs =
     subcategories && subcategories.length > 0
       ? subcategories
-      : STATIC_SUBS[activeCategory] || [];
+      : subCategories[activeCategory] || [];
 
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
-      {/* SORT + PRICE + MERCHANT */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
+      {/* SORT / PRICE / MERCHANT */}
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
 
         <select
@@ -95,9 +90,7 @@ export default function FiltersBar({ category, subcategories }: Props) {
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
           {brands.length === 0 ? (
-            <div className="text-xs text-gray-500">
-              No brands available
-            </div>
+            <div className="text-xs text-gray-500">No brands</div>
           ) : (
             brands.map(b => (
               <button
@@ -113,24 +106,18 @@ export default function FiltersBar({ category, subcategories }: Props) {
       </details>
 
       {/* SUBCATEGORIES */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
-          {finalSubCategories.length === 0 ? (
-            <span className="text-xs text-gray-400">
-              No subcategories found
-            </span>
-          ) : (
-            finalSubCategories.map(s => (
-              <button
-                key={s.slug}
-                className="text-xs px-2 py-1 bg-gray-100 rounded"
-                onClick={() => setParam("subcategory", s.slug)}
-              >
-                {s.name}
-              </button>
-            ))
-          )}
+          {subs.map(s => (
+            <button
+              key={s.slug}
+              className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-yellow-100"
+              onClick={() => setParam("subcategory", s.slug)}
+            >
+              {s.name}
+            </button>
+          ))}
         </div>
       </details>
 
@@ -150,3 +137,12 @@ export default function FiltersBar({ category, subcategories }: Props) {
     </div>
   );
 }
+
+/* 🔥 THIS FIXES PRERENDER ERROR */
+export default function FiltersBar(props: Props) {
+  return (
+    <Suspense fallback={null}>
+      <FiltersBarInner {...props} />
+    </Suspense>
+  );
+      }
