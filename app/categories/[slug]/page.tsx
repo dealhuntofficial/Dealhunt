@@ -22,9 +22,12 @@ export default function CategoryDealsPage({
     setLoading(true);
 
     const url = new URL("/api/deals", window.location.origin);
-    if (params.slug && params.slug !== "all")
+    if (params.slug && params.slug !== "all") {
       url.searchParams.set("category", params.slug);
-    if (search) url.searchParams.set("search", search);
+    }
+    if (search) {
+      url.searchParams.set("search", search);
+    }
 
     fetch(url.toString(), { cache: "no-store" })
       .then(r => r.json())
@@ -35,7 +38,9 @@ export default function CategoryDealsPage({
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <BackButton />
-      <FiltersBar category={params.slug} />
+
+      {/* IMPORTANT: search pass kiya taki filters data generate ho */}
+      <FiltersBar category={params.slug} search={search || ""} />
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading…</div>
@@ -52,4 +57,4 @@ export default function CategoryDealsPage({
       )}
     </div>
   );
-}
+      }
