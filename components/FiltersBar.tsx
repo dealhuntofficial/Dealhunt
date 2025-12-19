@@ -11,6 +11,9 @@ export default function FiltersBar({ category }: { category?: string }) {
   const [partners, setPartners] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
 
+  const activeCategory =
+    category && category !== "all" ? category : "others";
+
   const setParam = (key: string, value?: string) => {
     const p = new URLSearchParams(params.toString());
     value ? p.set(key, value) : p.delete(key);
@@ -20,7 +23,10 @@ export default function FiltersBar({ category }: { category?: string }) {
   useEffect(() => {
     if (!category) return;
 
-    fetch(`/api/deals?category=${category}`)
+    const url = new URL("/api/deals", window.location.origin);
+    if (category !== "all") url.searchParams.set("category", category);
+
+    fetch(url.toString())
       .then(r => r.json())
       .then(d => {
         setPartners(d.merchants || []);
@@ -35,8 +41,10 @@ export default function FiltersBar({ category }: { category?: string }) {
       <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
 
-        <select className="w-full mt-2 border rounded p-1"
-          onChange={e => setParam("sort", e.target.value)}>
+        <select
+          className="w-full mt-2 border rounded p-1"
+          onChange={e => setParam("sort", e.target.value)}
+        >
           <option value="">Select</option>
           <option value="newest">Newest</option>
           <option value="price_low">Low → High</option>
@@ -44,18 +52,26 @@ export default function FiltersBar({ category }: { category?: string }) {
         </select>
 
         <div className="mt-2 flex gap-2">
-          <input placeholder="Min"
+          <input
+            placeholder="Min"
             className="w-1/2 border rounded p-1 text-sm"
-            onBlur={e => setParam("minPrice", e.target.value)} />
-          <input placeholder="Max"
+            onBlur={e => setParam("minPrice", e.target.value)}
+          />
+          <input
+            placeholder="Max"
             className="w-1/2 border rounded p-1 text-sm"
-            onBlur={e => setParam("maxPrice", e.target.value)} />
+            onBlur={e => setParam("maxPrice", e.target.value)}
+          />
         </div>
 
-        <select className="w-full mt-2 border rounded p-1"
-          onChange={e => setParam("merchant", e.target.value)}>
+        <select
+          className="w-full mt-2 border rounded p-1"
+          onChange={e => setParam("merchant", e.target.value)}
+        >
           <option value="">Partners</option>
-          {partners.map(p => <option key={p}>{p}</option>)}
+          {partners.map(p => (
+            <option key={p}>{p}</option>
+          ))}
         </select>
       </details>
 
@@ -65,15 +81,19 @@ export default function FiltersBar({ category }: { category?: string }) {
         <div className="mt-2 space-y-1">
           {brands.length === 0 ? (
             <div className="text-xs text-gray-500">
-              No brands available for this merchant
+              No brands available
             </div>
-          ) : brands.map(b => (
-            <button key={b}
-              className="block text-sm hover:underline"
-              onClick={() => setParam("brand", b)}>
-              {b}
-            </button>
-          ))}
+          ) : (
+            brands.map(b => (
+              <button
+                key={b}
+                className="block text-sm hover:underline"
+                onClick={() => setParam("brand", b)}
+              >
+                {b}
+              </button>
+            ))
+          )}
         </div>
       </details>
 
@@ -81,10 +101,12 @@ export default function FiltersBar({ category }: { category?: string }) {
       <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
-          {(subCategories[category || "others"] || []).map(s => (
-            <button key={s.slug}
+          {(subCategories[activeCategory] || []).map(s => (
+            <button
+              key={s.slug}
               className="text-xs px-2 py-1 bg-gray-100 rounded"
-              onClick={() => setParam("subcategory", s.slug)}>
+              onClick={() => setParam("subcategory", s.slug)}
+            >
               {s.name}
             </button>
           ))}
@@ -95,13 +117,15 @@ export default function FiltersBar({ category }: { category?: string }) {
       <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
         <summary className="font-medium cursor-pointer">Ratings</summary>
         {[4, 3, 2].map(r => (
-          <button key={r}
+          <button
+            key={r}
             className="block text-sm hover:underline"
-            onClick={() => setParam("rating", String(r))}>
+            onClick={() => setParam("rating", String(r))}
+          >
             {r}★ & above
           </button>
         ))}
       </details>
     </div>
   );
-      }
+            }
