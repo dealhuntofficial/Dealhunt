@@ -18,10 +18,10 @@ type Suggestion =
   | { type: "merchant"; label: string; url: string };
 
 const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
-  Amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
-  Flipkart: q => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
-  Myntra: q => `https://www.myntra.com/${encodeURIComponent(q)}`,
-  Meesho: q => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
+  Amazon: (q) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
+  Flipkart: (q) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
+  Myntra: (q) => `https://www.myntra.com/${encodeURIComponent(q)}`,
+  Meesho: (q) => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
 };
 
 export default function Navbar() {
@@ -43,7 +43,7 @@ export default function Navbar() {
     if (!e.target.files?.[0]) return;
 
     alert(
-      "Image selected âœ”ï¸\n\nImage search via AI will be added later.\nFor now please search using keywords."
+      "Image selected ✅\n\nImage search via AI will be added later.\nFor now please search using keywords."
     );
 
     e.target.value = "";
@@ -91,6 +91,8 @@ export default function Navbar() {
     } else {
       window.open(item.url, "_blank");
     }
+
+    setSearchQuery(""); // ✅ CLEAR SEARCH
   };
 
   const handleEnterSearch = () => {
@@ -152,7 +154,7 @@ export default function Navbar() {
               <input
                 value={searchQuery}
                 onChange={handleChange}
-                onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleEnterSearch()}
                 placeholder="Search products..."
                 className="w-full px-4 pr-28 py-2 rounded-full border focus:ring-2 focus:ring-yellow-500"
               />
@@ -197,7 +199,7 @@ export default function Navbar() {
           <input
             value={searchQuery}
             onChange={handleChange}
-            onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
+            onKeyDown={(e) => e.key === "Enter" && handleEnterSearch()}
             placeholder="Search products..."
             className="w-full px-4 pr-28 py-2 rounded-full border"
           />
