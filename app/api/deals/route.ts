@@ -48,7 +48,7 @@ const deals: Deal[] = [
     id: "3",
     category: "fashion",
     subcategory: "shoes",
-    title: "Nike Running Shoes",
+    title: "Nike Air Shoes",
     image: "/nike.jpg",
     priceNow: 3999,
     priceOld: 4999,
@@ -63,21 +63,11 @@ const deals: Deal[] = [
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
-  const search = searchParams.get("search");
+  const search = searchParams.get("search")?.toLowerCase();
   const category = searchParams.get("category");
   const subcategory = searchParams.get("subcategory");
 
   let filtered = [...deals];
-
-  // ✅ SEARCH FIRST (fixes enter/search icon issue)
-  if (search) {
-    const q = search.toLowerCase();
-    filtered = filtered.filter(d =>
-      d.title.toLowerCase().includes(q) ||
-      d.brand.toLowerCase().includes(q) ||
-      d.subcategory.toLowerCase().includes(q)
-    );
-  }
 
   if (category && category !== "all") {
     filtered = filtered.filter(d => d.category === category);
@@ -85,6 +75,14 @@ export async function GET(req: Request) {
 
   if (subcategory) {
     filtered = filtered.filter(d => d.subcategory === subcategory);
+  }
+
+  if (search) {
+    filtered = filtered.filter(d =>
+      `${d.title} ${d.brand} ${d.subcategory}`
+        .toLowerCase()
+        .includes(search)
+    );
   }
 
   return NextResponse.json({
