@@ -10,7 +10,7 @@ export default function FiltersBar({ category }: { category?: string }) {
 
   const [partners, setPartners] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
-  const [apiSubcats, setApiSubcats] = useState<string[]>([]);
+  const [apiSubcategories, setApiSubcategories] = useState<string[]>([]);
 
   const detailsRefs = useRef<HTMLDetailsElement[]>([]);
 
@@ -18,22 +18,21 @@ export default function FiltersBar({ category }: { category?: string }) {
     category && category !== "all" ? category : "others";
 
   const closeAll = () => {
-    detailsRefs.current.forEach(d => d && (d.open = false));
+    detailsRefs.current.forEach(d => (d.open = false));
   };
 
   const setParam = (key: string, value?: string) => {
     const p = new URLSearchParams(params.toString());
     value ? p.set(key, value) : p.delete(key);
     router.push(`?${p.toString()}`);
-    closeAll(); // ✅ auto close filters
+    closeAll(); // ✅ auto close
   };
 
   useEffect(() => {
-    const url = new URL("/api/deals", window.location.origin);
+    if (!category) return;
 
-    if (category && category !== "all") {
-      url.searchParams.set("category", category);
-    }
+    const url = new URL("/api/deals", window.location.origin);
+    if (category !== "all") url.searchParams.set("category", category);
 
     const search = params.get("search");
     if (search) url.searchParams.set("search", search);
@@ -43,20 +42,27 @@ export default function FiltersBar({ category }: { category?: string }) {
       .then(d => {
         setPartners(d.merchants || []);
         setBrands(d.brands || []);
-        setApiSubcats(d.subcategories || []);
+        setApiSubcategories(d.subcategories || []);
       });
   }, [category, params]);
 
-  const finalSubcategories =
-    apiSubcats.length > 0
-      ? apiSubcats.map(s => ({ slug: s, name: s }))
-      : subCategories[activeCategory] || [];
+  const visibleSubcategories =
+    apiSubcategories.length > 0
+      ? apiSubcategories
+      : (subCategories[activeCategory] || []).map(s => s.slug);
 
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
       {/* SORT */}
-      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      <details
+        ref={el => {
+          if (el && !detailsRefs.current.includes(el)) {
+            detailsRefs.current.push(el);
+          }
+        }}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]"
+      >
         <summary className="font-medium cursor-pointer">Sort</summary>
 
         <select
@@ -71,39 +77,64 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
 
       {/* BRAND */}
-      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      <details
+        ref={el => {
+          if (el && !detailsRefs.current.includes(el)) {
+            detailsRefs.current.push(el);
+          }
+        }}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]"
+      >
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
-          {brands.map(b => (
-            <button
-              key={b}
-              className="block text-sm hover:underline"
-              onClick={() => setParam("brand", b)}
-            >
-              {b}
-            </button>
-          ))}
+          {brands.length === 0 ? (
+            <div className="text-xs text-gray-500">No brands available</div>
+          ) : (
+            brands.map(b => (
+              <button
+                key={b}
+                className="block text-sm hover:underline"
+                onClick={() => setParam("brand", b)}
+              >
+                {b}
+              </button>
+            ))
+          )}
         </div>
       </details>
 
       {/* SUBCATEGORIES */}
-      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
+      <details
+        ref={el => {
+          if (el && !detailsRefs.current.includes(el)) {
+            detailsRefs.current.push(el);
+          }
+        }}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]"
+      >
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
-          {finalSubcategories.map(s => (
+          {visibleSubcategories.map(s => (
             <button
-              key={s.slug}
+              key={s}
               className="text-xs px-2 py-1 bg-gray-100 rounded"
-              onClick={() => setParam("subcategory", s.slug)}
+              onClick={() => setParam("subcategory", s)}
             >
-              {s.name}
+              {s}
             </button>
           ))}
         </div>
       </details>
 
       {/* RATINGS */}
-      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
+      <details
+        ref={el => {
+          if (el && !detailsRefs.current.includes(el)) {
+            detailsRefs.current.push(el);
+          }
+        }}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]"
+      >
         <summary className="font-medium cursor-pointer">Ratings</summary>
         {[4, 3, 2].map(r => (
           <button
@@ -117,4 +148,4 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
     </div>
   );
-} ni
+  }
