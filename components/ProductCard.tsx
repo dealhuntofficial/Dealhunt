@@ -14,13 +14,13 @@ export default function ProductCard({ product }: Props) {
 
   const handleCompare = () => {
     const p = new URLSearchParams(params.toString());
-    p.set("compare", product.name); // ya product.id
+    p.set("compare", product.id); // name ki jagah id (safe)
     router.push(`?${p.toString()}`);
   };
 
   return (
     <div className="bg-white rounded-2xl shadow hover:shadow-lg transition p-3 flex flex-col">
-      {/* Image */}
+      {/* IMAGE */}
       <div className="relative w-full h-40 sm:h-48 mb-3">
         <Image
           src={product.image}
@@ -38,20 +38,31 @@ export default function ProductCard({ product }: Props) {
         ₹{product.price}
       </p>
 
+      {/* ACTIONS */}
       <div className="mt-auto flex gap-2 pt-3">
         {/* BUY */}
-        <a
-          href={product.dealUrl}
-          target="_blank"
-          className="flex-1 bg-red-600 text-white rounded-xl py-2 text-sm text-center"
-        >
-          Buy
-        </a>
+        {product.dealUrl ? (
+          <a
+            href={product.dealUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 bg-red-600 text-white rounded-xl py-2 text-sm text-center"
+          >
+            Buy
+          </a>
+        ) : (
+          <button
+            disabled
+            className="flex-1 bg-gray-300 text-gray-600 rounded-xl py-2 text-sm cursor-not-allowed"
+          >
+            Buy
+          </button>
+        )}
 
         {/* COMPARE */}
         <button
           onClick={handleCompare}
-          className="flex-1 border rounded-xl py-2 text-sm"
+          className="flex-1 border rounded-xl py-2 text-sm hover:bg-gray-50"
         >
           Compare
         </button>
