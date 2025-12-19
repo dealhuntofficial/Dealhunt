@@ -12,6 +12,7 @@ export default function CategoryDealsPage({
   params: { slug: string };
 }) {
   const searchParams = useSearchParams();
+
   const search = searchParams.get("search") || "";
   const subcategory = searchParams.get("subcategory") || "";
 
