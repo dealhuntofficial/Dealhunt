@@ -1,3 +1,4 @@
+// components/Navbar.tsx
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -35,21 +36,17 @@ export default function Navbar() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  /* ---------------- IMAGE SEARCH (OPTION 1 – placeholder) ---------------- */
   const handleCameraClick = () => {
     fileInputRef.current?.click();
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
-
     alert(
       "Image selected ✔️\n\nImage search via AI will be added later.\nFor now please search using keywords."
     );
-
     e.target.value = "";
   };
-  /* ---------------------------------------------------------------------- */
 
   const fetchSuggestions = async (query: string) => {
     if (!query.trim()) {
@@ -89,7 +86,9 @@ export default function Navbar() {
     setDrawerOpen(false);
 
     if (item.type === "deal") {
-      router.push(`/#products?search=${encodeURIComponent(item.label)}`);
+      router.push(
+        `/categories/all?search=${encodeURIComponent(item.label)}`
+      );
     } else {
       window.open(item.url, "_blank");
     }
@@ -128,7 +127,6 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md">
-      {/* IMAGE INPUT */}
       <input
         type="file"
         accept="image/*"
@@ -139,7 +137,6 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 py-3 w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
-          {/* Logo + Tagline */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <Link href="/" className="text-2xl font-bold tracking-wide">
               <span className="text-yellow-500">Deal</span>Hunt
@@ -149,7 +146,6 @@ export default function Navbar() {
             </p>
           </div>
 
-          {/* DESKTOP SEARCH */}
           <div className="hidden md:flex flex-1 justify-center px-4 mt-3 md:mt-0">
             <div className="relative w-full max-w-md">
               <input
@@ -175,7 +171,7 @@ export default function Navbar() {
               )}
 
               <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-                <button onClick={handleCameraClick} title="Search by image">
+                <button onClick={handleCameraClick}>
                   <FiCamera />
                 </button>
                 <FiMic
@@ -187,7 +183,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* DESKTOP RIGHT */}
           <div className="hidden md:flex items-center gap-3">
             <FiUser onClick={() => router.push("/signin")} />
             <span>Hi, {displayName}</span>
@@ -195,7 +190,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* MOBILE SEARCH */}
         <div className="md:hidden mt-3 relative">
           <input
             value={searchQuery}
@@ -216,7 +210,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* MOBILE PROFILE */}
         <div className="flex justify-end gap-2 mt-2 md:hidden">
           <span>Hi, {displayName}</span>
           <FiUser onClick={() => router.push("/signin")} />
@@ -224,7 +217,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* DRAWER */}
       {drawerOpen && (
         <>
           <div
@@ -235,7 +227,9 @@ export default function Navbar() {
             <FiX onClick={() => setDrawerOpen(false)} />
             <nav className="mt-6 flex flex-col gap-4">
               <button onClick={() => router.push("/")}>Home</button>
-              <button onClick={() => router.push("/#products")}>Products</button>
+              <button onClick={() => router.push("/categories/all")}>
+                Products
+              </button>
               <button onClick={() => router.push("/refer")}>Refer & Earn</button>
               <button onClick={() => router.push("/wallet")}>Wallet</button>
             </nav>
