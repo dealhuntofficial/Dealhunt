@@ -7,9 +7,9 @@ export default function FiltersBar({ category }: { category?: string }) {
   const router = useRouter();
   const params = useSearchParams();
 
-  const [subcategories, setSubcategories] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
   const [partners, setPartners] = useState<string[]>([]);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
 
   const setParam = (key: string, value?: string) => {
     const p = new URLSearchParams(params.toString());
@@ -19,29 +19,25 @@ export default function FiltersBar({ category }: { category?: string }) {
 
   useEffect(() => {
     const url = new URL("/api/deals", window.location.origin);
-
     if (category && category !== "all") {
       url.searchParams.set("category", category);
     }
 
-    const search = params.get("search");
-    if (search) url.searchParams.set("search", search);
-
     fetch(url.toString())
       .then(r => r.json())
       .then(d => {
-        setSubcategories(d.subcategories || []);
         setBrands(d.brands || []);
         setPartners(d.merchants || []);
+        setSubcategories(d.subcategories || []);
       });
-  }, [category, params]);
+  }, [category]);
 
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
       {/* SUBCATEGORIES */}
       <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
-        <summary className="font-medium cursor-pointer">Subcategories</summary>
+        <summary className="font-medium cursor-pointer">Subcategory</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {subcategories.map(s => (
             <button
@@ -61,7 +57,7 @@ export default function FiltersBar({ category }: { category?: string }) {
         {brands.map(b => (
           <button
             key={b}
-            className="block text-sm hover:underline"
+            className="block text-sm"
             onClick={() => setParam("brand", b)}
           >
             {b}
@@ -69,13 +65,13 @@ export default function FiltersBar({ category }: { category?: string }) {
         ))}
       </details>
 
-      {/* MERCHANT */}
+      {/* PARTNERS */}
       <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Partners</summary>
         {partners.map(p => (
           <button
             key={p}
-            className="block text-sm hover:underline"
+            className="block text-sm"
             onClick={() => setParam("merchant", p)}
           >
             {p}
@@ -84,4 +80,4 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
     </div>
   );
-            }
+}
