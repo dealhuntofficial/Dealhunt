@@ -1,17 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-
-// FIXED IMPORT 👇
 import { mockDeals } from "@/data/mockDeals";
 
+const CHUNK = 16;
+
 export default function DealsPage() {
-  const [list, setList] = useState<any[]>([]);
+  const [visible, setVisible] = useState(CHUNK);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // FIXED DATA SOURCE 👇
-    setList(mockDeals);
+    if (!loaderRef.current) return;
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setVisible(v => Math.min(v + CHUNK, mockDeals.length));
+      }
+    });
+
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -19,7 +28,7 @@ export default function DealsPage() {
       <h2 className="text-2xl font-bold mb-6">All Deals</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {list.map((deal, i) => (
+        {mockDeals.slice(0, visible).map((deal, i) => (
           <Link
             key={i}
             href={deal.dealUrl || "#"}
@@ -34,6 +43,8 @@ export default function DealsPage() {
           </Link>
         ))}
       </div>
+
+      <div ref={loaderRef} className="h-10" />
     </section>
   );
 }
