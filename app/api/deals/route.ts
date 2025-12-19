@@ -69,6 +69,16 @@ export async function GET(req: Request) {
 
   let filtered = [...deals];
 
+  // ✅ SEARCH FIRST (fixes enter/search icon issue)
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(d =>
+      d.title.toLowerCase().includes(q) ||
+      d.brand.toLowerCase().includes(q) ||
+      d.subcategory.toLowerCase().includes(q)
+    );
+  }
+
   if (category && category !== "all") {
     filtered = filtered.filter(d => d.category === category);
   }
@@ -77,24 +87,10 @@ export async function GET(req: Request) {
     filtered = filtered.filter(d => d.subcategory === subcategory);
   }
 
-  if (search) {
-    const q = search.toLowerCase();
-    filtered = filtered.filter(
-      d =>
-        d.title.toLowerCase().includes(q) ||
-        d.brand.toLowerCase().includes(q) ||
-        d.subcategory.toLowerCase().includes(q)
-    );
-  }
-
-  const brands = [...new Set(filtered.map(d => d.brand))];
-  const merchants = [...new Set(filtered.map(d => d.merchant))];
-  const subcategories = [...new Set(filtered.map(d => d.subcategory))];
-
   return NextResponse.json({
     deals: filtered,
-    brands,
-    merchants,
-    subcategories,
+    brands: [...new Set(filtered.map(d => d.brand))],
+    merchants: [...new Set(filtered.map(d => d.merchant))],
+    subcategories: [...new Set(filtered.map(d => d.subcategory))],
   });
 }
