@@ -1,4 +1,3 @@
-// app/categories/[slug]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,7 +12,7 @@ export default function CategoryDealsPage({
   params: { slug: string };
 }) {
   const searchParams = useSearchParams();
-  const search = searchParams.get("search");
+  const search = searchParams.get("search") || "";
 
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,9 +21,11 @@ export default function CategoryDealsPage({
     setLoading(true);
 
     const url = new URL("/api/deals", window.location.origin);
+
     if (params.slug && params.slug !== "all") {
       url.searchParams.set("category", params.slug);
     }
+
     if (search) {
       url.searchParams.set("search", search);
     }
@@ -39,8 +40,8 @@ export default function CategoryDealsPage({
     <div className="max-w-7xl mx-auto px-4 py-6">
       <BackButton />
 
-      {/* IMPORTANT: search pass kiya taki filters data generate ho */}
-      <FiltersBar category={params.slug} search={search || ""} />
+      {/* 🔥 FIX: FiltersBar ko sirf category diya */}
+      <FiltersBar category={params.slug} />
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading…</div>
@@ -57,4 +58,4 @@ export default function CategoryDealsPage({
       )}
     </div>
   );
-      }
+}
