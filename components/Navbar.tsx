@@ -36,15 +36,18 @@ export default function Navbar() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /* IMAGE SEARCH – placeholder */
   const handleCameraClick = () => {
     fileInputRef.current?.click();
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
+
     alert(
       "Image selected ✔️\n\nImage search via AI will be added later.\nFor now please search using keywords."
     );
+
     e.target.value = "";
   };
 
@@ -238,4 +241,4 @@ export default function Navbar() {
       )}
     </header>
   );
-}
+  }
