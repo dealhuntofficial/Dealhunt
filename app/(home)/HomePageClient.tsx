@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import BannerAdSection from "@/components/BannerAdSection";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedDeals from "@/components/FeaturedDeals";
@@ -10,9 +10,14 @@ import HeroBannerGeneral from "@/components/HeroBannerGeneral";
 import FiltersBar from "@/components/FiltersBar";
 import ProductsSection from "@/components/ProductsSection";
 
+const CHUNK = 12;
+
 export default function HomePageClient() {
   const [deals, setDeals] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [visible, setVisible] = useState(CHUNK);
+
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +35,20 @@ export default function HomePageClient() {
     fetchData();
   }, []);
 
+  // ✅ IntersectionObserver
+  useEffect(() => {
+    if (!loaderRef.current) return;
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setVisible(v => Math.min(v + CHUNK, products.length));
+      }
+    });
+
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [products]);
+
   return (
     <main>
       <HeroBannerGeneral />
@@ -42,15 +61,14 @@ export default function HomePageClient() {
       <CategoryGrid mode="general" />
       <CartToHeartSection />
 
-      {/* PRODUCTS FILTER */}
       <FiltersBar category="others" />
 
-      {/* PRODUCTS SECTION */}
       <section id="products">
-        <ProductsSection externalProducts={products} />
+        <ProductsSection externalProducts={products.slice(0, visible)} />
+        <div ref={loaderRef} className="h-10" />
       </section>
 
       <FloatingAIButtons />
     </main>
   );
-      }
+}
