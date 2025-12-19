@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { subCategories } from "@/data/subcategories";
 
@@ -10,35 +10,53 @@ export default function FiltersBar({ category }: { category?: string }) {
 
   const [partners, setPartners] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
+  const [apiSubcats, setApiSubcats] = useState<string[]>([]);
+
+  const detailsRefs = useRef<HTMLDetailsElement[]>([]);
 
   const activeCategory =
     category && category !== "all" ? category : "others";
+
+  const closeAll = () => {
+    detailsRefs.current.forEach(d => d && (d.open = false));
+  };
 
   const setParam = (key: string, value?: string) => {
     const p = new URLSearchParams(params.toString());
     value ? p.set(key, value) : p.delete(key);
     router.push(`?${p.toString()}`);
+    closeAll(); // ✅ auto close filters
   };
 
   useEffect(() => {
-    if (!category) return;
-
     const url = new URL("/api/deals", window.location.origin);
-    if (category !== "all") url.searchParams.set("category", category);
+
+    if (category && category !== "all") {
+      url.searchParams.set("category", category);
+    }
+
+    const search = params.get("search");
+    if (search) url.searchParams.set("search", search);
 
     fetch(url.toString())
       .then(r => r.json())
       .then(d => {
         setPartners(d.merchants || []);
         setBrands(d.brands || []);
+        setApiSubcats(d.subcategories || []);
       });
-  }, [category]);
+  }, [category, params]);
+
+  const finalSubcategories =
+    apiSubcats.length > 0
+      ? apiSubcats.map(s => ({ slug: s, name: s }))
+      : subCategories[activeCategory] || [];
 
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
-      {/* ✅ SORT + PRICE + PARTNERS */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      {/* SORT */}
+      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
 
         <select
@@ -50,58 +68,29 @@ export default function FiltersBar({ category }: { category?: string }) {
           <option value="price_low">Low → High</option>
           <option value="price_high">High → Low</option>
         </select>
-
-        <div className="mt-2 flex gap-2">
-          <input
-            placeholder="Min"
-            className="w-1/2 border rounded p-1 text-sm"
-            onBlur={e => setParam("minPrice", e.target.value)}
-          />
-          <input
-            placeholder="Max"
-            className="w-1/2 border rounded p-1 text-sm"
-            onBlur={e => setParam("maxPrice", e.target.value)}
-          />
-        </div>
-
-        <select
-          className="w-full mt-2 border rounded p-1"
-          onChange={e => setParam("merchant", e.target.value)}
-        >
-          <option value="">Partners</option>
-          {partners.map(p => (
-            <option key={p}>{p}</option>
-          ))}
-        </select>
       </details>
 
-      {/* ✅ BRAND */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      {/* BRAND */}
+      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
-          {brands.length === 0 ? (
-            <div className="text-xs text-gray-500">
-              No brands available
-            </div>
-          ) : (
-            brands.map(b => (
-              <button
-                key={b}
-                className="block text-sm hover:underline"
-                onClick={() => setParam("brand", b)}
-              >
-                {b}
-              </button>
-            ))
-          )}
+          {brands.map(b => (
+            <button
+              key={b}
+              className="block text-sm hover:underline"
+              onClick={() => setParam("brand", b)}
+            >
+              {b}
+            </button>
+          ))}
         </div>
       </details>
 
-      {/* ✅ FILTERS (SUBCATEGORIES) */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
+      {/* SUBCATEGORIES */}
+      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
-          {(subCategories[activeCategory] || []).map(s => (
+          {finalSubcategories.map(s => (
             <button
               key={s.slug}
               className="text-xs px-2 py-1 bg-gray-100 rounded"
@@ -113,8 +102,8 @@ export default function FiltersBar({ category }: { category?: string }) {
         </div>
       </details>
 
-      {/* ✅ RATINGS */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
+      {/* RATINGS */}
+      <details ref={el => el && detailsRefs.current.push(el)} className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
         <summary className="font-medium cursor-pointer">Ratings</summary>
         {[4, 3, 2].map(r => (
           <button
@@ -128,4 +117,4 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
     </div>
   );
-}
+} ni
