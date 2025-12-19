@@ -62,9 +62,20 @@ const deals: Deal[] = [
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+
   const search = searchParams.get("search");
+  const category = searchParams.get("category");
+  const subcategory = searchParams.get("subcategory");
 
   let filtered = [...deals];
+
+  if (category) {
+    filtered = filtered.filter(d => d.category === category);
+  }
+
+  if (subcategory) {
+    filtered = filtered.filter(d => d.subcategory === subcategory);
+  }
 
   if (search) {
     const q = search.toLowerCase();
@@ -76,7 +87,18 @@ export async function GET(req: Request) {
     );
   }
 
+  // 🔥 dynamic filters data
+  const subcategories = Array.from(
+    new Set(filtered.map(d => d.subcategory))
+  );
+
+  const brands = Array.from(new Set(filtered.map(d => d.brand)));
+  const merchants = Array.from(new Set(filtered.map(d => d.merchant)));
+
   return NextResponse.json({
     deals: filtered,
+    subcategories,
+    brands,
+    merchants,
   });
-}
+      }
