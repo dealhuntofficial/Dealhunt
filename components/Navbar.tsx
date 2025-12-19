@@ -18,10 +18,10 @@ type Suggestion =
   | { type: "merchant"; label: string; url: string };
 
 const MERCHANT_SEARCH_URLS: Record<string, (q: string) => string> = {
-  Amazon: (q) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
-  Flipkart: (q) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
-  Myntra: (q) => `https://www.myntra.com/${encodeURIComponent(q)}`,
-  Meesho: (q) => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
+  Amazon: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}`,
+  Flipkart: q => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}`,
+  Myntra: q => `https://www.myntra.com/${encodeURIComponent(q)}`,
+  Meesho: q => `https://www.meesho.com/search?q=${encodeURIComponent(q)}`,
 };
 
 export default function Navbar() {
@@ -92,7 +92,8 @@ export default function Navbar() {
       window.open(item.url, "_blank");
     }
 
-    setSearchQuery(""); // ✅ CLEAR SEARCH
+    // ✅ CLEAR SEARCH AFTER SEARCH
+    setSearchQuery("");
   };
 
   const handleEnterSearch = () => {
@@ -154,7 +155,7 @@ export default function Navbar() {
               <input
                 value={searchQuery}
                 onChange={handleChange}
-                onKeyDown={(e) => e.key === "Enter" && handleEnterSearch()}
+                onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
                 placeholder="Search products..."
                 className="w-full px-4 pr-28 py-2 rounded-full border focus:ring-2 focus:ring-yellow-500"
               />
@@ -174,9 +175,7 @@ export default function Navbar() {
               )}
 
               <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-                <button onClick={handleCameraClick}>
-                  <FiCamera />
-                </button>
+                <FiCamera onClick={handleCameraClick} />
                 <FiMic
                   onClick={handleMicClick}
                   className={listening ? "text-red-500" : ""}
@@ -194,19 +193,32 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Search */}
+        {/* ✅ Mobile Search */}
         <div className="md:hidden mt-3 relative">
           <input
             value={searchQuery}
             onChange={handleChange}
-            onKeyDown={(e) => e.key === "Enter" && handleEnterSearch()}
+            onKeyDown={e => e.key === "Enter" && handleEnterSearch()}
             placeholder="Search products..."
             className="w-full px-4 pr-28 py-2 rounded-full border"
           />
+
+          {suggestions.length > 0 && (
+            <ul className="absolute w-full bg-white shadow-md rounded-md mt-1 z-50">
+              {suggestions.map((s, i) => (
+                <li
+                  key={i}
+                  onClick={() => handleSelect(s)}
+                  className="px-4 py-2 hover:bg-yellow-100 cursor-pointer text-sm"
+                >
+                  {s.label}
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-            <button onClick={handleCameraClick}>
-              <FiCamera />
-            </button>
+            <FiCamera onClick={handleCameraClick} />
             <FiMic
               onClick={handleMicClick}
               className={listening ? "text-red-500" : ""}
