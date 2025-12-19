@@ -47,8 +47,8 @@ function FiltersBarInner({ category, subcategories }: Props) {
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
-      {/* SORT / PRICE / MERCHANT */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      {/* SORT */}
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
 
         <select
@@ -106,13 +106,13 @@ function FiltersBarInner({ category, subcategories }: Props) {
       </details>
 
       {/* SUBCATEGORIES */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {subs.map(s => (
             <button
               key={s.slug}
-              className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-yellow-100"
+              className="text-xs px-2 py-1 bg-gray-100 rounded"
               onClick={() => setParam("subcategory", s.slug)}
             >
               {s.name}
@@ -138,11 +138,10 @@ function FiltersBarInner({ category, subcategories }: Props) {
   );
 }
 
-/* 🔥 THIS FIXES PRERENDER ERROR */
 export default function FiltersBar(props: Props) {
   return (
     <Suspense fallback={null}>
       <FiltersBarInner {...props} />
     </Suspense>
   );
-      }
+        }
