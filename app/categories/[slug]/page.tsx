@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import DealCard from "@/components/DealCard";
 import FiltersBar from "@/components/FiltersBar";
 import BackButton from "@/components/BackButton";
+import CompareStrip from "@/components/CompareStrip";
 
 const CHUNK = 12;
 
@@ -14,9 +15,9 @@ export default function CategoryDealsPage({
   params: { slug: string };
 }) {
   const searchParams = useSearchParams();
-
   const search = searchParams.get("search") || "";
   const subcategory = searchParams.get("subcategory") || "";
+  const compare = searchParams.get("compare");
 
   const [allDeals, setAllDeals] = useState<any[]>([]);
   const [visible, setVisible] = useState(CHUNK);
@@ -29,9 +30,7 @@ export default function CategoryDealsPage({
 
     const url = new URL("/api/deals", window.location.origin);
 
-    if (params.slug !== "all") {
-      url.searchParams.set("category", params.slug);
-    }
+    if (params.slug !== "all") url.searchParams.set("category", params.slug);
     if (search) url.searchParams.set("search", search);
     if (subcategory) url.searchParams.set("subcategory", subcategory);
 
@@ -39,12 +38,11 @@ export default function CategoryDealsPage({
       .then(r => r.json())
       .then(d => {
         setAllDeals(d.deals || []);
-        setVisible(CHUNK); // reset on filter/search change
+        setVisible(CHUNK);
       })
       .finally(() => setLoading(false));
   }, [params.slug, search, subcategory]);
 
-  // ✅ Observer
   useEffect(() => {
     if (!loaderRef.current) return;
 
@@ -59,7 +57,7 @@ export default function CategoryDealsPage({
   }, [allDeals]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className={`max-w-7xl mx-auto px-4 py-6 ${compare ? "pb-40" : ""}`}>
       <BackButton />
       <FiltersBar category={params.slug} />
 
@@ -77,6 +75,8 @@ export default function CategoryDealsPage({
           <div ref={loaderRef} className="h-10" />
         </>
       )}
+
+      {compare && <CompareStrip productName={compare} />}
     </div>
   );
 }
