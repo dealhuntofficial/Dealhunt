@@ -4,9 +4,8 @@ export type Product = {
   price: number;
   image: string;
   category: string;
-
-  // ✅ BUY button ke liye (abhi single merchant)
-  dealUrl?: string;
-
   description?: string;
+
+  // ✅ ADD THIS
+  dealUrl?: string;        // primary/best merchant link
 };
