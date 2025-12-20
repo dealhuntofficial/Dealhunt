@@ -1,8 +1,20 @@
 "use client";
+
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function DealCard({ deal }: any) {
+type Deal = {
+  id: string;
+  title: string;
+  image?: string;
+  priceNow: number;
+  priceOld?: number;
+  discount?: number;
+  dealUrl: string;
+  merchant?: string;
+};
+
+export default function DealCard({ deal }: { deal: Deal }) {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -13,7 +25,8 @@ export default function DealCard({ deal }: any) {
   };
 
   return (
-    <article className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <article className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
+      {/* IMAGE */}
       <div className="relative h-44">
         <Image
           src={deal.image || "/images/placeholder.png"}
@@ -29,6 +42,7 @@ export default function DealCard({ deal }: any) {
         )}
       </div>
 
+      {/* CONTENT */}
       <div className="p-4 flex flex-col h-full">
         <h3 className="font-semibold text-sm line-clamp-2">
           {deal.title}
@@ -43,7 +57,8 @@ export default function DealCard({ deal }: any) {
           )}
         </div>
 
-        <div className="mt-4 flex gap-2">
+        {/* ACTIONS */}
+        <div className="mt-auto pt-4 flex gap-2">
           {/* BUY */}
           <a
             href={deal.dealUrl}
@@ -57,15 +72,17 @@ export default function DealCard({ deal }: any) {
           {/* COMPARE */}
           <button
             onClick={handleCompare}
-            className="flex-1 bg-gray-100 border text-sm rounded-md"
+            className="flex-1 bg-gray-100 border rounded-md text-sm"
           >
             Compare
           </button>
         </div>
 
-        <span className="mt-2 text-xs text-gray-500">
-          {deal.merchant}
-        </span>
+        {deal.merchant && (
+          <span className="mt-2 text-xs text-gray-500">
+            {deal.merchant}
+          </span>
+        )}
       </div>
     </article>
   );
