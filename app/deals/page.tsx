@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
 import { mockDeals } from "@/data/mockDeals";
+import CompareStrip from "@/components/CompareStrip";
 
 const CHUNK = 16;
 
@@ -24,14 +24,13 @@ export default function DealsPage() {
   }, []);
 
   return (
-    <section className="py-10 max-w-7xl mx-auto px-4">
+    <section className="py-10 max-w-7xl mx-auto px-4 pb-28">
       <h2 className="text-2xl font-bold mb-6">All Deals</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
         {mockDeals.slice(0, visible).map((deal, i) => (
-          <Link
+          <div
             key={i}
-            href={deal.dealUrl || "#"}
             className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition"
           >
             <img
@@ -40,11 +39,14 @@ export default function DealsPage() {
             />
             <h3 className="mt-3 font-semibold">{deal.title}</h3>
             <p className="text-sm text-gray-600">{deal.merchant}</p>
-          </Link>
+          </div>
         ))}
       </div>
 
       <div ref={loaderRef} className="h-10" />
+
+      {/* ✅ Compare Strip */}
+      <CompareStrip />
     </section>
   );
 }
