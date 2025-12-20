@@ -14,7 +14,7 @@ export default function ProductCard({ product }: Props) {
 
   const handleCompare = () => {
     const p = new URLSearchParams(params.toString());
-    p.set("compare", product.id); // name ki jagah id (safe)
+    p.set("compare", product.id); // id best rahega
     router.push(`?${p.toString()}`);
   };
 
@@ -38,10 +38,10 @@ export default function ProductCard({ product }: Props) {
         ₹{product.price}
       </p>
 
-      {/* ACTIONS */}
+      {/* ACTION BUTTONS */}
       <div className="mt-auto flex gap-2 pt-3">
         {/* BUY */}
-        {product.dealUrl ? (
+        {product.dealUrl && (
           <a
             href={product.dealUrl}
             target="_blank"
@@ -50,13 +50,6 @@ export default function ProductCard({ product }: Props) {
           >
             Buy
           </a>
-        ) : (
-          <button
-            disabled
-            className="flex-1 bg-gray-300 text-gray-600 rounded-xl py-2 text-sm cursor-not-allowed"
-          >
-            Buy
-          </button>
         )}
 
         {/* COMPARE */}
