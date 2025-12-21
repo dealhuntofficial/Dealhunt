@@ -1,63 +1,35 @@
 "use client";
 
 import { useCompare } from "@/context/CompareContext";
-import Image from "next/image";
 
-type Props = {
-  productName: string;
-};
+export default function CompareStrip() {
+  const { items, clearCompare } = useCompare();
 
-export default function CompareStrip({ productName }: Props) {
-  const { items, removeItem, clear } = useCompare();
-
-  if (!productName || items.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
       <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="font-semibold text-sm">
-            Comparing: <span className="text-blue-600">{productName}</span>
-          </h4>
+        <div className="flex items-center gap-4 overflow-x-auto">
+          {items.map(item => (
+            <div
+              key={item.id}
+              className="min-w-[160px] bg-gray-100 rounded-lg p-2 text-sm"
+            >
+              <p className="font-medium line-clamp-2">{item.name}</p>
+              <p className="text-red-600 font-semibold">₹{item.price}</p>
+              <p className="text-xs text-gray-500">{item.merchant}</p>
+            </div>
+          ))}
+
           <button
-            onClick={clear}
-            className="text-xs text-red-500 hover:underline"
+            onClick={clearCompare}
+            className="ml-auto text-sm px-4 py-2 border rounded-lg"
           >
             Clear
           </button>
         </div>
-
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {items.map(item => (
-            <div
-              key={item.id}
-              className="min-w-[160px] border rounded-lg p-2 flex-shrink-0"
-            >
-              <div className="relative h-20 mb-2">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-
-              <p className="text-xs font-medium line-clamp-2">
-                {item.name}
-              </p>
-
-              <p className="text-sm font-bold mt-1">₹{item.price}</p>
-
-              <button
-                onClick={() => removeItem(item.id)}
-                className="mt-1 text-xs text-gray-500 hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
-              }
+}
