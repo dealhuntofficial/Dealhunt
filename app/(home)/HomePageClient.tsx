@@ -71,8 +71,7 @@ export default function HomePageClient() {
         <div ref={loaderRef} className="h-10" />
       </section>
 
-      {/* CompareStrip now reads from context / searchParams internally */}
-      {compare && <CompareStrip />}
+      {compare && <CompareStrip productName={compare} />}
 
       <FloatingAIButtons />
     </main>
