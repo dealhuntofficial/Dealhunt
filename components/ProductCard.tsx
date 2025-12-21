@@ -1,26 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Product } from "@/types/product";
+import { useCompare } from "@/context/CompareContext";
 
 type Props = {
-  product: Product;
+  product: Product & {
+    dealUrl?: string;
+    merchant?: string;
+  };
 };
 
 export default function ProductCard({ product }: Props) {
-  const router = useRouter();
-  const params = useSearchParams();
-
-  const handleCompare = () => {
-    const p = new URLSearchParams(params.toString());
-    p.set("compare", product.id); // id best rahega
-    router.push(`?${p.toString()}`);
-  };
+  const { addItem } = useCompare();
 
   return (
     <div className="bg-white rounded-2xl shadow hover:shadow-lg transition p-3 flex flex-col">
-      {/* IMAGE */}
       <div className="relative w-full h-40 sm:h-48 mb-3">
         <Image
           src={product.image}
@@ -38,7 +33,6 @@ export default function ProductCard({ product }: Props) {
         ₹{product.price}
       </p>
 
-      {/* ACTION BUTTONS */}
       <div className="mt-auto flex gap-2 pt-3">
         {/* BUY */}
         {product.dealUrl && (
@@ -54,7 +48,16 @@ export default function ProductCard({ product }: Props) {
 
         {/* COMPARE */}
         <button
-          onClick={handleCompare}
+          onClick={() =>
+            addItem({
+              id: product.id,
+              title: product.name,
+              price: product.price,
+              image: product.image,
+              merchant: product.merchant || "Multiple",
+              dealUrl: product.dealUrl || "#",
+            })
+          }
           className="flex-1 border rounded-xl py-2 text-sm hover:bg-gray-50"
         >
           Compare
