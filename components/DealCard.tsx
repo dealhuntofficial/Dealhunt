@@ -3,83 +3,35 @@
 import Image from "next/image";
 import { useCompare } from "@/context/CompareContext";
 
-type Deal = {
-  id: string;
-  title: string;
-  image: string;
-  priceNow: number;
-  priceOld?: number;
-  discount?: number;
-  dealUrl: string;
-  merchant: string;
-};
-
-export default function DealCard({ deal }: { deal: Deal }) {
-  const { addItem } = useCompare();
+export default function DealCard({ deal }: any) {
+  const { setCompareId } = useCompare();
 
   return (
-    <article className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
+    <article className="bg-white rounded-lg shadow overflow-hidden flex flex-col">
       <div className="relative h-44">
-        <Image
-          src={deal.image || "/images/placeholder.png"}
-          alt={deal.title}
-          fill
-          className="object-cover"
-        />
-
-        {deal.discount && (
-          <span className="absolute top-3 left-3 bg-yellow-500 text-white px-2 py-1 text-xs rounded-md font-semibold">
-            {deal.discount}% OFF
-          </span>
-        )}
+        <Image src={deal.image} alt={deal.title} fill className="object-cover" />
       </div>
 
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-sm line-clamp-2">
-          {deal.title}
-        </h3>
+        <h3 className="text-sm font-semibold line-clamp-2">{deal.title}</h3>
+        <p className="text-lg font-bold mt-2">₹{deal.priceNow}</p>
 
-        <div className="mt-2 flex items-baseline gap-3">
-          <span className="text-lg font-bold">₹{deal.priceNow}</span>
-          {deal.priceOld && (
-            <span className="line-through text-sm text-gray-400">
-              ₹{deal.priceOld}
-            </span>
-          )}
-        </div>
-
-        <div className="mt-4 flex gap-2">
-          {/* BUY */}
+        <div className="mt-auto flex gap-2 pt-3">
           <a
             href={deal.dealUrl}
             target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 text-center bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700"
+            className="flex-1 bg-blue-600 text-white rounded-md py-2 text-sm text-center"
           >
             Buy
           </a>
 
-          {/* COMPARE */}
           <button
-            onClick={() =>
-              addItem({
-                id: deal.id,
-                title: deal.title,
-                price: deal.priceNow,
-                image: deal.image,
-                merchant: deal.merchant,
-                dealUrl: deal.dealUrl,
-              })
-            }
-            className="flex-1 bg-gray-100 border rounded-md text-sm hover:bg-gray-200"
+            onClick={() => setCompareId(deal.id)}
+            className="flex-1 border rounded-md py-2 text-sm"
           >
             Compare
           </button>
         </div>
-
-        <span className="mt-2 text-xs text-gray-500">
-          {deal.merchant}
-        </span>
       </div>
     </article>
   );
