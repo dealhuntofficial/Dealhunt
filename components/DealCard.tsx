@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCompare } from "@/context/CompareContext";
 
 type Deal = {
   id: string;
@@ -15,14 +15,7 @@ type Deal = {
 };
 
 export default function DealCard({ deal }: { deal: Deal }) {
-  const router = useRouter();
-  const params = useSearchParams();
-
-  const handleCompare = () => {
-    const p = new URLSearchParams(params.toString());
-    p.set("compare", deal.title); // ya deal.id
-    router.push(`?${p.toString()}`);
-  };
+  const { addItem } = useCompare();
 
   return (
     <article className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
@@ -33,6 +26,7 @@ export default function DealCard({ deal }: { deal: Deal }) {
           fill
           className="object-cover"
         />
+
         {deal.discount && (
           <span className="absolute top-3 left-3 bg-yellow-500 text-white px-2 py-1 text-xs rounded-md font-semibold">
             {deal.discount}% OFF
@@ -41,7 +35,9 @@ export default function DealCard({ deal }: { deal: Deal }) {
       </div>
 
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-sm line-clamp-2">{deal.title}</h3>
+        <h3 className="font-semibold text-sm line-clamp-2">
+          {deal.title}
+        </h3>
 
         <div className="mt-2 flex items-baseline gap-3">
           <span className="text-lg font-bold">₹{deal.priceNow}</span>
@@ -65,14 +61,25 @@ export default function DealCard({ deal }: { deal: Deal }) {
 
           {/* COMPARE */}
           <button
-            onClick={handleCompare}
+            onClick={() =>
+              addItem({
+                id: deal.id,
+                title: deal.title,
+                price: deal.priceNow,
+                image: deal.image,
+                merchant: deal.merchant,
+                dealUrl: deal.dealUrl,
+              })
+            }
             className="flex-1 bg-gray-100 border rounded-md text-sm hover:bg-gray-200"
           >
             Compare
           </button>
         </div>
 
-        <span className="mt-2 text-xs text-gray-500">{deal.merchant}</span>
+        <span className="mt-2 text-xs text-gray-500">
+          {deal.merchant}
+        </span>
       </div>
     </article>
   );
