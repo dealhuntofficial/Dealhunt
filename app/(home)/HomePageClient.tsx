@@ -71,6 +71,7 @@ export default function HomePageClient() {
         <div ref={loaderRef} className="h-10" />
       </section>
 
+      {/* ✅ ALWAYS pass productName (TypeScript safe) */}
       {compare && <CompareStrip productName={compare} />}
 
       <FloatingAIButtons />
