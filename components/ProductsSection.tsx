@@ -9,7 +9,6 @@ interface ProductType {
   price: number;
   image: string;
   merchant?: string;
-  buyUrl?: string;
 }
 
 export default function ProductsSection({
@@ -52,46 +51,38 @@ export default function ProductsSection({
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
         setVisibleCount(v => v + 4);
       }
     });
 
     if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [visibleCount, filteredProducts.length]);
+
+  const addToCompare = (name: string) => {
+    router.push(`/?compare=${encodeURIComponent(name)}`);
+  };
 
   return (
     <section className="py-10">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {filteredProducts.slice(0, visibleCount).map(prod => (
-          <div key={prod.id} className="bg-white rounded-xl shadow p-3">
-            <img
-              src={prod.image}
-              alt={prod.title}
-              className="h-40 w-full object-cover"
-            />
-
-            <h3 className="mt-2 font-semibold truncate">{prod.title}</h3>
+          <div key={prod.id} className="bg-white rounded-xl shadow p-3 text-center">
+            <img src={prod.image} className="h-40 mx-auto object-contain" />
+            <h3 className="font-semibold text-sm mt-2 truncate">{prod.title}</h3>
             <p className="font-bold text-blue-600">₹{prod.price}</p>
 
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-2">
               <button
-                className="flex-1 text-sm border rounded py-1"
-                onClick={() =>
-                  router.push(`?compare=${encodeURIComponent(prod.title)}`)
-                }
+                onClick={() => addToCompare(prod.title)}
+                className="flex-1 text-xs border rounded py-1"
               >
                 Compare
               </button>
-
-              <a
-                href={prod.buyUrl || "#"}
-                target="_blank"
-                className="flex-1 text-sm bg-blue-600 text-white rounded py-1 text-center"
-              >
+              <button className="flex-1 text-xs bg-blue-600 text-white rounded py-1">
                 Buy
-              </a>
+              </button>
             </div>
           </div>
         ))}
