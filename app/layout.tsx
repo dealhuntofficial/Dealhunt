@@ -1,43 +1,40 @@
+import "../styles/globals.css";
+import type { Metadata } from "next";
+import Providers from "@/components/Providers";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import InstallButton from "@/components/InstallButton";
 
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-import { Product } from "@/types/product";
-
-type Props = {
-  product: Product;
+export const metadata: Metadata = {
+  title: "DealHunt",
+  description: "Luxury deals at your fingertips",
 };
 
-export default function ProductCard({ product }: Props) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="bg-white rounded-2xl shadow hover:shadow-lg transition p-3 flex flex-col">
-      <Link href={`/products/${product.id}`} className="flex flex-col h-full">
-        {/* Product Image */}
-        <div className="relative w-full h-40 sm:h-48 mb-3">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-contain rounded-xl"
-            sizes="(max-width: 768px) 100vw, 200px"
-            priority={false}
-          />
-        </div>
+    <html lang="en" className="bg-gray-50">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#e9b300" />
+        <link rel="icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+      </head>
 
-        {/* Product Info */}
-        <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
-          {product.name}
-        </h3>
-        <p className="text-lg font-bold text-red-600 mt-1">
-          ${product.price.toFixed(2)}
-        </p>
+      <body className="min-h-screen flex flex-col text-gray-900 w-full">
+        <Providers>
+          <Navbar />
 
-        {/* Buy Button */}
-        <button className="mt-auto bg-red-600 text-white rounded-xl py-2 px-3 text-sm hover:bg-red-700">
-          View Deal
-        </button>
-      </Link>
-    </div>
+          {/* PAGE CONTENT */}
+          <main className="flex-1 w-full">{children}</main>
+
+          <Footer />
+          <InstallButton />
+        </Providers>
+      </body>
+    </html>
   );
 }
