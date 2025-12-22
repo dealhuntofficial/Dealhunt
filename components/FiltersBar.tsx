@@ -48,12 +48,19 @@ export default function FiltersBar({ category }: { category?: string }) {
       ? apiSubcategories
       : (subCategories[activeCategory] || []).map(s => s.slug);
 
+  const addRef = (el: HTMLDetailsElement | null) => {
+    if (el && !detailsRefs.current.includes(el)) {
+      detailsRefs.current.push(el);
+    }
+  };
+
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
-      {/* SORT */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      {/* SORT (✅ partners + price range yahin rahenge) */}
+      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[220px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
+
         <select
           className="w-full mt-2 border rounded p-1"
           onChange={e => setParam("sort", e.target.value)}
@@ -63,11 +70,24 @@ export default function FiltersBar({ category }: { category?: string }) {
           <option value="price_low">Low → High</option>
           <option value="price_high">High → Low</option>
         </select>
-      </details>
 
-      {/* PARTNERS / MERCHANTS */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
-        <summary className="font-medium cursor-pointer">Partners</summary>
+        {/* MANUAL PRICE */}
+        <div className="flex gap-2 mt-2">
+          <input
+            type="number"
+            placeholder="Min"
+            className="w-1/2 border rounded p-1 text-sm"
+            onBlur={e => setParam("minPrice", e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            className="w-1/2 border rounded p-1 text-sm"
+            onBlur={e => setParam("maxPrice", e.target.value)}
+          />
+        </div>
+
+        {/* PARTNERS */}
         <div className="mt-2 space-y-1">
           {partners.map(p => (
             <button
@@ -81,27 +101,8 @@ export default function FiltersBar({ category }: { category?: string }) {
         </div>
       </details>
 
-      {/* PRICE */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[200px]">
-        <summary className="font-medium cursor-pointer">Price</summary>
-        <div className="flex gap-2 mt-2">
-          <input
-            type="number"
-            placeholder="Min"
-            className="border rounded px-2 py-1 w-full"
-            onBlur={e => setParam("minPrice", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            className="border rounded px-2 py-1 w-full"
-            onBlur={e => setParam("maxPrice", e.target.value)}
-          />
-        </div>
-      </details>
-
       {/* BRAND */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
           {brands.map(b => (
@@ -116,8 +117,8 @@ export default function FiltersBar({ category }: { category?: string }) {
         </div>
       </details>
 
-      {/* SUBCATEGORIES */}
-      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
+      {/* FILTERS */}
+      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {visibleSubcategories.map(s => (
@@ -131,6 +132,20 @@ export default function FiltersBar({ category }: { category?: string }) {
           ))}
         </div>
       </details>
+
+      {/* RATINGS (🔥 wapas aa gaya) */}
+      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
+        <summary className="font-medium cursor-pointer">Ratings</summary>
+        {[4, 3, 2].map(r => (
+          <button
+            key={r}
+            className="block text-sm hover:underline"
+            onClick={() => setParam("rating", String(r))}
+          >
+            {r}★ & above
+          </button>
+        ))}
+      </details>
     </div>
   );
-        }
+          }
