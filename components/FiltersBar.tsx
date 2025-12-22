@@ -61,9 +61,13 @@ export default function FiltersBar({ category }: { category?: string }) {
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
       {/* SORT (includes price + partners) */}
-      <details ref={registerDetails} className="bg-white rounded-xl shadow px-3 py-2 min-w-[240px]">
+      <details
+        ref={registerDetails}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[240px]"
+      >
         <summary className="font-medium cursor-pointer">Sort</summary>
 
+        {/* Sort by */}
         <select
           className="w-full mt-2 border rounded p-1"
           onChange={e => setParam("sort", e.target.value)}
@@ -74,54 +78,71 @@ export default function FiltersBar({ category }: { category?: string }) {
           <option value="price_high">High → Low</option>
         </select>
 
-        {/* MANUAL PRICE */}
-        <div className="flex gap-2 mt-3">
+        {/* Manual Price */}
+        <div className="mt-3 space-y-1">
           <input
             type="number"
-            placeholder="Min"
-            className="w-1/2 border rounded p-1 text-sm"
+            placeholder="Min Price"
+            className="w-full border rounded p-1 text-sm"
             onBlur={e => setParam("minPrice", e.target.value)}
           />
           <input
             type="number"
-            placeholder="Max"
-            className="w-1/2 border rounded p-1 text-sm"
+            placeholder="Max Price"
+            className="w-full border rounded p-1 text-sm"
             onBlur={e => setParam("maxPrice", e.target.value)}
           />
         </div>
 
-        {/* PARTNERS */}
-        <div className="mt-3 space-y-1">
-          {partners.map(p => (
-            <button
-              key={p}
-              className="block text-sm hover:underline"
-              onClick={() => setParam("merchant", p)}
-            >
-              {p}
-            </button>
-          ))}
+        {/* Partners / Merchants */}
+        <div className="mt-3">
+          <p className="text-sm font-medium mb-1">Partners</p>
+          {partners.length === 0 ? (
+            <div className="text-xs text-gray-400">No partners</div>
+          ) : (
+            <div className="max-h-32 overflow-auto space-y-1">
+              {partners.map(p => (
+                <button
+                  key={p}
+                  className="block text-sm text-left hover:underline"
+                  onClick={() => setParam("merchant", p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </details>
 
       {/* BRAND */}
-      <details ref={registerDetails} className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      <details
+        ref={registerDetails}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]"
+      >
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
-          {brands.map(b => (
-            <button
-              key={b}
-              className="block text-sm hover:underline"
-              onClick={() => setParam("brand", b)}
-            >
-              {b}
-            </button>
-          ))}
+          {brands.length === 0 ? (
+            <div className="text-xs text-gray-500">No brands</div>
+          ) : (
+            brands.map(b => (
+              <button
+                key={b}
+                className="block text-sm hover:underline"
+                onClick={() => setParam("brand", b)}
+              >
+                {b}
+              </button>
+            ))
+          )}
         </div>
       </details>
 
       {/* SUBCATEGORIES */}
-      <details ref={registerDetails} className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
+      <details
+        ref={registerDetails}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]"
+      >
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {visibleSubcategories.map(s => (
@@ -137,7 +158,10 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
 
       {/* RATINGS */}
-      <details ref={registerDetails} className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
+      <details
+        ref={registerDetails}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]"
+      >
         <summary className="font-medium cursor-pointer">Ratings</summary>
         {[4, 3, 2].map(r => (
           <button
@@ -151,4 +175,4 @@ export default function FiltersBar({ category }: { category?: string }) {
       </details>
     </div>
   );
-                  }
+}
