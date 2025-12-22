@@ -48,19 +48,17 @@ export default function FiltersBar({ category }: { category?: string }) {
       ? apiSubcategories
       : (subCategories[activeCategory] || []).map(s => s.slug);
 
-  const addRef = (el: HTMLDetailsElement | null) => {
-    if (el && !detailsRefs.current.includes(el)) {
-      detailsRefs.current.push(el);
-    }
-  };
-
   return (
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
-      {/* SORT (✅ partners + price range yahin rahenge) */}
-      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[220px]">
+      {/* SORT (includes price + partners) */}
+      <details
+        ref={el => el && detailsRefs.current.push(el)}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[220px]"
+      >
         <summary className="font-medium cursor-pointer">Sort</summary>
 
+        {/* sort */}
         <select
           className="w-full mt-2 border rounded p-1"
           onChange={e => setParam("sort", e.target.value)}
@@ -71,38 +69,46 @@ export default function FiltersBar({ category }: { category?: string }) {
           <option value="price_high">High → Low</option>
         </select>
 
-        {/* MANUAL PRICE */}
-        <div className="flex gap-2 mt-2">
+        {/* manual price */}
+        <div className="flex gap-2 mt-3">
           <input
             type="number"
-            placeholder="Min"
+            placeholder="Min ₹"
             className="w-1/2 border rounded p-1 text-sm"
             onBlur={e => setParam("minPrice", e.target.value)}
           />
           <input
             type="number"
-            placeholder="Max"
+            placeholder="Max ₹"
             className="w-1/2 border rounded p-1 text-sm"
             onBlur={e => setParam("maxPrice", e.target.value)}
           />
         </div>
 
-        {/* PARTNERS */}
-        <div className="mt-2 space-y-1">
-          {partners.map(p => (
-            <button
-              key={p}
-              className="block text-sm hover:underline"
-              onClick={() => setParam("merchant", p)}
-            >
-              {p}
-            </button>
-          ))}
+        {/* partners */}
+        <div className="mt-3 space-y-1 max-h-32 overflow-auto">
+          <p className="text-xs font-semibold text-gray-600">Partners</p>
+          {partners.length === 0 ? (
+            <p className="text-xs text-gray-400">No partners</p>
+          ) : (
+            partners.map(p => (
+              <button
+                key={p}
+                className="block text-sm hover:underline"
+                onClick={() => setParam("merchant", p)}
+              >
+                {p}
+              </button>
+            ))
+          )}
         </div>
       </details>
 
       {/* BRAND */}
-      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
+      <details
+        ref={el => el && detailsRefs.current.push(el)}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]"
+      >
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
           {brands.map(b => (
@@ -117,8 +123,11 @@ export default function FiltersBar({ category }: { category?: string }) {
         </div>
       </details>
 
-      {/* FILTERS */}
-      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+      {/* SUBCATEGORIES */}
+      <details
+        ref={el => el && detailsRefs.current.push(el)}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]"
+      >
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {visibleSubcategories.map(s => (
@@ -133,8 +142,11 @@ export default function FiltersBar({ category }: { category?: string }) {
         </div>
       </details>
 
-      {/* RATINGS (🔥 wapas aa gaya) */}
-      <details ref={addRef} className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]">
+      {/* RATINGS (RESTORED) */}
+      <details
+        ref={el => el && detailsRefs.current.push(el)}
+        className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]"
+      >
         <summary className="font-medium cursor-pointer">Ratings</summary>
         {[4, 3, 2].map(r => (
           <button
@@ -146,6 +158,7 @@ export default function FiltersBar({ category }: { category?: string }) {
           </button>
         ))}
       </details>
+
     </div>
   );
-          }
+}
