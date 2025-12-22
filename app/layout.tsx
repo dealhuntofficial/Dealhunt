@@ -8,6 +8,8 @@ import InstallButton from "@/components/InstallButton";
 export const metadata: Metadata = {
   title: "DealHunt",
   description: "Luxury deals at your fingertips",
+  manifest: "/manifest.json",
+  themeColor: "#1e3a8a",
 };
 
 export default function RootLayout({
