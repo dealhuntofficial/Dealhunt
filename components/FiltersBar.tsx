@@ -25,7 +25,7 @@ export default function FiltersBar({ category }: { category?: string }) {
     const p = new URLSearchParams(params.toString());
     value ? p.set(key, value) : p.delete(key);
     router.push(`?${p.toString()}`);
-    closeAll(); // ✅ auto close
+    closeAll();
   };
 
   useEffect(() => {
@@ -34,9 +34,6 @@ export default function FiltersBar({ category }: { category?: string }) {
     const url = new URL("/api/deals", window.location.origin);
     if (category !== "all") url.searchParams.set("category", category);
 
-    const search = params.get("search");
-    if (search) url.searchParams.set("search", search);
-
     fetch(url.toString())
       .then(r => r.json())
       .then(d => {
@@ -44,7 +41,7 @@ export default function FiltersBar({ category }: { category?: string }) {
         setBrands(d.brands || []);
         setApiSubcategories(d.subcategories || []);
       });
-  }, [category, params]);
+  }, [category]);
 
   const visibleSubcategories =
     apiSubcategories.length > 0
@@ -55,16 +52,8 @@ export default function FiltersBar({ category }: { category?: string }) {
     <div className="flex gap-3 overflow-x-auto py-3 sticky top-0 bg-gray-50 z-20">
 
       {/* SORT */}
-      <details
-        ref={el => {
-          if (el && !detailsRefs.current.includes(el)) {
-            detailsRefs.current.push(el);
-          }
-        }}
-        className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]"
-      >
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
         <summary className="font-medium cursor-pointer">Sort</summary>
-
         <select
           className="w-full mt-2 border rounded p-1"
           onChange={e => setParam("sort", e.target.value)}
@@ -76,42 +65,59 @@ export default function FiltersBar({ category }: { category?: string }) {
         </select>
       </details>
 
+      {/* PARTNERS / MERCHANTS */}
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[180px]">
+        <summary className="font-medium cursor-pointer">Partners</summary>
+        <div className="mt-2 space-y-1">
+          {partners.map(p => (
+            <button
+              key={p}
+              className="block text-sm hover:underline"
+              onClick={() => setParam("merchant", p)}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      </details>
+
+      {/* PRICE */}
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[200px]">
+        <summary className="font-medium cursor-pointer">Price</summary>
+        <div className="flex gap-2 mt-2">
+          <input
+            type="number"
+            placeholder="Min"
+            className="border rounded px-2 py-1 w-full"
+            onBlur={e => setParam("minPrice", e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            className="border rounded px-2 py-1 w-full"
+            onBlur={e => setParam("maxPrice", e.target.value)}
+          />
+        </div>
+      </details>
+
       {/* BRAND */}
-      <details
-        ref={el => {
-          if (el && !detailsRefs.current.includes(el)) {
-            detailsRefs.current.push(el);
-          }
-        }}
-        className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]"
-      >
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[160px]">
         <summary className="font-medium cursor-pointer">Brand</summary>
         <div className="mt-2 space-y-1">
-          {brands.length === 0 ? (
-            <div className="text-xs text-gray-500">No brands available</div>
-          ) : (
-            brands.map(b => (
-              <button
-                key={b}
-                className="block text-sm hover:underline"
-                onClick={() => setParam("brand", b)}
-              >
-                {b}
-              </button>
-            ))
-          )}
+          {brands.map(b => (
+            <button
+              key={b}
+              className="block text-sm hover:underline"
+              onClick={() => setParam("brand", b)}
+            >
+              {b}
+            </button>
+          ))}
         </div>
       </details>
 
       {/* SUBCATEGORIES */}
-      <details
-        ref={el => {
-          if (el && !detailsRefs.current.includes(el)) {
-            detailsRefs.current.push(el);
-          }
-        }}
-        className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]"
-      >
+      <details className="bg-white rounded-xl shadow px-3 py-2 min-w-[170px]">
         <summary className="font-medium cursor-pointer">Filters</summary>
         <div className="mt-2 flex flex-wrap gap-2">
           {visibleSubcategories.map(s => (
@@ -125,27 +131,6 @@ export default function FiltersBar({ category }: { category?: string }) {
           ))}
         </div>
       </details>
-
-      {/* RATINGS */}
-      <details
-        ref={el => {
-          if (el && !detailsRefs.current.includes(el)) {
-            detailsRefs.current.push(el);
-          }
-        }}
-        className="bg-white rounded-xl shadow px-3 py-2 min-w-[140px]"
-      >
-        <summary className="font-medium cursor-pointer">Ratings</summary>
-        {[4, 3, 2].map(r => (
-          <button
-            key={r}
-            className="block text-sm hover:underline"
-            onClick={() => setParam("rating", String(r))}
-          >
-            {r}★ & above
-          </button>
-        ))}
-      </details>
     </div>
   );
-  }
+        }
