@@ -16,13 +16,12 @@ export default function ProductsSection({
   const [visibleCount, setVisibleCount] = useState(6);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  /* ---------- FILTERS ---------- */
+  /* ---------- FILTER & SORT ---------- */
   useEffect(() => {
     let list = [...externalProducts];
 
     const minPrice = Number(params.get("minPrice")) || 0;
     const maxPrice = Number(params.get("maxPrice")) || Infinity;
-    const merchant = params.get("merchant")?.toLowerCase() || "";
     const sort = params.get("sort");
 
     list = list.filter(p => {
@@ -30,18 +29,12 @@ export default function ProductsSection({
       return price >= minPrice && price <= maxPrice;
     });
 
-    if (merchant) {
-      list = list.filter(p =>
-        (p.merchant ?? "").toLowerCase().includes(merchant)
-      );
-    }
-
     if (sort === "price_low") {
-      list.sort((a, b) => a.price - b.price);
+      list.sort((a, b) => Number(a.price) - Number(b.price));
     }
 
     if (sort === "price_high") {
-      list.sort((a, b) => b.price - a.price);
+      list.sort((a, b) => Number(b.price) - Number(a.price));
     }
 
     setFilteredProducts(list);
@@ -51,7 +44,10 @@ export default function ProductsSection({
   /* ---------- INFINITE SCROLL ---------- */
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
+      if (
+        entries[0].isIntersecting &&
+        visibleCount < filteredProducts.length
+      ) {
         setVisibleCount(v => v + 4);
       }
     });
@@ -61,7 +57,7 @@ export default function ProductsSection({
   }, [visibleCount, filteredProducts.length]);
 
   return (
-    <section id="products" className="py-10">
+    <section className="py-10">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {filteredProducts.slice(0, visibleCount).map(product => (
           <ProductCard key={product.id} product={product} />
