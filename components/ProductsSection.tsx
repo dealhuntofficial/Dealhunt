@@ -1,28 +1,22 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-
-interface ProductType {
-  id: number | string;
-  title: string;
-  price: number;
-  image: string;
-  merchant?: string;
-}
+import { useSearchParams } from "next/navigation";
+import ProductCard from "@/components/ProductCard";
+import { Product } from "@/types/product";
 
 export default function ProductsSection({
   externalProducts = [],
 }: {
-  externalProducts?: ProductType[];
+  externalProducts?: Product[];
 }) {
   const params = useSearchParams();
-  const router = useRouter();
 
-  const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [visibleCount, setVisibleCount] = useState(6);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  /* ---------- FILTER LOGIC ---------- */
   useEffect(() => {
     let list = [...externalProducts];
 
@@ -49,9 +43,13 @@ export default function ProductsSection({
     setVisibleCount(6);
   }, [params, externalProducts]);
 
+  /* ---------- INFINITE SCROLL ---------- */
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
+      if (
+        entries[0].isIntersecting &&
+        visibleCount < filteredProducts.length
+      ) {
         setVisibleCount(v => v + 4);
       }
     });
@@ -60,31 +58,11 @@ export default function ProductsSection({
     return () => observer.disconnect();
   }, [visibleCount, filteredProducts.length]);
 
-  const addToCompare = (name: string) => {
-    router.push(`/?compare=${encodeURIComponent(name)}`);
-  };
-
   return (
     <section className="py-10">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {filteredProducts.slice(0, visibleCount).map(prod => (
-          <div key={prod.id} className="bg-white rounded-xl shadow p-3 text-center">
-            <img src={prod.image} className="h-40 mx-auto object-contain" />
-            <h3 className="font-semibold text-sm mt-2 truncate">{prod.title}</h3>
-            <p className="font-bold text-blue-600">₹{prod.price}</p>
-
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => addToCompare(prod.title)}
-                className="flex-1 text-xs border rounded py-1"
-              >
-                Compare
-              </button>
-              <button className="flex-1 text-xs bg-blue-600 text-white rounded py-1">
-                Buy
-              </button>
-            </div>
-          </div>
+        {filteredProducts.slice(0, visibleCount).map(product => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
