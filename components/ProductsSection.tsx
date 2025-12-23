@@ -46,10 +46,7 @@ export default function ProductsSection({
   /* ---------- INFINITE SCROLL ---------- */
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (
-        entries[0].isIntersecting &&
-        visibleCount < filteredProducts.length
-      ) {
+      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
         setVisibleCount(v => v + 4);
       }
     });
