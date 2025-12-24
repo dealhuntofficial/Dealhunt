@@ -7,22 +7,18 @@ export default function FloatingAIButtons() {
   const fileInputRef = useRef(null);
 
   const handleCamera = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     alert(`Selected file: ${file.name}`);
     e.target.value = "";
   };
 
   return (
     <>
-      {/* Hidden File Input */}
       <input
         type="file"
         accept="image/*"
@@ -31,7 +27,8 @@ export default function FloatingAIButtons() {
         className="hidden"
       />
 
-      <div className="fixed bottom-5 right-5 z-50">
+      {/* ⬆️ moved UP to avoid CompareStrip overlap */}
+      <div className="fixed bottom-24 right-5 z-50">
         <button
           onClick={handleCamera}
           className="bg-orange-500 hover:bg-orange-600 p-4 rounded-full shadow-lg text-white text-2xl"
