@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import BannerAdSection from "@/components/BannerAdSection";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedDeals from "@/components/FeaturedDeals";
@@ -10,7 +9,6 @@ import FloatingAIButtons from "@/components/FloatingAIButtons";
 import HeroBannerGeneral from "@/components/HeroBannerGeneral";
 import FiltersBar from "@/components/FiltersBar";
 import ProductsSection from "@/components/ProductsSection";
-import CompareStrip from "@/components/CompareStrip";
 
 const CHUNK = 12;
 
@@ -20,8 +18,6 @@ export default function HomePageClient() {
   const [visible, setVisible] = useState(CHUNK);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
-  const searchParams = useSearchParams();
-  const compare = searchParams.get("compare");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +49,7 @@ export default function HomePageClient() {
   }, [products]);
 
   return (
-    <main className={compare ? "pb-40" : ""}>
+    <main>
       <HeroBannerGeneral />
       <BannerAdSection />
 
@@ -70,9 +66,6 @@ export default function HomePageClient() {
         <ProductsSection externalProducts={products.slice(0, visible)} />
         <div ref={loaderRef} className="h-10" />
       </section>
-
-      {/* ✅ NO PROPS */}
-      {compare && <CompareStrip />}
 
       <FloatingAIButtons />
     </main>
