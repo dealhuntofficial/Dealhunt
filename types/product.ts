@@ -1,21 +1,21 @@
 export type Product = {
   id: string;
 
-  // 🔹 BASIC INFO
-  name: string;          // product title (use this everywhere)
+  // BASIC INFO
+  name: string;        // product title
   price: number;
   image: string;
 
-  // 🔹 OPTIONAL BUT USED IN UI
+  // OPTIONAL INFO
   category?: string;
   description?: string;
 
-  // 🔹 DEAL / MERCHANT INFO
-  dealUrl?: string;      // buy link
-  merchant?: string;     // amazon / flipkart etc
+  // DEAL / MERCHANT
+  dealUrl?: string;    // buy link
+  merchant?: string;
   brand?: string;
 
-  // 🔹 PRICING (optional but useful)
+  // PRICING (optional)
   originalPrice?: number;
   discountPercent?: number;
 };
