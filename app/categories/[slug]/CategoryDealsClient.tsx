@@ -17,7 +17,7 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  // ✅ SINGLE compare item (IMPORTANT)
+  // 🔥 ONLY ONE ITEM
   const [compareItem, setCompareItem] = useState<any | null>(null);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -61,11 +61,10 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {/* ✅ CompareStrip ONLY HERE */}
       {compareItem && (
         <CompareStrip
           item={compareItem}
-          onClose={() => setCompareItem(null)}
+          onClear={() => setCompareItem(null)}
         />
       )}
     </div>
