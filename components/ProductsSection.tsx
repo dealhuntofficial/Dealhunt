@@ -29,13 +29,8 @@ export default function ProductsSection({
       return price >= minPrice && price <= maxPrice;
     });
 
-    if (sort === "price_low") {
-      list.sort((a, b) => a.price - b.price);
-    }
-
-    if (sort === "price_high") {
-      list.sort((a, b) => b.price - a.price);
-    }
+    if (sort === "price_low") list.sort((a, b) => Number(a.price) - Number(b.price));
+    if (sort === "price_high") list.sort((a, b) => Number(b.price) - Number(a.price));
 
     setFilteredProducts(list);
     setVisibleCount(6);
