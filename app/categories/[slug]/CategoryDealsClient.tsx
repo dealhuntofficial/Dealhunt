@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import DealCard from "@/components/DealCard";
 import FiltersBar from "@/components/FiltersBar";
 import BackButton from "@/components/BackButton";
-import CompareStrip, { CompareItem } from "@/components/CompareStrip";
+import CompareStrip from "@/components/CompareStrip";
 
 const CHUNK = 12;
 
@@ -17,7 +17,9 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  const [compareItems, setCompareItems] = useState<CompareItem[]>([]);
+  // ✅ SINGLE compare item (IMPORTANT)
+  const [compareItem, setCompareItem] = useState<any | null>(null);
+
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,25 +39,6 @@ export default function CategoryDealsClient({
       .finally(() => setLoading(false));
   }, [params.slug]);
 
-  const addToCompare = (deal: any) => {
-    setCompareItems(prev =>
-      prev.find(i => i.id === deal.id)
-        ? prev
-        : [
-            ...prev,
-            {
-              id: deal.id,
-              title: deal.title,
-              image: deal.image,
-            },
-          ]
-    );
-  };
-
-  const removeFromCompare = (id: string) => {
-    setCompareItems(prev => prev.filter(i => i.id !== id));
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 pb-40">
       <BackButton />
@@ -70,7 +53,7 @@ export default function CategoryDealsClient({
               <DealCard
                 key={d.id}
                 deal={d}
-                onCompare={() => addToCompare(d)}
+                onCompare={() => setCompareItem(d)} // ✅ REPLACE
               />
             ))}
           </div>
@@ -78,10 +61,11 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {compareItems.length > 0 && (
+      {/* ✅ CompareStrip ONLY HERE */}
+      {compareItem && (
         <CompareStrip
-          items={compareItems}
-          onRemove={removeFromCompare}
+          item={compareItem}
+          onClose={() => setCompareItem(null)}
         />
       )}
     </div>
