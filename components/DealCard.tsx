@@ -7,7 +7,7 @@ export default function DealCard({
   onCompare,
 }: {
   deal: any;
-  onCompare?: () => void;
+  onCompare: () => void;
 }) {
   return (
     <article className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -34,7 +34,6 @@ export default function DealCard({
           )}
         </div>
 
-        {/* BUTTONS */}
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Link
             href={deal.dealUrl || "#"}
@@ -46,9 +45,8 @@ export default function DealCard({
 
           {/* ✅ WORKING COMPARE */}
           <button
-            type="button"
             onClick={onCompare}
-            className="border-2 border-black bg-white text-black font-semibold text-sm py-2 rounded"
+            className="border-2 border-black text-black font-semibold text-sm py-2 rounded bg-white"
           >
             Compare
           </button>
