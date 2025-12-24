@@ -24,7 +24,9 @@ export default function CategoryDealsClient({
     setLoading(true);
 
     const url = new URL("/api/deals", window.location.origin);
-    if (params.slug !== "all") url.searchParams.set("category", params.slug);
+    if (params.slug !== "all") {
+      url.searchParams.set("category", params.slug);
+    }
 
     fetch(url.toString(), { cache: "no-store" })
       .then(r => r.json())
@@ -35,10 +37,15 @@ export default function CategoryDealsClient({
       .finally(() => setLoading(false));
   }, [params.slug]);
 
+  /* ✅ REAL COMPARE HANDLER */
   const addToCompare = (deal: any) => {
     setCompareItems(prev =>
       prev.find(d => d.id === deal.id) ? prev : [...prev, deal]
     );
+  };
+
+  const removeFromCompare = (id: string) => {
+    setCompareItems(prev => prev.filter(d => d.id !== id));
   };
 
   return (
@@ -55,7 +62,7 @@ export default function CategoryDealsClient({
               <DealCard
                 key={d.id}
                 deal={d}
-                onCompare={() => addToCompare(d)}
+                onCompare={addToCompare}
               />
             ))}
           </div>
@@ -63,8 +70,12 @@ export default function CategoryDealsClient({
         </>
       )}
 
+      {/* ✅ COMPARE STRIP ONLY HERE */}
       {compareItems.length > 0 && (
-        <CompareStrip items={compareItems} />
+        <CompareStrip
+          items={compareItems}
+          onRemove={removeFromCompare}
+        />
       )}
     </div>
   );
