@@ -1,21 +1,21 @@
 export type Product = {
   id: string;
 
-  // BASIC INFO
-  name: string;        // product title
+  // 🔹 BASIC INFO
+  name: string;          // product title
   price: number;
   image: string;
 
-  // OPTIONAL INFO
+  // 🔹 OPTIONAL
   category?: string;
   description?: string;
 
-  // DEAL / MERCHANT
-  dealUrl?: string;    // buy link
-  merchant?: string;
+  // 🔹 DEAL / MERCHANT INFO
+  dealUrl?: string;      // buy link
+  merchant?: string;     // amazon / flipkart
   brand?: string;
 
-  // PRICING (optional)
+  // 🔹 PRICING
   originalPrice?: number;
   discountPercent?: number;
 };
