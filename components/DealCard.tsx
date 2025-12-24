@@ -1,13 +1,18 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function DealCard({ deal }: any) {
   const router = useRouter();
+  const params = useSearchParams();
 
   const addToCompare = () => {
-    router.push(`/?compare=${encodeURIComponent(deal.title)}`);
+    const current = new URLSearchParams(params.toString());
+    current.set("compare", deal.title);
+
+    // ✅ SAME PAGE – NO HOMEPAGE REDIRECT
+    router.push(`?${current.toString()}`, { scroll: false });
   };
 
   return (
@@ -45,10 +50,9 @@ export default function DealCard({ deal }: any) {
             Buy Deal
           </Link>
 
-          {/* ✅ COMPARE BUTTON */}
           <button
             onClick={addToCompare}
-            className="border-2 border-black text-black font-semibold text-sm py-2 rounded bg-white"
+            className="border-2 border-black bg-white text-black font-semibold text-sm py-2 rounded"
           >
             Compare
           </button>
