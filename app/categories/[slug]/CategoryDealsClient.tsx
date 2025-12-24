@@ -17,7 +17,7 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 ONLY ONE ITEM
+  // ✅ ONLY ONE DEAL AT A TIME
   const [compareItem, setCompareItem] = useState<any | null>(null);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -40,7 +40,7 @@ export default function CategoryDealsClient({
   }, [params.slug]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-40">
+    <div className="max-w-7xl mx-auto px-4 py-6 pb-48">
       <BackButton />
       <FiltersBar category={params.slug} />
 
@@ -53,7 +53,7 @@ export default function CategoryDealsClient({
               <DealCard
                 key={d.id}
                 deal={d}
-                onCompare={() => setCompareItem(d)} // ✅ REPLACE
+                onCompare={() => setCompareItem(d)} // ✅ REPLACE OLD
               />
             ))}
           </div>
