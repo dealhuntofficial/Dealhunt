@@ -1,19 +1,14 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 
-export default function DealCard({ deal }: any) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const addToCompare = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("compare", deal.title);
-    router.push(`?${params.toString()}`);
-  };
-
+export default function DealCard({
+  deal,
+  onCompare,
+}: {
+  deal: any;
+  onCompare?: () => void;
+}) {
   return (
     <article className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="relative h-44">
@@ -39,6 +34,7 @@ export default function DealCard({ deal }: any) {
           )}
         </div>
 
+        {/* BUTTONS */}
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Link
             href={deal.dealUrl || "#"}
@@ -48,9 +44,11 @@ export default function DealCard({ deal }: any) {
             Buy Deal
           </Link>
 
+          {/* ✅ WORKING COMPARE */}
           <button
-            onClick={addToCompare}
-            className="border-2 border-black text-black font-semibold text-sm py-2 rounded bg-white"
+            type="button"
+            onClick={onCompare}
+            className="border-2 border-black bg-white text-black font-semibold text-sm py-2 rounded"
           >
             Compare
           </button>
