@@ -41,28 +41,22 @@ export default function ProductCard({ product }: Props) {
       {/* ACTION BUTTONS */}
       <div className="mt-auto flex gap-2 pt-3">
         {/* BUY */}
-        {product.dealUrl ? (
+        {product.dealUrl && (
           <a
             href={product.dealUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-red-600 text-white rounded-xl py-2 text-sm text-center"
+            className="flex-1 bg-red-600 text-white rounded-xl py-2 text-sm text-center font-semibold"
           >
             Buy
           </a>
-        ) : (
-          <button
-            disabled
-            className="flex-1 bg-gray-300 text-gray-600 rounded-xl py-2 text-sm"
-          >
-            Buy
-          </button>
         )}
 
-        {/* ✅ COMPARE — FORCE VISIBLE */}
+        {/* ✅ COMPARE (FORCED VISIBLE) */}
         <button
+          type="button"
           onClick={handleCompare}
-          className="flex-1 border border-gray-400 rounded-xl py-2 text-sm font-semibold text-black bg-white hover:bg-gray-100"
+          className="flex-1 border-2 border-black text-black bg-white rounded-xl py-2 text-sm font-semibold hover:bg-gray-100"
         >
           Compare
         </button>
