@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import DealCard from "@/components/DealCard";
 import FiltersBar from "@/components/FiltersBar";
 import BackButton from "@/components/BackButton";
-import CompareStrip from "@/components/CompareStrip";
+import CompareStrip, { CompareItem } from "@/components/CompareStrip";
 
 const CHUNK = 12;
 
@@ -17,7 +17,7 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  const [compareItems, setCompareItems] = useState<any[]>([]);
+  const [compareItems, setCompareItems] = useState<CompareItem[]>([]);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,15 +37,23 @@ export default function CategoryDealsClient({
       .finally(() => setLoading(false));
   }, [params.slug]);
 
-  /* ✅ REAL COMPARE HANDLER */
   const addToCompare = (deal: any) => {
     setCompareItems(prev =>
-      prev.find(d => d.id === deal.id) ? prev : [...prev, deal]
+      prev.find(i => i.id === deal.id)
+        ? prev
+        : [
+            ...prev,
+            {
+              id: deal.id,
+              title: deal.title,
+              image: deal.image,
+            },
+          ]
     );
   };
 
   const removeFromCompare = (id: string) => {
-    setCompareItems(prev => prev.filter(d => d.id !== id));
+    setCompareItems(prev => prev.filter(i => i.id !== id));
   };
 
   return (
@@ -62,7 +70,7 @@ export default function CategoryDealsClient({
               <DealCard
                 key={d.id}
                 deal={d}
-                onCompare={addToCompare}
+                onCompare={() => addToCompare(d)}
               />
             ))}
           </div>
@@ -70,7 +78,6 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {/* ✅ COMPARE STRIP ONLY HERE */}
       {compareItems.length > 0 && (
         <CompareStrip
           items={compareItems}
