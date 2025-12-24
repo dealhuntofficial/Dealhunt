@@ -14,7 +14,6 @@ export default function CategoryDealsClient({
   params: { slug: string };
 }) {
   const searchParams = useSearchParams();
-
   const search = searchParams.get("search") || "";
   const subcategory = searchParams.get("subcategory") || "";
 
@@ -28,10 +27,7 @@ export default function CategoryDealsClient({
     setLoading(true);
 
     const url = new URL("/api/deals", window.location.origin);
-
-    if (params.slug !== "all") {
-      url.searchParams.set("category", params.slug);
-    }
+    if (params.slug !== "all") url.searchParams.set("category", params.slug);
     if (search) url.searchParams.set("search", search);
     if (subcategory) url.searchParams.set("subcategory", subcategory);
 
