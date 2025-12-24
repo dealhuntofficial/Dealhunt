@@ -5,7 +5,7 @@ import { Product } from "@/types/product";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="relative bg-white rounded-xl shadow p-3 flex flex-col">
+    <div className="relative bg-white rounded-xl shadow p-3">
 
       {/* IMAGE */}
       <div className="relative h-36 w-full">
@@ -18,7 +18,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* TITLE */}
-      <h3 className="mt-2 text-sm font-semibold text-black line-clamp-2">
+      <h3 className="mt-2 text-sm font-semibold text-black">
         {product.name}
       </h3>
 
@@ -28,21 +28,19 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* BUY BUTTON */}
-      {product.dealUrl && (
-        <a
-          href={product.dealUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 block text-center bg-blue-600 text-white py-2 rounded z-10"
-        >
-          Buy Deal
-        </a>
-      )}
+      <a
+        href={product.dealUrl ?? "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2 block text-center bg-blue-600 text-white py-2 rounded"
+      >
+        Buy Deal
+      </a>
 
-      {/* 🔥 COMPARE BUTTON — GUARANTEED RENDER */}
+      {/* 🔥 COMPARE BUTTON */}
       <button
         type="button"
-        className="mt-2 w-full border-2 border-black bg-white text-black font-bold py-2 rounded z-10"
+        className="mt-2 w-full border-2 border-black bg-white text-black font-bold py-2 rounded"
       >
         Compare
       </button>
