@@ -30,11 +30,11 @@ export default function ProductsSection({
     });
 
     if (sort === "price_low") {
-      list.sort((a, b) => Number(a.price) - Number(b.price));
+      list.sort((a, b) => a.price - b.price);
     }
 
     if (sort === "price_high") {
-      list.sort((a, b) => Number(b.price) - Number(a.price));
+      list.sort((a, b) => b.price - a.price);
     }
 
     setFilteredProducts(list);
@@ -44,10 +44,7 @@ export default function ProductsSection({
   /* ---------- INFINITE SCROLL ---------- */
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (
-        entries[0].isIntersecting &&
-        visibleCount < filteredProducts.length
-      ) {
+      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
         setVisibleCount(v => v + 4);
       }
     });
