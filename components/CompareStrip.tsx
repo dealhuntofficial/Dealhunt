@@ -10,38 +10,55 @@ export default function CompareStrip({
   onClear: () => void;
 }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14">
-            <Image
-              src={item.image || "/images/placeholder.png"}
-              alt={item.title}
-              fill
-              className="object-contain"
-            />
-          </div>
+    <div className="fixed bottom-20 left-0 right-0 z-50">
+      {/* STRIP CONTAINER */}
+      <div className="max-w-7xl mx-auto bg-white border shadow-xl rounded-xl mx-3 px-4 py-4">
+        
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-gray-800">
+            Compare Deals
+          </h3>
 
-          <div>
-            <p className="text-sm font-semibold line-clamp-1">
-              {item.title}
-            </p>
-            <p className="text-xs text-gray-500">
-              Compare prices across sellers
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
           <button
             onClick={onClear}
-            className="px-3 py-2 border rounded-md text-sm"
+            className="text-xs px-3 py-1 border rounded-md hover:bg-gray-100"
           >
-            Remove
+            Clear
           </button>
+        </div>
 
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">
-            Compare
+        {/* ITEMS (HORIZONTAL SCROLL) */}
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          
+          {/* SINGLE ITEM (future-ready for multiple) */}
+          <div className="min-w-[140px] max-w-[160px] flex-shrink-0 border rounded-lg p-2">
+            <div className="relative h-20 w-full">
+              <Image
+                src={item.image || "/images/placeholder.png"}
+                alt={item.title}
+                fill
+                className="object-contain"
+              />
+            </div>
+
+            <p className="mt-2 text-xs font-semibold line-clamp-2">
+              {item.title}
+            </p>
+
+            {item.priceNow && (
+              <p className="mt-1 text-sm font-bold text-blue-600">
+                ₹{item.priceNow}
+              </p>
+            )}
+          </div>
+
+        </div>
+
+        {/* ACTION BUTTON */}
+        <div className="mt-4 flex justify-end">
+          <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+            Compare Now
           </button>
         </div>
       </div>
