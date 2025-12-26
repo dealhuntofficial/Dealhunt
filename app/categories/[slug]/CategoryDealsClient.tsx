@@ -17,7 +17,10 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 ARRAY instead of single item
+  // 🔥 selected product (single)
+  const [compareBase, setCompareBase] = useState<any | null>(null);
+
+  // 🔥 only related deals (same product)
   const [compareItems, setCompareItems] = useState<any[]>([]);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -40,12 +43,18 @@ export default function CategoryDealsClient({
   }, [params.slug]);
 
   const handleCompare = (deal: any) => {
-    // same product ke other sellers / merchants
-    const sameProducts = allDeals.filter(
-      d => d.productId === deal.productId && d.id !== deal.id
+    setCompareBase(deal);
+
+    // 🔥 filter ONLY same product (by productId / sku / title fallback)
+    const related = allDeals.filter(
+      d =>
+        d.id !== deal.id &&
+        (d.productId
+          ? d.productId === deal.productId
+          : d.title === deal.title)
     );
 
-    setCompareItems(sameProducts);
+    setCompareItems(related);
   };
 
   return (
@@ -70,10 +79,13 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {compareItems.length > 0 && (
+      {compareBase && compareItems.length > 0 && (
         <CompareStrip
           items={compareItems}
-          onClear={() => setCompareItems([])}
+          onClear={() => {
+            setCompareBase(null);
+            setCompareItems([]);
+          }}
         />
       )}
     </div>
