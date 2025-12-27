@@ -17,9 +17,8 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  // ✅ selected deal only (single)
-  const [compareBaseDeal, setCompareBaseDeal] = useState<any | null>(null);
-  const [compareDeals, setCompareDeals] = useState<any[]>([]);
+  // ✅ ONLY SELECTED DEAL
+  const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,27 +35,12 @@ export default function CategoryDealsClient({
       .then(d => {
         setAllDeals(d.deals || []);
         setVisible(CHUNK);
-        setCompareBaseDeal(null);
-        setCompareDeals([]);
       })
       .finally(() => setLoading(false));
   }, [params.slug]);
 
-  const handleCompare = (deal: any) => {
-    setCompareBaseDeal(deal);
-
-    // ✅ same product ke other merchants only
-    const related = allDeals.filter(
-      d =>
-        d.id !== deal.id &&
-        d.productId === deal.productId
-    );
-
-    setCompareDeals(related);
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-56">
+    <div className="max-w-7xl mx-auto px-4 py-6 pb-48">
       <BackButton />
       <FiltersBar category={params.slug} />
 
@@ -65,11 +49,11 @@ export default function CategoryDealsClient({
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {allDeals.slice(0, visible).map(d => (
+            {allDeals.slice(0, visible).map(deal => (
               <DealCard
-                key={d.id}
-                deal={d}
-                onCompare={() => handleCompare(d)}
+                key={deal.id}
+                deal={deal}
+                onCompare={() => setSelectedDeal(deal)} // ✅ ONLY ONE
               />
             ))}
           </div>
@@ -77,13 +61,10 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {compareBaseDeal && compareDeals.length > 0 && (
+      {selectedDeal && (
         <CompareStrip
-          items={compareDeals}
-          onClear={() => {
-            setCompareBaseDeal(null);
-            setCompareDeals([]);
-          }}
+          sellers={selectedDeal.sellers || []}
+          onClear={() => setSelectedDeal(null)}
         />
       )}
     </div>
