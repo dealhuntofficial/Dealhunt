@@ -17,11 +17,9 @@ export default function CategoryDealsClient({
   const [visible, setVisible] = useState(CHUNK);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 selected product (single)
-  const [compareBase, setCompareBase] = useState<any | null>(null);
-
-  // 🔥 only related deals (same product)
-  const [compareItems, setCompareItems] = useState<any[]>([]);
+  // ✅ selected deal only (single)
+  const [compareBaseDeal, setCompareBaseDeal] = useState<any | null>(null);
+  const [compareDeals, setCompareDeals] = useState<any[]>([]);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,27 +36,27 @@ export default function CategoryDealsClient({
       .then(d => {
         setAllDeals(d.deals || []);
         setVisible(CHUNK);
+        setCompareBaseDeal(null);
+        setCompareDeals([]);
       })
       .finally(() => setLoading(false));
   }, [params.slug]);
 
   const handleCompare = (deal: any) => {
-    setCompareBase(deal);
+    setCompareBaseDeal(deal);
 
-    // 🔥 filter ONLY same product (by productId / sku / title fallback)
+    // ✅ same product ke other merchants only
     const related = allDeals.filter(
       d =>
         d.id !== deal.id &&
-        (d.productId
-          ? d.productId === deal.productId
-          : d.title === deal.title)
+        d.productId === deal.productId
     );
 
-    setCompareItems(related);
+    setCompareDeals(related);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-48">
+    <div className="max-w-7xl mx-auto px-4 py-6 pb-56">
       <BackButton />
       <FiltersBar category={params.slug} />
 
@@ -79,12 +77,12 @@ export default function CategoryDealsClient({
         </>
       )}
 
-      {compareBase && compareItems.length > 0 && (
+      {compareBaseDeal && compareDeals.length > 0 && (
         <CompareStrip
-          items={compareItems}
+          items={compareDeals}
           onClear={() => {
-            setCompareBase(null);
-            setCompareItems([]);
+            setCompareBaseDeal(null);
+            setCompareDeals([]);
           }}
         />
       )}
