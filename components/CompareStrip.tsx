@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export type CompareDeal = {
   id: string;
@@ -19,30 +20,30 @@ export default function CompareStrip({
   onClear: () => void;
 }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-xl z-50">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-semibold">
             Compare prices from other sellers
           </p>
           <button
             onClick={onClear}
-            className="text-sm px-3 py-1 border rounded-md"
+            className="text-sm text-gray-500"
           >
-            Close
+            Clear
           </button>
         </div>
 
-        {/* 🔥 horizontal scroll */}
+        {/* ✅ horizontal scroll (mobile + desktop) */}
         <div className="flex gap-4 overflow-x-auto pb-2">
           {items.map(item => (
-            <a
+            <Link
               key={item.id}
-              href={item.merchantUrl}
+              href={item.merchantUrl || "#"}
               target="_blank"
-              className="min-w-[220px] border rounded-lg p-3 flex-shrink-0 hover:shadow"
+              className="min-w-[220px] border rounded-lg p-3 flex-shrink-0 hover:shadow-md transition"
             >
-              <div className="relative w-full h-32 mb-2">
+              <div className="relative w-full h-28 mb-2">
                 <Image
                   src={item.image || "/images/placeholder.png"}
                   alt={item.title}
@@ -55,18 +56,17 @@ export default function CompareStrip({
                 {item.title}
               </p>
 
-              {item.price && (
-                <p className="text-sm font-semibold mt-1">
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-blue-600 font-semibold">
                   ₹{item.price}
-                </p>
-              )}
-
-              {item.rating && (
-                <p className="text-xs text-gray-500">
-                  ⭐ {item.rating}
-                </p>
-              )}
-            </a>
+                </span>
+                {item.rating && (
+                  <span className="text-xs text-gray-500">
+                    ⭐ {item.rating}
+                  </span>
+                )}
+              </div>
+            </Link>
           ))}
         </div>
       </div>
